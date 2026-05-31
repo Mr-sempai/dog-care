@@ -3286,10 +3286,10 @@ function KinologVisit() {
               <span className="dc-service-price-num">~900</span>
               <span className="dc-service-price-unit">₴ / година</span>
             </div>
-            <a href="#contact" className="dc-btn dc-btn-primary" style={{ marginTop: 24 }}
-              onClick={(e) => { e.preventDefault(); document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); }}>
+            <button className="dc-btn dc-btn-primary" style={{ marginTop: 24 }}
+              onClick={() => window.openLeadModal && window.openLeadModal("Кінолог на виїзд")}>
               Записатися <span className="dc-btn-arrow"><Arrow /></span>
-            </a>
+            </button>
           </div>
           <div className="dc-kinolog-card">
             <div className="dc-kinolog-card-icon">🐕</div>
@@ -3866,7 +3866,7 @@ function validateLeadForm(data) {
 }
 
 function LeadModal() {
-  const SERVICES = ["Курс кінології", "Грумінг", "Зоо‑готель", "Зооняня", "Консультація"];
+  const SERVICES = ["Курс кінології", "Кінолог на виїзд", "Грумінг", "Зоо‑готель", "Зооняня", "Консультація"];
   const empty = { name: "", phone: "", pet: "", service: "Курс кінології", message: "" };
   const [open, setOpen] = useState(false);
   const [data, setData] = useState(empty);

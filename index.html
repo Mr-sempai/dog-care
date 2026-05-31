@@ -1496,6 +1496,44 @@ button.dc-trainer { border: none; background: var(--white); }
 }
 #pricing { padding-bottom: 40px; }
 
+/* ============ Кінолог на виїзд ============ */
+.dc-kinolog-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 64px;
+  align-items: center;
+}
+.dc-kinolog-desc {
+  color: var(--ink-2);
+  font-size: 17px;
+  line-height: 1.65;
+  margin: 20px 0 28px;
+  max-width: 520px;
+}
+.dc-kinolog-card {
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 28px;
+  padding: 44px 36px 40px;
+  text-align: center;
+}
+.dc-kinolog-card-icon { font-size: 52px; margin-bottom: 10px; }
+.dc-kinolog-card-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--yellow);
+  margin-bottom: 32px;
+  letter-spacing: -.01em;
+}
+.dc-kinolog-card-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.dc-kinolog-fact-num { font-size: 20px; font-weight: 800; color: var(--cream); line-height: 1.1; }
+.dc-kinolog-fact-label { font-size: 11px; color: rgba(255,254,247,0.5); margin-top: 4px; line-height: 1.3; }
+@media (max-width: 860px) {
+  .dc-kinolog-layout { grid-template-columns: 1fr; }
+  .dc-kinolog-card { order: -1; }
+  .dc-kinolog-card-facts { grid-template-columns: repeat(3, 1fr); }
+}
+
 /* ============ Pricing groups ============ */
 .dc-pricegrid {
   display: grid;
@@ -3197,6 +3235,74 @@ function Pricing() {
   );
 }
 
+const KINOLOG_FEATURES = [
+  "Тренування у звичному середовищі вашої собаки — там, де і виникають проблеми",
+  "Без стресу від поїздки та нового незнайомого місця",
+  "Консультація для всіх членів родини одночасно",
+  "Індивідуальний темп і розклад занять під вас",
+  "Аналіз поведінки вдома та розробка плану корекції",
+];
+
+function KinologVisit() {
+  return (
+    <section className="dc-section dc-section-light dc-section-with-wave" id="kinolog">
+      <WaveDivider from="#FFFFFF" variant="soft" height={80} />
+      <div className="dc-wrap">
+        <div className="dc-kinolog-layout">
+          <div>
+            <div className="dc-eyebrow-text">Кінолог на виїзд</div>
+            <h2 className="dc-h2">Хочу <em>кінолога</em></h2>
+            <p className="dc-kinolog-desc">
+              Наш кінолог приїде до вас додому — без стресу дороги для собаки,
+              без змін звичного середовища. Заняття там, де собака відчуває себе собою,
+              а проблеми проявляються найчастіше.
+            </p>
+            <ul className="dc-service-features">
+              {KINOLOG_FEATURES.map(f => (
+                <li key={f}>
+                  <span className="dc-check">
+                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6.5L5 9.5L10 3.5" stroke="#1A1814" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <div className="dc-service-price" style={{ marginTop: 28 }}>
+              <span className="dc-service-price-from">від</span>
+              <span className="dc-service-price-num">~900</span>
+              <span className="dc-service-price-unit">₴ / година</span>
+            </div>
+            <a href="#contact" className="dc-btn dc-btn-primary" style={{ marginTop: 24 }}
+              onClick={(e) => { e.preventDefault(); document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); }}>
+              Записатися <span className="dc-btn-arrow"><Arrow /></span>
+            </a>
+          </div>
+          <div className="dc-kinolog-card">
+            <div className="dc-kinolog-card-icon">🐕</div>
+            <div className="dc-kinolog-card-title">Кінолог на виїзд</div>
+            <div className="dc-kinolog-card-facts">
+              <div>
+                <div className="dc-kinolog-fact-num">1 год</div>
+                <div className="dc-kinolog-fact-label">тривалість заняття</div>
+              </div>
+              <div>
+                <div className="dc-kinolog-fact-num">~900 ₴</div>
+                <div className="dc-kinolog-fact-label">ціна виїзду</div>
+              </div>
+              <div>
+                <div className="dc-kinolog-fact-num">ІФ</div>
+                <div className="dc-kinolog-fact-label">Івано‑Франківськ та район</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 const TESTI = [
   { quote: "За 6 тижнів наш Рекс перестав тягнути повідок і слухається без ласощів. Магія, але насправді — професіоналізм Оксани.", name: "Ірина", pet: "та Рекс (3 р., лабрадор)", stars: 5, initials: "ІР" },
   { quote: "Залишали Бусю на 10 днів у готелі — і отримували фото щодня. Повернулися — собака не схудла і навіть навчилася давати лапу.", name: "Дмитро", pet: "та Буся (5 р., шпіц)", stars: 5, initials: "ДМ" },
@@ -3578,7 +3684,7 @@ function Zoomarket() {
   const goContact = () => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   return (
     <section className="dc-section dc-section-light dc-section-with-wave" id="zoomarket">
-      <WaveDivider from="#FFFFFF" variant="arch" height={40} />
+      <WaveDivider from="#FFFEF7" variant="arch" height={40} />
       <div className="dc-wrap">
         <div className="dc-zoomarket-hero">
           <div>
@@ -3983,6 +4089,7 @@ function App() {
       <Process />
       <Team />
       <Pricing />
+      <KinologVisit />
       <Zoomarket />
       {t.showMarquee && <Marquee />}
       <Testimonials />

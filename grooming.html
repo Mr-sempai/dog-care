@@ -1,0 +1,2226 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <title>Dog Care · Грумінг</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ============ Design tokens — YELLOW theme ============ */
+    :root {
+      --accent:       #FFD23F;
+      --accent-deep:  #E6B800;
+      --accent-soft:  #FFF8D0;
+      --cream:        #FFFDF0;
+      --ink:          #1A1814;
+      --ink-2:        #4a453c;
+      --ink-3:        #8a8378;
+      --line:         rgba(26,24,20,.08);
+      --line-2:       rgba(26,24,20,.14);
+      --white:        #ffffff;
+      --shadow-sm:    0 2px 8px rgba(26,24,20,.06);
+      --shadow-md:    0 12px 32px rgba(26,24,20,.09);
+      --shadow-lg:    0 24px 64px rgba(26,24,20,.13);
+      --radius-sm:    14px;
+      --radius-md:    22px;
+      --radius-lg:    32px;
+      --radius-xl:    44px;
+      --display:      "Unbounded", system-ui, sans-serif;
+      --body:         "Manrope", system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--body);
+      color: var(--ink);
+      background: var(--accent);
+      font-size: 16px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    input, select, textarea { font-family: inherit; color: inherit; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ============ Layout ============ */
+    .dc-app { min-height: 100vh; background: var(--accent); overflow-x: hidden; position: relative; }
+    .dc-wrap { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+
+    /* ============ Scroll reveal ============ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(36px) scale(0.97);
+      transition: opacity 1.1s cubic-bezier(.16,1,.3,1), transform 1.1s cubic-bezier(.16,1,.3,1);
+      transition-delay: calc(var(--reveal-i,0) * 90ms);
+    }
+    .reveal.in-view { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity:1!important; transform:none!important; transition:none!important; } }
+
+    /* ============ Nav ============ */
+    .dc-nav {
+      position: sticky; top: 0; z-index: 50;
+      padding: 18px 0;
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      transition: backdrop-filter .2s, -webkit-backdrop-filter .2s, background .2s;
+      will-change: backdrop-filter;
+    }
+    .dc-nav.scrolled {
+      background: rgba(230,184,0,.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .dc-nav-inner {
+      display: flex; align-items: center; justify-content: space-between; gap: 32px;
+    }
+    .dc-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -.02em;
+      color: var(--ink);
+    }
+    .dc-logo-mark {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--ink); color: var(--accent);
+      display: grid; place-items: center; font-size: 20px;
+    }
+    .dc-nav-links { display: flex; gap: 8px; align-items: center; flex: 1; justify-content: center; }
+    .dc-nav-link {
+      padding: 10px 16px; border-radius: 999px;
+      font-weight: 600; font-size: 14.5px; color: var(--ink);
+      transition: background .15s, color .15s;
+      white-space: nowrap;
+    }
+    .dc-nav-link:hover { background: rgba(26,24,20,.1); }
+    .dc-nav-link.active { background: var(--ink); color: var(--accent); }
+    .dc-nav-cta { flex-shrink: 0; padding: 10px 20px; font-size: 13px; font-weight: 700; }
+
+    /* Burger */
+    .dc-burger {
+      display: none; width: 44px; height: 44px;
+      background: var(--ink); border-radius: 14px; padding: 12px 10px;
+      flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+    }
+    .dc-burger span { display: block; width: 22px; height: 2px; background: var(--accent); border-radius: 2px; transition: transform .25s, opacity .15s; }
+    .dc-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .dc-burger.open span:nth-child(2) { opacity: 0; }
+    .dc-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .dc-mobile-menu {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(26,24,20,.42); backdrop-filter: blur(8px);
+      animation: dc-fadein .2s ease;
+      display: none;
+    }
+    .dc-mobile-menu.open { display: block; }
+    @keyframes dc-fadein { from { opacity: 0; } to { opacity: 1; } }
+    .dc-mobile-panel {
+      position: absolute; top: 0; left: 0; right: 0;
+      background: var(--cream); padding: 22px 22px 28px;
+      border-radius: 0 0 28px 28px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.18);
+      animation: dc-slide-in-top .28s cubic-bezier(.2,.8,.2,1);
+    }
+    @keyframes dc-slide-in-top { from { transform: translateY(-100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
+    .dc-mobile-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .dc-mobile-close { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: var(--ink); display: grid; place-items: center; }
+    .dc-mobile-links { display: flex; flex-direction: column; gap: 4px; }
+    .dc-mobile-link { padding: 14px 18px; font-size: 17px; font-weight: 600; border-radius: 14px; transition: background .15s; }
+    .dc-mobile-link:hover { background: rgba(26,24,20,.06); }
+    .dc-mobile-link.active { background: var(--accent); }
+
+    /* ============ Buttons ============ */
+    .dc-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 26px; border-radius: 999px;
+      font-weight: 700; font-size: 15px;
+      transition: transform .15s, background .15s, color .15s, box-shadow .15s;
+      white-space: nowrap;
+    }
+    .dc-btn:hover { transform: translateY(-1px); }
+    .dc-btn-primary { background: var(--ink); color: #fff; }
+    .dc-btn-primary:hover { background: #333; }
+    .dc-btn-primary .dc-btn-arrow { background: var(--accent); color: var(--ink); }
+    .dc-btn-light { background: var(--white); color: var(--ink); }
+    .dc-btn-light:hover { background: var(--ink); color: var(--accent); }
+    .dc-btn-arrow {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent); color: var(--ink);
+      display: grid; place-items: center;
+      transition: background .2s, color .2s;
+    }
+
+    /* ============ Hero ============ */
+    .dc-hero { position: relative; padding: 32px 0 64px; }
+    .dc-hero-card {
+      background: var(--cream); border-radius: var(--radius-xl);
+      padding: 72px 60px 60px; position: relative; overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+    .dc-hero-grid {
+      display: flex; gap: 40px; align-items: flex-start;
+    }
+    .dc-hero-grid > div:first-child {
+      flex: 1 1 0; min-width: 0; padding-top: 16px;
+    }
+    .dc-nowrap { white-space: nowrap; }
+    .dc-eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 6px 18px 6px 6px; border-radius: 999px;
+      background: var(--accent-soft); color: var(--ink);
+      font-size: 13px; font-weight: 600; margin-bottom: 22px;
+    }
+    .dc-eyebrow-dot {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--accent); display: grid; place-items: center;
+      font-size: 14px;
+    }
+    .dc-h1 {
+      font-family: var(--display);
+      font-size: clamp(32px, 4.2vw, 54px);
+      line-height: 1.02; letter-spacing: -.035em;
+      font-weight: 700; margin: 0 0 22px; text-wrap: pretty;
+    }
+    .dc-h1 em {
+      font-style: normal; background: var(--accent); color: var(--ink);
+      padding: 0 18px; border-radius: 18px;
+      display: inline-block; margin: 4px 0;
+      box-shadow: 0 0 0 6px rgba(255,210,63,.25);
+    }
+    .dc-hero-sub { font-size: 17px; color: var(--ink-2); max-width: 460px; margin: 0 0 30px; text-wrap: pretty; }
+    .dc-hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 36px; }
+    .dc-hero-stats { display: flex; gap: 36px; flex-wrap: wrap; }
+    .dc-stat-num { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: -.03em; line-height: 1; }
+    .dc-stat-label { font-size: 12.5px; color: var(--ink-3); margin-top: 4px; font-weight: 500; letter-spacing: .02em; }
+
+    .dc-hero-visual {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      flex: 0 0 56%; flex-shrink: 0;
+    }
+    .dc-hero-circle {
+      width: 340px; height: 340px; border-radius: 50%;
+      background: var(--accent); display: grid; place-items: center;
+      position: relative; flex-shrink: 0;
+    }
+    .dc-hero-circle-inner {
+      font-size: 120px; line-height: 1;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,.15));
+    }
+    .dc-hero-badge {
+      position: absolute;
+      background: var(--white); border-radius: 999px;
+      padding: 10px 16px; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: var(--shadow-md);
+    }
+    .dc-hero-badge-1 { top: 18%; left: -10%; }
+    .dc-hero-badge-2 { bottom: 18%; right: -10%; }
+    .dc-hero-badge-icon { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-size: 13px; }
+
+    /* ============ Marquee ============ */
+    .dc-marquee-wrap {
+      background: var(--ink); overflow: hidden; padding: 22px 0;
+      position: relative; z-index: 2; margin: -1px 0;
+    }
+    .dc-marquee-track {
+      display: flex; gap: 0; width: max-content;
+      animation: dc-marquee 50s linear infinite;
+    }
+    .dc-marquee-track:hover { animation-play-state: paused; }
+    @keyframes dc-marquee { to { transform: translateX(-50%); } }
+    .dc-marquee-item {
+      display: inline-flex; align-items: center; gap: 0;
+      padding: 0; white-space: nowrap;
+      font-family: var(--display); font-weight: 600; font-size: 30px;
+      color: var(--accent); letter-spacing: -0.02em; line-height: 1;
+    }
+    .dc-marquee-item svg { display: block; }
+    .dc-marquee-dot { display: inline-flex; align-items: center; justify-content: center; margin: 0 32px; transform: translateY(3px); opacity: 1; }
+
+    /* ============ Section base ============ */
+    .dc-section { padding: 100px 0; position: relative; overflow: hidden; }
+    .dc-section-cream { background: var(--cream); }
+    .dc-section-yellow { background: var(--accent); }
+    .dc-section-white { background: var(--white); }
+    .dc-section-dark { background: var(--ink); }
+
+    .dc-section-head { display: flex; align-items: end; justify-content: space-between; gap: 32px; margin-bottom: 48px; }
+    .dc-section-head--center { flex-direction: column; align-items: center; text-align: center; }
+    .dc-eyebrow-text {
+      font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--ink-3); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .dc-eyebrow-text::before { content: ""; width: 22px; height: 1.5px; background: currentColor; }
+    .dc-section-head--center .dc-eyebrow-text { justify-content: center; }
+    .dc-h2 {
+      font-family: var(--display); font-weight: 700;
+      font-size: clamp(30px, 3.8vw, 48px);
+      line-height: 1.05; letter-spacing: -.03em;
+      margin: 0; max-width: 700px; text-wrap: balance;
+    }
+    .dc-h2 em { font-style: normal; color: var(--ink-3); }
+    .dc-section-sub { max-width: 380px; color: var(--ink-2); font-size: 15.5px; }
+
+    /* ============ Pricing table ============ */
+    .dc-price-tabs {
+      display: flex; gap: 8px; padding: 8px;
+      background: var(--white); border-radius: 999px;
+      box-shadow: var(--shadow-sm); width: max-content;
+      margin: 0 auto 48px; flex-wrap: wrap; justify-content: center;
+    }
+    .dc-price-tab {
+      padding: 11px 22px; border-radius: 999px;
+      font-weight: 600; font-size: 14px;
+      transition: background .15s, color .15s;
+    }
+    .dc-price-tab:hover { background: var(--accent-soft); }
+    .dc-price-tab.active { background: var(--ink); color: var(--accent); }
+
+    .dc-price-panel { display: none; }
+    .dc-price-panel.active { display: block; }
+
+    .dc-price-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md); overflow: hidden;
+    }
+    .dc-price-card-head {
+      background: var(--accent); padding: 32px 40px;
+      display: flex; align-items: center; gap: 20px;
+    }
+    .dc-price-card-icon { font-size: 40px; }
+    .dc-price-card-title { font-family: var(--display); font-weight: 700; font-size: 22px; color: var(--ink); }
+    .dc-price-card-desc { font-size: 14px; color: var(--ink-2); margin-top: 4px; }
+    .dc-price-table { width: 100%; border-collapse: collapse; }
+    .dc-price-table th {
+      padding: 14px 24px; text-align: left;
+      font-size: 11px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--ink-3);
+      border-bottom: 1.5px solid var(--line);
+    }
+    .dc-price-table td { padding: 16px 24px; font-size: 15px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    .dc-price-table tr:last-child td { border-bottom: none; }
+    .dc-price-table tr:hover td { background: var(--accent-soft); }
+    .dc-price-badge {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .dc-price-note {
+      background: var(--accent-soft); border-radius: var(--radius-sm);
+      padding: 16px 24px; margin: 24px;
+      font-size: 13.5px; color: var(--ink-2);
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .dc-price-note-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ============ Additional services grid ============ */
+    .dc-add-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+    .dc-add-card {
+      background: var(--white); border-radius: var(--radius-md);
+      padding: 24px 20px; text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .dc-add-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .dc-add-icon { font-size: 32px; margin-bottom: 10px; }
+    .dc-add-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+    .dc-add-price { font-family: var(--display); font-weight: 700; font-size: 20px; color: var(--accent-deep); }
+
+    /* ============ Process — radial layout ============ */
+    .gp-section {
+      position: relative;
+      padding: 60px 0 0;
+      overflow: visible;
+    }
+    .gp-inner {
+      position: relative;
+      min-height: 940px;
+      max-width: 1920px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+    /* Header */
+    .gp-head { text-align: center; position: relative; z-index: 5; }
+
+    /* Background paw prints */
+    .gp-paws { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .gp-paw  { position: absolute; opacity: .14; }
+
+    /* SVG arc connector */
+    .gp-arc {
+      position: absolute; left: 0; top: 90px;
+      width: 100%; height: calc(100% - 90px);
+      z-index: 1; pointer-events: none;
+    }
+
+    /* Central dog */
+    .gp-dog-wrap {
+      position: absolute;
+      left: 50%;
+      bottom: 60px;
+      transform: translateX(-50%);
+      z-index: 3;
+      width: clamp(300px, 28vw, 440px);
+    }
+
+    /* Wave — inside section, covers dog feet */
+    .gp-wave {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      z-index: 5;
+      line-height: 0;
+      pointer-events: none;
+    }
+    .gp-silhouette {
+      position: absolute;
+      inset: -20% -8% 0 -8%;
+      width: 116%; height: 120%;
+      pointer-events: none; z-index: 0;
+      object-fit: contain;
+    }
+    .gp-dog {
+      width: 100%; height: auto; display: block;
+      position: relative; z-index: 1;
+    }
+
+    /* Steps */
+    .gp-step {
+      position: absolute; z-index: 4;
+      display: flex; gap: 10px; align-items: flex-start;
+      max-width: 310px;
+      background: var(--accent);
+      padding: 10px 0;
+    }
+    .gp-num {
+      flex-shrink: 0;
+      width: 37px; height: 37px; border-radius: 18.5px;
+      background: #1d1d1d; color: var(--accent);
+      font-family: var(--display); font-weight: 600; font-size: 14px;
+      display: grid; place-items: center;
+      box-shadow: 0 4px 16px rgba(26,24,20,.22);
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+    }
+    .gp-step:hover .gp-num { transform: scale(1.1); }
+    .gp-text-wrap { display: flex; flex-direction: column; gap: 6px; width: 256px; }
+    .gp-title { font-weight: 700; font-size: 15px; color: var(--ink); line-height: 1.55; }
+    .gp-body  { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+
+    /* Step positions (based on Figma 1920px layout) */
+    .gp-s1 { left: 16%; top: 80%; }
+    .gp-s2 { left: 21%; top: 45%; }
+    .gp-s3 { left: 50%; top: 21%; transform: translateX(-50%); }
+    .gp-s4 { left: 65%; top: 44%; }
+    .gp-s5 { left: 70%; top: 81%; }
+    /* Fix: preserve translateX(-50%) centering through reveal animation lifecycle */
+    .gp-s3.reveal { transform: translateX(-50%) translateY(36px) scale(0.97); }
+    .gp-s3.reveal.in-view { transform: translateX(-50%); }
+
+    /* Tablet */
+    @media (min-width:861px) and (max-width:1200px) {
+      .gp-inner { min-height: 820px; }
+      .gp-step  { max-width: 240px; }
+      .gp-text-wrap { width: 200px; }
+      .gp-dog-wrap { width: clamp(240px, 24vw, 360px); bottom: -60px; }
+      .gp-s1 { left: 2%; top: 74%; }
+      .gp-s2 { left: 6%; top: 42%; }
+      .gp-s3 { top: 18%; }
+      .gp-s4 { left: 68%; top: 41%; }
+      .gp-s5 { left: 72%; top: 74%; }
+    }
+
+    /* Mobile */
+    @media (max-width: 860px) {
+      .gp-section { padding-top: 40px; }
+      .gp-inner { min-height: auto; padding-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
+      .gp-arc, .gp-paws { display: none; }
+      .gp-dog-wrap { position: relative; left: auto; bottom: auto; transform: none; width: 220px; margin: 0 auto 0; }
+      .gp-wave { display: none; }
+      .gp-silhouette { display: none; }
+      .gp-step { position: static !important; width: 100%; max-width: 100%; transform: none !important;
+        margin-bottom: 16px; padding: 0; }
+      .gp-text-wrap { width: auto; flex: 1; }
+      .gp-num { flex-shrink: 0; }
+    }
+
+    /* ============ Features cards ============ */
+    .dc-feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .dc-feat-card {
+      background: var(--white); border-radius: var(--radius-md);
+      padding: 32px 28px; box-shadow: var(--shadow-sm);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .dc-feat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .dc-feat-ic {
+      width: 52px; height: 52px; border-radius: 16px;
+      background: var(--accent); color: var(--ink);
+      display: grid; place-items: center; font-size: 24px;
+      margin-bottom: 18px;
+    }
+    .dc-feat-title { font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+    .dc-feat-body { font-size: 14.5px; color: var(--ink-2); }
+
+    /* ============ FAQ ============ */
+    .dc-faq-list { display: flex; flex-direction: column; gap: 16px; }
+    .dc-faq-item {
+      background: #f2f0ec;
+      border-radius: 24px;
+      overflow: hidden;
+      transition: background .3s ease, box-shadow .3s ease;
+    }
+    .dc-faq-item.open {
+      background: #fff;
+      box-shadow: 0 4px 28px rgba(26,24,20,.08);
+    }
+    .dc-faq-q {
+      width: 100%; text-align: left;
+      padding: 28px 32px;
+      font-weight: 700; font-size: 18px;
+      letter-spacing: -.02em; line-height: 1.3;
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;
+      color: var(--ink);
+    }
+    .dc-faq-q:hover { background: transparent; }
+
+    /* + → × via rotation */
+    .dc-faq-chevron {
+      flex-shrink: 0; width: 24px; height: 24px;
+      display: grid; place-items: center;
+      font-size: 26px; line-height: 1; color: #bbb;
+      margin-top: -1px; background: none;
+      transition: transform .4s cubic-bezier(.4,0,.2,1), color .25s;
+    }
+    .dc-faq-chevron::before { content: '+'; display: block; }
+    .dc-faq-chevron svg { display: none; }
+    .dc-faq-item.open .dc-faq-chevron {
+      transform: rotate(45deg);
+      color: #ccc;
+    }
+
+    /* Smooth height via grid trick — найплавніший спосіб */
+    .dc-faq-a {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1),
+                  padding-bottom .4s cubic-bezier(.4,0,.2,1);
+      padding: 0 32px;
+      padding-bottom: 0;
+    }
+    .dc-faq-a p {
+      overflow: hidden; min-height: 0;
+      font-size: 16px; color: #999; line-height: 1.7; margin: 0;
+    }
+    .dc-faq-item.open .dc-faq-a {
+      grid-template-rows: 1fr;
+      padding-bottom: 32px;
+    }
+
+    /* ============ CTA banner ============ */
+    .dc-cta-band {
+      background: var(--ink); border-radius: var(--radius-xl);
+      padding: 64px 60px;
+      display: flex; align-items: center; justify-content: space-between; gap: 32px;
+      flex-wrap: wrap;
+    }
+    .dc-cta-band h2 { font-family: var(--display); font-weight: 700; font-size: clamp(26px, 3vw, 40px); color: #fff; margin: 0 0 10px; letter-spacing: -.02em; }
+    .dc-cta-band p { color: rgba(255,255,255,.65); font-size: 16px; margin: 0; }
+    .dc-cta-contacts { display: flex; flex-direction: column; gap: 8px; }
+    .dc-cta-phone { font-family: var(--display); font-weight: 700; font-size: 22px; color: var(--accent); letter-spacing: -.02em; }
+    .dc-cta-social { font-size: 14px; color: rgba(255,255,255,.5); }
+
+    /* ============ Booking modal ============ */
+    .bk-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(26,24,20,.72); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    .bk-overlay.open { opacity: 1; pointer-events: auto; }
+    .bk-modal {
+      background: var(--cream); border-radius: var(--radius-lg);
+      padding: 48px; max-width: 600px; width: 100%;
+      position: relative;
+      transform: translateY(24px); transition: transform .28s;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .bk-overlay.open .bk-modal { transform: translateY(0); }
+    .bk-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--line); border: none; cursor: pointer;
+      display: grid; place-items: center; transition: background .15s; color: var(--ink);
+    }
+    .bk-close:hover { background: var(--line-2); }
+    .bk-title { font-family: var(--display); font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 6px; }
+    .bk-subtitle { font-size: 14px; color: var(--ink-2); margin: 0 0 28px; }
+    .bk-form { display: flex; flex-direction: column; gap: 16px; }
+    .bk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .bk-field { display: flex; flex-direction: column; gap: 6px; }
+    .bk-field label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+    .bk-field input, .bk-field select, .bk-field textarea {
+      border: 1.5px solid var(--line-2); border-radius: 12px;
+      padding: 11px 14px; font-family: var(--body); font-size: 15px;
+      color: var(--ink); background: var(--white); outline: none;
+      transition: border-color .15s; width: 100%;
+    }
+    .bk-field input:focus, .bk-field select:focus, .bk-field textarea:focus { border-color: var(--accent-deep); }
+    .bk-field textarea { resize: vertical; min-height: 80px; }
+    .bk-field.bk-has-error input,
+    .bk-field.bk-has-error select,
+    .bk-field.bk-has-error textarea { border-color: #e53e3e; background: #fff5f5; }
+    .bk-error-msg { font-size: 12px; color: #e53e3e; margin-top: 4px; display: none; }
+    .bk-field.bk-has-error .bk-error-msg { display: block; }
+    .bk-submit { width: 100%; margin-top: 8px; justify-content: center; }
+    .bk-success { text-align: center; padding: 16px 0 8px; }
+    .bk-success-icon {
+      width: 64px; height: 64px; background: var(--accent); border-radius: 50%;
+      display: grid; place-items: center; font-size: 28px; margin: 0 auto 16px;
+    }
+    .bk-success h4 { font-family: var(--display); font-size: 20px; letter-spacing: -.02em; margin: 0 0 8px; }
+    .bk-success p { color: var(--ink-2); font-size: 15px; margin: 0; }
+    .bk-send-error { display: none; background: #fff5f5; border: 1.5px solid #e53e3e; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #c53030; margin-top: 4px; }
+    .bk-hidden { display: none !important; }
+    @media (max-width: 600px) {
+      .bk-modal { padding: 32px 20px; }
+      .bk-row { grid-template-columns: 1fr; }
+    }
+
+    /* ============ Footer ============ */
+    .dc-footer { background: var(--ink); color: var(--cream); padding: 80px 0 32px; position: relative; overflow: hidden; }
+    .dc-footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 56px; }
+    .dc-footer h4 { font-family: var(--display); font-weight: 600; font-size: 14px; margin: 0 0 18px; color: var(--accent); letter-spacing: .04em; text-transform: uppercase; }
+    .dc-footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .dc-footer ul a { font-size: 14px; opacity: .7; transition: opacity .15s; }
+    .dc-footer ul a:hover { opacity: 1; }
+    .dc-footer-logo { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: -.03em; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+    .dc-footer-desc { font-size: 14px; opacity: .65; max-width: 280px; margin-bottom: 24px; }
+    .dc-socials { display: flex; gap: 8px; }
+    .dc-social { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,254,247,.15); display: grid; place-items: center; transition: background .15s, color .15s; }
+    .dc-social:hover { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+    .dc-footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 28px; border-top: 1px solid rgba(255,254,247,.1); font-size: 13px; opacity: .5; flex-wrap: wrap; gap: 12px; }
+    .dc-footer-bottom a { color: inherit; }
+    @media (max-width: 900px) {
+      .dc-footer { padding: 48px 0 22px; }
+      .dc-footer-grid { grid-template-columns: 1fr 1fr 1fr; gap: 22px 14px; margin-bottom: 24px; }
+      .dc-footer-grid > div:first-child { grid-column: 1 / -1; margin-bottom: 4px; }
+      .dc-footer-logo { font-size: 22px; margin-bottom: 10px; }
+      .dc-footer-desc { font-size: 13px; margin-bottom: 16px; max-width: none; }
+    }
+    @media (max-width: 600px) {
+      .dc-footer-grid { grid-template-columns: 1fr 1fr; }
+      .dc-footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ============ Wave separators ============ */
+    .wave-sep {
+      display: block;
+      line-height: 0;
+      margin: -1px 0;
+      position: relative;
+      z-index: 5;
+      overflow: hidden;
+    }
+    .wave-sep svg { display: block; width: 100%; height: auto; }
+
+    /* ============ Responsive ============ */
+    @media (max-width: 900px) {
+      .dc-h1 em { white-space: normal; }
+      .dc-nowrap { white-space: normal; }
+      .dc-wrap { padding: 0 20px; }
+      .dc-hero-card { padding: 44px 28px 44px; }
+      .dc-hero-grid { flex-direction: column; }
+      .dc-hero-visual { flex: 0 0 auto; width: 100%; margin-top: 8px; }
+      .dc-hero-circle { width: 260px; height: 260px; }
+      .dc-hero-badge-1 { left: -4%; }
+      .dc-hero-badge-2 { right: -4%; }
+      .dc-nav-links { display: none; }
+      .dc-burger { display: flex; }
+      .dc-feat-grid { grid-template-columns: 1fr 1fr; }
+      .dc-cta-band { flex-direction: column; text-align: center; padding: 44px 28px; }
+      .dc-footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 600px) {
+      .dc-section { padding: 56px 0; }
+      .dc-wrap { padding: 0 16px; }
+      .dc-feat-grid { grid-template-columns: 1fr; }
+      .dc-steps-grid { grid-template-columns: 1fr; }
+      .dc-add-grid { grid-template-columns: 1fr 1fr; }
+      .dc-price-tabs { padding: 6px; flex-wrap: wrap; }
+      .dc-price-tab { padding: 9px 12px; font-size: 12.5px; }
+      /* Price table horizontal scroll */
+      .dc-price-panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .dc-price-table { min-width: 340px; }
+      .dc-price-table th, .dc-price-table td { padding: 10px 14px; font-size: 13px; }
+      .dc-h2 { font-size: clamp(26px, 7vw, 34px); }
+      /* Hero */
+      .dc-hero-card { padding: 32px 18px; }
+      .dc-hero-circle { width: 200px; height: 200px; }
+      .dc-hero-sub { font-size: 14.5px; }
+      .dc-hero-stats { gap: 14px; }
+      /* CTA band */
+      .dc-cta-band { padding: 36px 18px; }
+      /* Booking modal */
+      .bk-modal { padding: 24px 16px; border-radius: 20px; }
+      /* Lightbox nav buttons smaller on mobile */
+      .grm-lb-prev, .grm-lb-next { width: 40px; height: 40px; font-size: 24px; }
+      .grm-lb-prev { left: 8px; }
+      .grm-lb-next { right: 8px; }
+      .grm-lightbox { padding: 12px; }
+      .grm-lb-img { max-width: 96vw; border-radius: 10px; }
+      /* Footer */
+      .dc-footer-grid { grid-template-columns: 1fr 1fr; gap: 18px 12px; }
+      .dc-footer-grid > div:first-child { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 400px) {
+      .dc-add-grid { grid-template-columns: 1fr; }
+      .dc-nav-cta { display: none; }
+      .dc-h2 { font-size: 24px; }
+      .dc-hero-circle { width: 160px; height: 160px; }
+    }
+
+    /* ── Каруселі фото ── */
+    .grm-carousel { overflow: hidden; user-select: none; }
+    .grm-carousel-track {
+      display: flex;
+      gap: 16px;
+      transition: transform 0.6s cubic-bezier(.4,0,.2,1);
+      will-change: transform;
+    }
+    .grm-carousel-item {
+      flex: 0 0 var(--car-item-w, calc(25% - 12px));
+      aspect-ratio: 1/1;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--accent-soft);
+    }
+    .grm-carousel-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.35s ease;
+    }
+    .grm-carousel-item:hover img { transform: scale(1.06); }
+    .grm-carousel-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .grm-carousel-btn {
+      background: var(--ink); border: none;
+      color: var(--accent); font-size: 20px; width: 44px; height: 44px;
+      border-radius: 50%; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: opacity .2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,.18);
+    }
+    .grm-carousel-btn:hover { opacity: .75; }
+    .grm-carousel-empty {
+      text-align: center; padding: 60px 0;
+      color: var(--ink-2, #888); font-size: 15px;
+    }
+    @media (max-width: 900px) {
+      .grm-carousel-item { flex: 0 0 calc(33.33% - 11px); }
+    }
+    @media (max-width: 600px) {
+      .grm-carousel-item { flex: 0 0 calc(50% - 8px); }
+    }
+    @media (max-width: 420px) {
+      .grm-carousel-item { flex: 0 0 calc(100% - 8px); }
+    }
+
+    /* ── Лайтбокс ── */
+    .grm-lightbox {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.88);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .grm-lightbox.open { display: flex; }
+    .grm-lb-img {
+      max-width: min(90vw, 900px);
+      max-height: 85vh;
+      border-radius: 16px;
+      object-fit: contain;
+      box-shadow: 0 32px 80px rgba(0,0,0,.6);
+    }
+    .grm-lb-close {
+      position: absolute; top: 20px; right: 24px;
+      background: rgba(255,255,255,.15); border: none;
+      color: #fff; font-size: 22px; width: 44px; height: 44px;
+      border-radius: 50%; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(6px);
+      transition: background .2s;
+    }
+    .grm-lb-close:hover { background: rgba(255,255,255,.3); }
+    .grm-lb-prev, .grm-lb-next {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,.15); border: none;
+      color: #fff; font-size: 32px; width: 52px; height: 52px;
+      border-radius: 50%; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(6px);
+      transition: background .2s;
+    }
+    .grm-lb-prev:hover, .grm-lb-next:hover { background: rgba(255,255,255,.3); }
+    .grm-lb-prev { left: 20px; }
+    .grm-lb-next { right: 20px; }
+  </style>
+  <!-- Firebase SDK (завантажується першим) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyDFtRAWaJ5Rg67FS6VRb9Z9wL675BO5H0w",
+      authDomain: "dog-care-9aef2.firebaseapp.com",
+      projectId: "dog-care-9aef2",
+      storageBucket: "dog-care-9aef2.firebasestorage.app",
+      messagingSenderId: "527199586701",
+      appId: "1:527199586701:web:2afe10b198c127377b15c4"
+    });
+  </script>
+</head>
+<body>
+<div class="dc-app">
+
+  <!-- ══ NAV ══ -->
+  <nav class="dc-nav" id="nav">
+    <div class="dc-wrap">
+      <div class="dc-nav-inner">
+        <a href="index.html" class="dc-logo">
+          <svg height="44" viewBox="0 0 237 45" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0">
+            <circle cx="20.0223" cy="22.2089" r="20.0223" fill="#1A1814"/>
+            <path d="M30.0114 13.9169H27.9469C27.9932 13.5724 28.1349 13.2482 28.1811 12.9037H25.998V10.915C25.5758 10.9874 25.1537 11.274 24.8297 11.5432C23.7947 12.3971 23.3494 13.7055 23.3494 15.0111V16.415C23.3494 16.7595 23.3784 17.0345 23.144 17.3124C22.4617 18.1142 21.4438 18.6584 20.507 19.0984C17.7744 20.3808 14.4 20.7918 11.7398 19.1042C9.7735 17.8566 8.61977 15.8418 7.80435 13.7229C7.67712 13.8908 7.62218 14.1108 7.55857 14.3077C7.42266 14.7245 7.30989 15.1587 7.24918 15.5958C7.12483 16.47 7.17688 17.3818 7.51231 18.2097C8.41448 20.4387 11.0892 21.42 13.3388 21.1363C13.0381 21.3679 12.7489 21.5821 12.506 21.8774C11.7166 22.8384 11.6096 24.0397 11.6241 25.2323C11.6299 25.7534 11.8988 26.315 11.7398 26.8331C11.6733 27.0502 11.52 27.2586 11.3147 27.3571C11.1643 27.4294 10.9764 27.3831 10.881 27.5423C10.5629 28.0749 10.3634 28.7234 10.1118 29.2908C9.8082 29.9767 9.41494 30.6773 9.20965 31.3981H11.7802C11.7802 31.2185 11.7976 31.0276 11.76 30.8509C11.653 30.353 11.2713 30.0346 10.8058 29.8754C11.3205 29.3688 11.9219 28.9318 12.48 28.4802C12.6969 28.3037 13.0872 28.0865 13.2174 27.8376C13.2694 27.7363 13.226 27.606 13.2202 27.4989C13.2116 27.2673 13.2087 27.027 13.2492 26.7955C13.3995 25.8923 19.9113 23.6084 21.892 26.5234C22.1147 26.781 22.531 27.2239 22.8838 27.2847C23.014 27.3078 23.1528 27.2413 23.2742 27.2007L24.0145 26.9547C24.9455 26.645 25.8996 26.3613 26.8191 26.0197C26.6053 26.6971 26.6949 27.5105 27.4813 27.7449C27.7734 27.8318 28.0422 27.7999 28.3372 27.7768V23.8255C27.6867 23.8255 26.987 23.9413 26.3507 24.06C26.7093 23.646 27.0708 23.2755 27.3137 22.7718C28.0047 21.3505 27.8167 19.6658 27.3483 18.2068C27.1893 17.7147 26.9175 17.2545 26.7758 16.7624C26.9435 16.7624 27.1633 16.7247 27.3194 16.7855C27.5594 16.8782 27.7503 17.1763 27.9845 17.3124C28.5049 17.6134 29.0862 17.7205 29.6586 17.5034C30.7256 17.1011 31.1536 15.9461 31.0292 14.8866C31.0033 14.6608 30.9569 14.1311 30.8935 13.9111H30.0114V13.9169Z" fill="#FFD23F"/>
+            <path d="M15.5161 31.3924H18.0867C17.9739 30.5182 17.3031 29.89 16.4125 29.8698C16.5744 29.2763 16.9359 28.7003 17.2684 28.1937C17.4361 27.939 18.5494 26.0776 18.6274 25.7823C16.7826 25.4755 14.8539 26.3236 14.5156 26.7028C14.3537 26.8099 15.1055 29.1258 15.1489 29.3661C15.2703 30.0377 15.4294 30.715 15.5161 31.3924ZM27.9789 31.4329C27.9789 30.8135 27.6203 30.2953 27.0044 30.0521C26.7962 29.9712 26.1947 30 26.1195 29.7424C25.9865 29.5601 25.5817 27.6523 25.4169 27.0676C24.9744 27.1052 23.8814 27.496 23.8379 27.6205C23.8091 27.7044 23.9825 28.1589 24.0116 28.2343C24.081 28.4166 24.1591 28.5961 24.2285 28.7813C24.4656 29.4067 24.7258 30.0261 24.96 30.6543C25.0641 30.9959 25.1046 31.0942 25.174 31.4358H27.9789V31.4329Z" fill="#FFD23F"/>
+            <path d="M23.4487 16.0556C23.4487 16.0556 26.5051 17.0832 27.1904 17.6824C28.243 18.6029 29.2029 19.6335 28.1476 22.6469C27.2713 19.9114 24.3132 17.4248 23.2088 17.2048C23.0786 17.1758 23.0757 17.0224 23.1595 16.8198C23.2434 16.6171 23.1567 15.9774 23.4487 16.0556Z" fill="#FFD23F"/>
+            <path d="M67.7106 14.9177C65.935 13.3526 63.1171 12.5696 59.2239 12.5534L51.6984 12.5371C51.3564 12.5371 51.0468 12.6671 50.8025 12.9119C50.5583 13.1566 50.428 13.4664 50.428 13.8412L50.3789 30.6208C50.3789 30.964 50.5096 31.2738 50.7538 31.5014C50.9981 31.7461 51.3077 31.8608 51.6497 31.8608L59.1752 31.8771C63.0684 31.8933 65.9025 31.1266 67.6781 29.5778C69.4532 28.028 70.3491 25.5824 70.3658 22.2554C70.3658 18.9293 69.4861 16.4837 67.7106 14.9177ZM63.9643 26.7565C63.0846 27.637 61.4393 28.0777 59.0287 28.0615L55.4451 28.0443L55.4776 16.3527L59.0612 16.369C61.4717 16.369 63.117 16.826 63.9805 17.7065C64.8439 18.587 65.2833 20.1033 65.2671 22.2391C65.2671 24.3759 64.8273 25.876 63.9643 26.7565Z" fill="#1A1814"/>
+            <path d="M92.7265 14.569C90.9023 12.9542 88.2146 12.1387 84.6635 12.1387C81.1123 12.1387 78.4246 12.9217 76.5679 14.5192C74.727 16.1178 73.7987 18.678 73.7824 22.1676C73.7662 25.6572 74.6783 28.2175 76.5188 29.8313C78.3597 31.4461 81.0474 32.2616 84.5981 32.2779C88.1493 32.2942 90.837 31.4949 92.6774 29.8801C94.5183 28.2663 95.4467 25.7222 95.4467 22.2326C95.4629 18.7431 94.5508 16.1828 92.7265 14.569ZM86.846 18.3358C86.9113 16.656 87.8397 15.3185 88.9149 15.351C90.0064 15.3835 90.837 16.786 90.772 18.4658C90.7067 20.1456 89.7784 21.4821 88.7031 21.4496C87.6116 21.4171 86.7811 20.0146 86.846 18.3358ZM82.3178 13.8835C83.3606 13.4274 84.7937 14.3567 85.5107 15.9868C86.2272 17.6178 85.9667 19.2976 84.9239 19.7708C83.8816 20.2269 82.4481 19.2976 81.7315 17.6665C81.015 16.0365 81.2754 14.3405 82.3178 13.8835ZM81.878 26.0645C81.5035 27.0923 79.9235 27.4508 78.3435 26.8638C76.7635 26.293 75.786 24.989 76.1443 23.9775C76.5192 22.9497 78.0992 22.5912 79.6792 23.1782C81.2592 23.749 82.2529 25.0377 81.878 26.0645ZM81.7153 21.9229C80.9009 22.7222 79.2232 22.3302 77.9852 21.0586C76.7468 19.7871 76.4215 18.1073 77.2358 17.308C78.0501 16.5088 79.7279 16.9008 80.9659 18.1723C82.2038 19.4439 82.5296 21.1237 81.7153 21.9229ZM91.9284 25.9507C90.951 27.0923 89.0127 26.423 87.7094 27.337C87.7094 27.337 87.7094 27.337 87.6932 27.3533H87.677C86.3575 28.2175 86.2434 30.2558 84.8099 30.7444C83.3768 31.2176 81.9271 29.8639 82.6274 26.684C83.1159 24.5157 82.5134 22.9009 83.9794 21.8579C85.4944 20.8952 86.7648 22.0529 88.9636 22.4124C92.2051 22.9334 92.9059 24.8092 91.9284 25.9507Z" fill="#1A1814"/>
+            <path d="M118.752 21.4178L111.992 21.4016C111.65 21.4016 111.341 21.5154 111.097 21.7764C110.852 22.0211 110.722 22.3146 110.722 22.6731V23.7172C110.722 24.0594 110.836 24.3692 111.097 24.6139C111.341 24.8587 111.634 24.9887 111.992 24.9887L115.038 25.0049C115.022 26.0327 114.696 26.832 114.077 27.3855C113.458 27.94 112.416 28.2173 110.982 28.201L108.229 28.1848C106.617 28.1848 105.493 27.745 104.874 26.8807C104.255 26.0164 103.946 24.4504 103.946 22.1836C103.946 19.9178 104.304 18.368 105.005 17.52C105.705 16.672 107.041 16.2647 109.011 16.2647H111.406C113.214 16.2647 114.338 16.7217 114.794 17.6023C115.25 18.4828 115.869 18.9226 116.635 18.9226H118.231C118.524 18.9226 118.834 18.8088 119.143 18.5803C119.453 18.3518 119.616 17.977 119.616 17.4387C119.616 16.02 118.834 14.8297 117.238 13.8841C115.641 12.9386 113.866 12.4491 111.878 12.4491L108.881 12.4329C105.558 12.4166 103.05 13.2159 101.389 14.7972C99.727 16.3785 98.8798 18.8413 98.8635 22.1511C98.8473 25.4619 99.6454 27.9238 101.225 29.5385C102.805 31.1523 105.102 31.9679 108.083 31.9679L111.113 31.9841C114.028 32.0004 116.244 31.3159 117.759 29.9783C119.274 28.6255 120.023 26.701 120.039 24.1894V22.6894C120.039 22.3471 119.925 22.0374 119.664 21.7926C119.404 21.5479 119.11 21.4341 118.752 21.4178Z" fill="#1A1814"/>
+            <path d="M143.084 24.5814H141.488C140.657 24.5814 140.006 25.07 139.55 26.0652C138.898 27.484 137.791 28.1848 136.243 28.1848H133.572C131.601 28.1848 130.281 27.745 129.581 26.897C128.88 26.049 128.538 24.483 128.538 22.1999C128.538 19.9169 128.897 18.3518 129.597 17.52C130.298 16.672 131.633 16.2648 133.605 16.2648H135.999C137.546 16.2648 138.637 16.9818 139.305 18.4006C139.761 19.3958 140.397 19.8843 141.228 19.8843H142.824C143.117 19.8843 143.427 19.7706 143.736 19.5421C144.045 19.3136 144.209 18.9388 144.209 18.4006C144.209 16.5582 143.443 15.107 141.879 14.0467C140.315 12.9864 138.524 12.4492 136.471 12.4492L133.474 12.4329C130.151 12.4157 127.642 13.2149 125.981 14.7972C124.32 16.3785 123.473 18.8413 123.456 22.1674C123.44 25.4945 124.271 27.9563 125.932 29.5548C127.594 31.1524 130.086 31.9516 133.409 31.9679L136.699 31.9841C138.735 31.9841 140.543 31.4621 142.107 30.4191C143.671 29.3751 144.453 27.9238 144.469 26.0815C144.469 25.7058 144.355 25.3635 144.094 25.0537C143.834 24.7277 143.508 24.5814 143.084 24.5814Z" fill="#1A1814"/>
+            <path d="M167.562 12.5553L160.313 12.5391C155.264 12.5391 152.284 14.2839 151.354 17.7734L147.933 30.5903C147.901 30.705 147.885 30.835 147.885 30.9985C147.885 31.161 147.95 31.3245 148.113 31.5358C148.26 31.7318 148.521 31.8456 148.863 31.8456H151.518C151.86 31.8456 152.202 31.7318 152.511 31.487C152.821 31.2423 153.032 30.9488 153.114 30.574L154.027 27.182L163.604 27.2144L163.588 30.6065C163.588 30.9813 163.702 31.2748 163.946 31.5195C164.19 31.7643 164.484 31.879 164.859 31.879H167.384C167.725 31.879 168.035 31.7643 168.279 31.5195C168.523 31.2748 168.653 30.9813 168.653 30.639L168.703 13.8106C168.703 13.4846 168.588 13.1911 168.377 12.9301C168.165 12.6854 167.888 12.5553 167.562 12.5553ZM163.604 23.3989L155.036 23.3664L156.242 19.045C156.469 18.2132 156.909 17.5612 157.545 17.0717C158.179 16.5832 158.946 16.3384 159.809 16.3384L163.653 16.3547L163.604 23.3989Z" fill="#1A1814"/>
+            <path d="M189.517 26.759C188.929 25.845 188.408 25.1442 187.952 24.6547C187.496 24.1662 186.992 23.8393 186.454 23.628C189.842 22.975 191.536 21.3449 191.536 18.7196C191.536 16.8438 190.885 15.3438 189.581 14.2347C188.279 13.1258 186.584 12.5722 184.532 12.555L173.422 12.5225C173.081 12.5225 172.771 12.6534 172.527 12.8982C172.283 13.142 172.169 13.4527 172.169 13.795L172.119 30.5746C172.119 30.9169 172.25 31.2267 172.494 31.4714C172.739 31.7162 173.049 31.8462 173.39 31.8462H175.915C176.257 31.8462 176.567 31.7324 176.811 31.4714C177.056 31.2267 177.185 30.9332 177.185 30.5746L177.202 24.7858L180.492 24.802C181.828 24.802 182.969 25.5515 183.897 27.0191L186.177 30.6071C186.388 30.9657 186.698 31.2592 187.106 31.5039C187.513 31.7487 187.887 31.8787 188.23 31.8787L191.454 31.895C191.91 31.895 192.139 31.6999 192.139 31.3242C192.139 31.1129 192.074 30.8844 191.927 30.6396L189.517 26.759ZM185.411 20.4806C184.712 20.8392 183.897 21.0352 182.969 21.0189L177.234 21.0027L177.25 16.3715L182.985 16.3878C183.913 16.3878 184.728 16.5828 185.427 16.9423C186.129 17.3171 186.487 17.9041 186.487 18.7033C186.487 19.5016 186.129 20.1059 185.411 20.4806Z" fill="#1A1814"/>
+            <path d="M212.397 16.3868C212.74 16.3868 213.049 16.2731 213.293 16.0121C213.538 15.7673 213.668 15.4738 213.668 15.1153V13.8428C213.668 13.5005 213.554 13.1908 213.293 12.946C213.049 12.7013 212.756 12.5712 212.397 12.5712L196.874 12.5225C196.532 12.5225 196.223 12.6363 195.978 12.881C195.734 13.1258 195.603 13.4193 195.603 13.7615L195.555 30.5412C195.555 30.916 195.685 31.2094 195.93 31.4704C196.173 31.7152 196.483 31.8462 196.825 31.8462L212.284 31.895C212.626 31.895 212.935 31.7802 213.18 31.5192C213.424 31.2754 213.554 30.9819 213.554 30.6224V29.3346C213.554 28.9923 213.44 28.6826 213.196 28.4378C212.951 28.1931 212.659 28.0794 212.316 28.0794L200.621 28.0459L200.637 24.0678L210.736 24.1003C211.078 24.1003 211.388 23.9855 211.632 23.7255C211.876 23.4807 212.007 23.1872 212.007 22.8277V21.5562C212.007 21.214 211.893 20.9042 211.632 20.6594C211.388 20.4147 211.095 20.2847 210.736 20.2847L200.637 20.2512L200.653 16.3381L212.397 16.3868Z" fill="#1A1814"/>
+          </svg>
+        </a>
+        <div class="dc-nav-links">
+          <a href="index.html" class="dc-nav-link">Головна</a>
+          <a href="index.html#about" class="dc-nav-link">Про нас</a>
+          <a href="index.html#services" class="dc-nav-link">Послуги</a>
+          <a href="index.html#pricing" class="dc-nav-link">Ціни</a>
+          <a href="index.html#team" class="dc-nav-link">Команда</a>
+          <a href="index.html#zoomarket" class="dc-nav-link">Зоомагазин</a>
+          <a href="grooming.html" class="dc-nav-link active">Грумінг</a>
+          <a href="#контакти" class="dc-nav-link">Контакти</a>
+        </div>
+        <a href="index.html#contact" class="dc-btn dc-btn-light dc-nav-cta">Записатися <span class="dc-btn-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <button class="dc-burger" id="burger" aria-label="Меню">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="dc-mobile-menu" id="mobileMenu">
+    <div class="dc-mobile-panel">
+      <div class="dc-mobile-head">
+        <div class="dc-logo">
+          <svg height="36" viewBox="0 0 237 45" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0">
+            <circle cx="20.0223" cy="22.2089" r="20.0223" fill="#1A1814"/>
+            <path d="M30.0114 13.9169H27.9469C27.9932 13.5724 28.1349 13.2482 28.1811 12.9037H25.998V10.915C25.5758 10.9874 25.1537 11.274 24.8297 11.5432C23.7947 12.3971 23.3494 13.7055 23.3494 15.0111V16.415C23.3494 16.7595 23.3784 17.0345 23.144 17.3124C22.4617 18.1142 21.4438 18.6584 20.507 19.0984C17.7744 20.3808 14.4 20.7918 11.7398 19.1042C9.7735 17.8566 8.61977 15.8418 7.80435 13.7229C7.67712 13.8908 7.62218 14.1108 7.55857 14.3077C7.42266 14.7245 7.30989 15.1587 7.24918 15.5958C7.12483 16.47 7.17688 17.3818 7.51231 18.2097C8.41448 20.4387 11.0892 21.42 13.3388 21.1363C13.0381 21.3679 12.7489 21.5821 12.506 21.8774C11.7166 22.8384 11.6096 24.0397 11.6241 25.2323C11.6299 25.7534 11.8988 26.315 11.7398 26.8331C11.6733 27.0502 11.52 27.2586 11.3147 27.3571C11.1643 27.4294 10.9764 27.3831 10.881 27.5423C10.5629 28.0749 10.3634 28.7234 10.1118 29.2908C9.8082 29.9767 9.41494 30.6773 9.20965 31.3981H11.7802C11.7802 31.2185 11.7976 31.0276 11.76 30.8509C11.653 30.353 11.2713 30.0346 10.8058 29.8754C11.3205 29.3688 11.9219 28.9318 12.48 28.4802C12.6969 28.3037 13.0872 28.0865 13.2174 27.8376C13.2694 27.7363 13.226 27.606 13.2202 27.4989C13.2116 27.2673 13.2087 27.027 13.2492 26.7955C13.3995 25.8923 19.9113 23.6084 21.892 26.5234C22.1147 26.781 22.531 27.2239 22.8838 27.2847C23.014 27.3078 23.1528 27.2413 23.2742 27.2007L24.0145 26.9547C24.9455 26.645 25.8996 26.3613 26.8191 26.0197C26.6053 26.6971 26.6949 27.5105 27.4813 27.7449C27.7734 27.8318 28.0422 27.7999 28.3372 27.7768V23.8255C27.6867 23.8255 26.987 23.9413 26.3507 24.06C26.7093 23.646 27.0708 23.2755 27.3137 22.7718C28.0047 21.3505 27.8167 19.6658 27.3483 18.2068C27.1893 17.7147 26.9175 17.2545 26.7758 16.7624C26.9435 16.7624 27.1633 16.7247 27.3194 16.7855C27.5594 16.8782 27.7503 17.1763 27.9845 17.3124C28.5049 17.6134 29.0862 17.7205 29.6586 17.5034C30.7256 17.1011 31.1536 15.9461 31.0292 14.8866C31.0033 14.6608 30.9569 14.1311 30.8935 13.9111H30.0114V13.9169Z" fill="#FFD23F"/>
+            <path d="M15.5161 31.3924H18.0867C17.9739 30.5182 17.3031 29.89 16.4125 29.8698C16.5744 29.2763 16.9359 28.7003 17.2684 28.1937C17.4361 27.939 18.5494 26.0776 18.6274 25.7823C16.7826 25.4755 14.8539 26.3236 14.5156 26.7028C14.3537 26.8099 15.1055 29.1258 15.1489 29.3661C15.2703 30.0377 15.4294 30.715 15.5161 31.3924ZM27.9789 31.4329C27.9789 30.8135 27.6203 30.2953 27.0044 30.0521C26.7962 29.9712 26.1947 30 26.1195 29.7424C25.9865 29.5601 25.5817 27.6523 25.4169 27.0676C24.9744 27.1052 23.8814 27.496 23.8379 27.6205C23.8091 27.7044 23.9825 28.1589 24.0116 28.2343C24.081 28.4166 24.1591 28.5961 24.2285 28.7813C24.4656 29.4067 24.7258 30.0261 24.96 30.6543C25.0641 30.9959 25.1046 31.0942 25.174 31.4358H27.9789V31.4329Z" fill="#FFD23F"/>
+            <path d="M23.4487 16.0556C23.4487 16.0556 26.5051 17.0832 27.1904 17.6824C28.243 18.6029 29.2029 19.6335 28.1476 22.6469C27.2713 19.9114 24.3132 17.4248 23.2088 17.2048C23.0786 17.1758 23.0757 17.0224 23.1595 16.8198C23.2434 16.6171 23.1567 15.9774 23.4487 16.0556Z" fill="#FFD23F"/>
+            <path d="M67.7106 14.9177C65.935 13.3526 63.1171 12.5696 59.2239 12.5534L51.6984 12.5371C51.3564 12.5371 51.0468 12.6671 50.8025 12.9119C50.5583 13.1566 50.428 13.4664 50.428 13.8412L50.3789 30.6208C50.3789 30.964 50.5096 31.2738 50.7538 31.5014C50.9981 31.7461 51.3077 31.8608 51.6497 31.8608L59.1752 31.8771C63.0684 31.8933 65.9025 31.1266 67.6781 29.5778C69.4532 28.028 70.3491 25.5824 70.3658 22.2554C70.3658 18.9293 69.4861 16.4837 67.7106 14.9177ZM63.9643 26.7565C63.0846 27.637 61.4393 28.0777 59.0287 28.0615L55.4451 28.0443L55.4776 16.3527L59.0612 16.369C61.4717 16.369 63.117 16.826 63.9805 17.7065C64.8439 18.587 65.2833 20.1033 65.2671 22.2391C65.2671 24.3759 64.8273 25.876 63.9643 26.7565Z" fill="#1A1814"/>
+            <path d="M92.7265 14.569C90.9023 12.9542 88.2146 12.1387 84.6635 12.1387C81.1123 12.1387 78.4246 12.9217 76.5679 14.5192C74.727 16.1178 73.7987 18.678 73.7824 22.1676C73.7662 25.6572 74.6783 28.2175 76.5188 29.8313C78.3597 31.4461 81.0474 32.2616 84.5981 32.2779C88.1493 32.2942 90.837 31.4949 92.6774 29.8801C94.5183 28.2663 95.4467 25.7222 95.4467 22.2326C95.4629 18.7431 94.5508 16.1828 92.7265 14.569ZM86.846 18.3358C86.9113 16.656 87.8397 15.3185 88.9149 15.351C90.0064 15.3835 90.837 16.786 90.772 18.4658C90.7067 20.1456 89.7784 21.4821 88.7031 21.4496C87.6116 21.4171 86.7811 20.0146 86.846 18.3358ZM82.3178 13.8835C83.3606 13.4274 84.7937 14.3567 85.5107 15.9868C86.2272 17.6178 85.9667 19.2976 84.9239 19.7708C83.8816 20.2269 82.4481 19.2976 81.7315 17.6665C81.015 16.0365 81.2754 14.3405 82.3178 13.8835ZM81.878 26.0645C81.5035 27.0923 79.9235 27.4508 78.3435 26.8638C76.7635 26.293 75.786 24.989 76.1443 23.9775C76.5192 22.9497 78.0992 22.5912 79.6792 23.1782C81.2592 23.749 82.2529 25.0377 81.878 26.0645ZM81.7153 21.9229C80.9009 22.7222 79.2232 22.3302 77.9852 21.0586C76.7468 19.7871 76.4215 18.1073 77.2358 17.308C78.0501 16.5088 79.7279 16.9008 80.9659 18.1723C82.2038 19.4439 82.5296 21.1237 81.7153 21.9229ZM91.9284 25.9507C90.951 27.0923 89.0127 26.423 87.7094 27.337C87.7094 27.337 87.7094 27.337 87.6932 27.3533H87.677C86.3575 28.2175 86.2434 30.2558 84.8099 30.7444C83.3768 31.2176 81.9271 29.8639 82.6274 26.684C83.1159 24.5157 82.5134 22.9009 83.9794 21.8579C85.4944 20.8952 86.7648 22.0529 88.9636 22.4124C92.2051 22.9334 92.9059 24.8092 91.9284 25.9507Z" fill="#1A1814"/>
+            <path d="M118.752 21.4178L111.992 21.4016C111.65 21.4016 111.341 21.5154 111.097 21.7764C110.852 22.0211 110.722 22.3146 110.722 22.6731V23.7172C110.722 24.0594 110.836 24.3692 111.097 24.6139C111.341 24.8587 111.634 24.9887 111.992 24.9887L115.038 25.0049C115.022 26.0327 114.696 26.832 114.077 27.3855C113.458 27.94 112.416 28.2173 110.982 28.201L108.229 28.1848C106.617 28.1848 105.493 27.745 104.874 26.8807C104.255 26.0164 103.946 24.4504 103.946 22.1836C103.946 19.9178 104.304 18.368 105.005 17.52C105.705 16.672 107.041 16.2647 109.011 16.2647H111.406C113.214 16.2647 114.338 16.7217 114.794 17.6023C115.25 18.4828 115.869 18.9226 116.635 18.9226H118.231C118.524 18.9226 118.834 18.8088 119.143 18.5803C119.453 18.3518 119.616 17.977 119.616 17.4387C119.616 16.02 118.834 14.8297 117.238 13.8841C115.641 12.9386 113.866 12.4491 111.878 12.4491L108.881 12.4329C105.558 12.4166 103.05 13.2159 101.389 14.7972C99.727 16.3785 98.8798 18.8413 98.8635 22.1511C98.8473 25.4619 99.6454 27.9238 101.225 29.5385C102.805 31.1523 105.102 31.9679 108.083 31.9679L111.113 31.9841C114.028 32.0004 116.244 31.3159 117.759 29.9783C119.274 28.6255 120.023 26.701 120.039 24.1894V22.6894C120.039 22.3471 119.925 22.0374 119.664 21.7926C119.404 21.5479 119.11 21.4341 118.752 21.4178Z" fill="#1A1814"/>
+            <path d="M143.084 24.5814H141.488C140.657 24.5814 140.006 25.07 139.55 26.0652C138.898 27.484 137.791 28.1848 136.243 28.1848H133.572C131.601 28.1848 130.281 27.745 129.581 26.897C128.88 26.049 128.538 24.483 128.538 22.1999C128.538 19.9169 128.897 18.3518 129.597 17.52C130.298 16.672 131.633 16.2648 133.605 16.2648H135.999C137.546 16.2648 138.637 16.9818 139.305 18.4006C139.761 19.3958 140.397 19.8843 141.228 19.8843H142.824C143.117 19.8843 143.427 19.7706 143.736 19.5421C144.045 19.3136 144.209 18.9388 144.209 18.4006C144.209 16.5582 143.443 15.107 141.879 14.0467C140.315 12.9864 138.524 12.4492 136.471 12.4492L133.474 12.4329C130.151 12.4157 127.642 13.2149 125.981 14.7972C124.32 16.3785 123.473 18.8413 123.456 22.1674C123.44 25.4945 124.271 27.9563 125.932 29.5548C127.594 31.1524 130.086 31.9516 133.409 31.9679L136.699 31.9841C138.735 31.9841 140.543 31.4621 142.107 30.4191C143.671 29.3751 144.453 27.9238 144.469 26.0815C144.469 25.7058 144.355 25.3635 144.094 25.0537C143.834 24.7277 143.508 24.5814 143.084 24.5814Z" fill="#1A1814"/>
+            <path d="M167.562 12.5553L160.313 12.5391C155.264 12.5391 152.284 14.2839 151.354 17.7734L147.933 30.5903C147.901 30.705 147.885 30.835 147.885 30.9985C147.885 31.161 147.95 31.3245 148.113 31.5358C148.26 31.7318 148.521 31.8456 148.863 31.8456H151.518C151.86 31.8456 152.202 31.7318 152.511 31.487C152.821 31.2423 153.032 30.9488 153.114 30.574L154.027 27.182L163.604 27.2144L163.588 30.6065C163.588 30.9813 163.702 31.2748 163.946 31.5195C164.19 31.7643 164.484 31.879 164.859 31.879H167.384C167.725 31.879 168.035 31.7643 168.279 31.5195C168.523 31.2748 168.653 30.9813 168.653 30.639L168.703 13.8106C168.703 13.4846 168.588 13.1911 168.377 12.9301C168.165 12.6854 167.888 12.5553 167.562 12.5553ZM163.604 23.3989L155.036 23.3664L156.242 19.045C156.469 18.2132 156.909 17.5612 157.545 17.0717C158.179 16.5832 158.946 16.3384 159.809 16.3384L163.653 16.3547L163.604 23.3989Z" fill="#1A1814"/>
+            <path d="M189.517 26.759C188.929 25.845 188.408 25.1442 187.952 24.6547C187.496 24.1662 186.992 23.8393 186.454 23.628C189.842 22.975 191.536 21.3449 191.536 18.7196C191.536 16.8438 190.885 15.3438 189.581 14.2347C188.279 13.1258 186.584 12.5722 184.532 12.555L173.422 12.5225C173.081 12.5225 172.771 12.6534 172.527 12.8982C172.283 13.142 172.169 13.4527 172.169 13.795L172.119 30.5746C172.119 30.9169 172.25 31.2267 172.494 31.4714C172.739 31.7162 173.049 31.8462 173.39 31.8462H175.915C176.257 31.8462 176.567 31.7324 176.811 31.4714C177.056 31.2267 177.185 30.9332 177.185 30.5746L177.202 24.7858L180.492 24.802C181.828 24.802 182.969 25.5515 183.897 27.0191L186.177 30.6071C186.388 30.9657 186.698 31.2592 187.106 31.5039C187.513 31.7487 187.887 31.8787 188.23 31.8787L191.454 31.895C191.91 31.895 192.139 31.6999 192.139 31.3242C192.139 31.1129 192.074 30.8844 191.927 30.6396L189.517 26.759ZM185.411 20.4806C184.712 20.8392 183.897 21.0352 182.969 21.0189L177.234 21.0027L177.25 16.3715L182.985 16.3878C183.913 16.3878 184.728 16.5828 185.427 16.9423C186.129 17.3171 186.487 17.9041 186.487 18.7033C186.487 19.5016 186.129 20.1059 185.411 20.4806Z" fill="#1A1814"/>
+            <path d="M212.397 16.3868C212.74 16.3868 213.049 16.2731 213.293 16.0121C213.538 15.7673 213.668 15.4738 213.668 15.1153V13.8428C213.668 13.5005 213.554 13.1908 213.293 12.946C213.049 12.7013 212.756 12.5712 212.397 12.5712L196.874 12.5225C196.532 12.5225 196.223 12.6363 195.978 12.881C195.734 13.1258 195.603 13.4193 195.603 13.7615L195.555 30.5412C195.555 30.916 195.685 31.2094 195.93 31.4704C196.173 31.7152 196.483 31.8462 196.825 31.8462L212.284 31.895C212.626 31.895 212.935 31.7802 213.18 31.5192C213.424 31.2754 213.554 30.9819 213.554 30.6224V29.3346C213.554 28.9923 213.44 28.6826 213.196 28.4378C212.951 28.1931 212.659 28.0794 212.316 28.0794L200.621 28.0459L200.637 24.0678L210.736 24.1003C211.078 24.1003 211.388 23.9855 211.632 23.7255C211.876 23.4807 212.007 23.1872 212.007 22.8277V21.5562C212.007 21.214 211.893 20.9042 211.632 20.6594C211.388 20.4147 211.095 20.2847 210.736 20.2847L200.637 20.2512L200.653 16.3381L212.397 16.3868Z" fill="#1A1814"/>
+          </svg>
+        </div>
+        <button class="dc-mobile-close" id="menuClose">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="dc-mobile-links">
+        <a href="index.html" class="dc-mobile-link">Головна</a>
+        <a href="index.html#about" class="dc-mobile-link">Про нас</a>
+        <a href="index.html#services" class="dc-mobile-link">Послуги</a>
+        <a href="index.html#pricing" class="dc-mobile-link">Ціни</a>
+        <a href="index.html#team" class="dc-mobile-link">Команда</a>
+        <a href="index.html#zoomarket" class="dc-mobile-link">Зоомагазин</a>
+        <a href="grooming.html" class="dc-mobile-link active">Грумінг</a>
+        <a href="#контакти" class="dc-mobile-link">Контакти</a>
+        <a href="index.html#contact" class="dc-mobile-link">Записатися</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HERO ══ -->
+  <section class="dc-hero">
+    <div class="dc-wrap">
+      <div class="dc-hero-card">
+        <div class="dc-hero-grid">
+          <div>
+            <h1 class="dc-h1 reveal" style="--reveal-i:1">
+              DOG CARE —<br><span class="dc-nowrap">перша прозора</span><br>територія<br><em>грумінгу</em>
+            </h1>
+            <p class="dc-hero-sub reveal" style="--reveal-i:2" id="grm-sub">
+              Місце де ваш улюбленець почуває себе комфортно
+            </p>
+            <div class="dc-hero-ctas reveal" style="--reveal-i:3">
+              <a href="tel:+380667235102" class="dc-btn dc-btn-primary">
+                Записатись
+                <span class="dc-btn-arrow">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </a>
+              <a href="#послуги" class="dc-btn dc-btn-light">Переглянути ціни</a>
+            </div>
+            <div class="dc-hero-stats reveal" style="--reveal-i:4" id="grm-stats">
+              <div>
+                <div class="dc-stat-num">5+</div>
+                <div class="dc-stat-label">років досвіду</div>
+              </div>
+              <div>
+                <div class="dc-stat-num">500+</div>
+                <div class="dc-stat-label">щасливих клієнтів</div>
+              </div>
+              <div>
+                <div class="dc-stat-num">100%</div>
+                <div class="dc-stat-label">прозорість</div>
+              </div>
+            </div>
+          </div>
+          <div class="dc-hero-visual reveal" style="--reveal-i:2; margin-top:-60px; position:relative;">
+            <!-- deco: sparkle top-right -->
+            <span style="position:absolute;top:8%;right:4%;z-index:2;pointer-events:none;">
+              <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="30" y1="6" x2="46" y2="2" stroke="#1A1814" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="36" y1="20" x2="52" y2="18" stroke="#1A1814" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="32" y1="34" x2="46" y2="34" stroke="#1A1814" stroke-width="2.8" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <!-- deco: curl left-middle -->
+            <span style="position:absolute;left:4%;top:42%;z-index:2;pointer-events:none;">
+              <svg width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M42 58 C18 56 8 38 20 24 C32 10 52 18 48 34 C44 50 26 50 22 38" stroke="#1A1814" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <img src="Grooming_hero.png" alt="Грумінг" style="width:100%;height:auto;display:block;object-fit:contain;mask-image:linear-gradient(to bottom,black 65%,transparent 100%),linear-gradient(to right,transparent 0%,black 10%,black 90%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,black 65%,transparent 100%),linear-gradient(to right,transparent 0%,black 10%,black 90%,transparent 100%);mask-composite:intersect;-webkit-mask-composite:source-in;">
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- wave: yellow → ink -->
+  <div class="wave-sep" style="background:#FFD23F;">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,0 C480,80 960,80 1440,0 L1440,80 L0,80 Z" fill="#1A1814"/>
+    </svg>
+  </div>
+
+  <!-- ══ MARQUEE ══ -->
+  <div class="dc-marquee-wrap">
+    <div class="dc-marquee-track">
+      <!-- Two copies for seamless loop -->
+      <div class="dc-marquee-item"><span>Грумінг</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Стрижка</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Купання</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Чищення вух</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Стрижка кігтів</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Всі породи</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>5 років досвіду</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Прозорий простір</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Грумінг</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Стрижка</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Купання</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Чищення вух</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Стрижка кігтів</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Всі породи</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>5 років досвіду</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+      <div class="dc-marquee-item"><span>Прозорий простір</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
+    </div>
+  </div>
+
+  <!-- wave: ink → cream -->
+  <div class="wave-sep" style="background:#1A1814;">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,80 C480,0 960,0 1440,80 L1440,80 L0,80 Z" fill="#FFFDF0"/>
+    </svg>
+  </div>
+
+  <!-- ══ ПЕРЕВАГИ ══ -->
+  <section class="dc-section dc-section-cream">
+    <div class="dc-wrap">
+      <div class="dc-section-head dc-section-head--center">
+        <div>
+          <div class="dc-eyebrow-text reveal">Чому Dog Care</div>
+          <h2 class="dc-h2 reveal" style="--reveal-i:1">Догляд, якому <em>можна довіряти</em></h2>
+        </div>
+      </div>
+      <div class="dc-feat-grid">
+        <div class="dc-feat-card reveal" style="--reveal-i:0">
+          <div class="dc-feat-ic">🔍</div>
+          <div class="dc-feat-title">Повна прозорість</div>
+          <div class="dc-feat-body">Скляні стіни дозволяють вам спостерігати за кожним кроком догляду вашого улюбленця. Жодних закритих дверей.</div>
+        </div>
+        <div class="dc-feat-card reveal" style="--reveal-i:1">
+          <div class="dc-feat-ic">🏆</div>
+          <div class="dc-feat-title">5 років досвіду</div>
+          <div class="dc-feat-body">Наші грумери працюють з усіма породами собак і кішок. Знаємо особливості кожної породи та індивідуальний підхід.</div>
+        </div>
+        <div class="dc-feat-card reveal" style="--reveal-i:2">
+          <div class="dc-feat-ic">🧴</div>
+          <div class="dc-feat-title">Професійна косметика</div>
+          <div class="dc-feat-body">Використовуємо виключно професійні шампуні, кондиціонери та засоби догляду, безпечні для здоров'я тварин.</div>
+        </div>
+        <div class="dc-feat-card reveal" style="--reveal-i:3">
+          <div class="dc-feat-ic">🐾</div>
+          <div class="dc-feat-title">Всі породи</div>
+          <div class="dc-feat-body">Від маленьких йоркширських тер'єрів до великих вівчарок. Догляд за довго-, коротко- та жорсткошерстними породами.</div>
+        </div>
+        <div class="dc-feat-card reveal" style="--reveal-i:4">
+          <div class="dc-feat-ic">📍</div>
+          <div class="dc-feat-title">Зручне розташування</div>
+          <div class="dc-feat-body">Знаходимось на вулиці Молодіжка, 40 в Івано-Франківську. Є зручна парковка поряд.</div>
+        </div>
+        <div class="dc-feat-card reveal" style="--reveal-i:5">
+          <div class="dc-feat-ic">😌</div>
+          <div class="dc-feat-title">Комфорт тварини</div>
+          <div class="dc-feat-body">При прояві агресії просимо власника бути присутнім. При необхідності можливе використання заспокійливих за рекомендацією ветеринара.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- wave: cream → white -->
+  <div class="wave-sep" style="background:#FFFDF0;">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,20 C360,0 720,80 1080,40 C1260,20 1380,50 1440,20 L1440,80 L0,80 Z" fill="#ffffff"/>
+    </svg>
+  </div>
+
+  <!-- ══ ЦІНИ ══ -->
+  <section class="dc-section dc-section-white" id="послуги">
+    <div class="dc-wrap" id="grm-pricing-section-wrap">
+      <div class="dc-section-head dc-section-head--center">
+        <div>
+          <div class="dc-eyebrow-text reveal">Прозоре ціноутворення</div>
+          <h2 class="dc-h2 reveal" style="--reveal-i:1">Послуги та <em>ціни</em></h2>
+          <p class="dc-section-sub reveal" style="--reveal-i:2; margin: 12px auto 0;">Ціни залежать від породи, розміру та стану шерсті вашого улюбленця</p>
+        </div>
+      </div>
+
+      <div class="dc-price-tabs reveal" style="--reveal-i:2">
+        <button class="dc-price-tab active" data-tab="hygiene">Гігієнічний догляд</button>
+        <button class="dc-price-tab" data-tab="full">Повний комплекс</button>
+        <button class="dc-price-tab" data-tab="hard">Жорсткошерстні</button>
+        <button class="dc-price-tab" data-tab="cats">Кішки</button>
+        <button class="dc-price-tab" data-tab="extras">Додаткові послуги</button>
+      </div>
+
+      <!-- Гігієнічний догляд -->
+      <div class="dc-price-panel active reveal" id="tab-hygiene" style="--reveal-i:3">
+        <div class="dc-price-card">
+          <div class="dc-price-card-head">
+            <div class="dc-price-card-icon">🛁</div>
+            <div>
+              <div class="dc-price-card-title">Гігієнічний догляд</div>
+              <div class="dc-price-card-desc">Купання, сушка, базовий догляд — для довгошерстних порід</div>
+            </div>
+          </div>
+          <table class="dc-price-table">
+            <thead>
+              <tr>
+                <th>Порода / розмір</th>
+                <th>Що входить</th>
+                <th style="text-align:right">Ціна</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Йоркширський тер'єр</strong></td>
+                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух, протирання очей</td>
+                <td style="text-align:right"><span class="dc-price-badge">800 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Мальтезе</strong></td>
+                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух, протирання очей</td>
+                <td style="text-align:right"><span class="dc-price-badge">800 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Той-пудель</strong></td>
+                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух, протирання очей</td>
+                <td style="text-align:right"><span class="dc-price-badge">800–850 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Метис до 10 кг</strong></td>
+                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух</td>
+                <td style="text-align:right"><span class="dc-price-badge">650–750 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Метис 10–25 кг</strong></td>
+                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух</td>
+                <td style="text-align:right"><span class="dc-price-badge">900–1050 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Метис 25–45 кг</strong></td>
+                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух</td>
+                <td style="text-align:right"><span class="dc-price-badge">1100–1200 ₴</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="dc-price-note">
+            <span class="dc-price-note-icon">ℹ️</span>
+            <span>Гігієнічний догляд включає: купання з профкосметикою та кондиціонером, сушку з розчісуванням, стрижку подушечок лап та паху, чищення вух, стрижку кігтів, протирання очей, мінімальне розколтунювання.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Повний комплекс -->
+      <div class="dc-price-panel" id="tab-full">
+        <div class="dc-price-card">
+          <div class="dc-price-card-head">
+            <div class="dc-price-card-icon">✂️</div>
+            <div>
+              <div class="dc-price-card-title">Повний комплекс</div>
+              <div class="dc-price-card-desc">Гігієнічний догляд + модельна/породна стрижка</div>
+            </div>
+          </div>
+          <table class="dc-price-table">
+            <thead>
+              <tr>
+                <th>Порода / розмір</th>
+                <th>Що входить</th>
+                <th style="text-align:right">Ціна</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Йоркширський тер'єр</strong></td>
+                <td>Повний гігієнічний догляд + модельна стрижка, стрижка хвостика, полірування шерсті</td>
+                <td style="text-align:right"><span class="dc-price-badge">900–1000 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Мальтезе</strong></td>
+                <td>Повний гігієнічний догляд + породна стрижка, фінішне полірування</td>
+                <td style="text-align:right"><span class="dc-price-badge">950–1050 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Мініатюрний пудель</strong></td>
+                <td>Повний гігієнічний догляд + модельна стрижка пуделя, оформлення помпонів</td>
+                <td style="text-align:right"><span class="dc-price-badge">1000–1100 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Кокер-спанієль</strong></td>
+                <td>Повний гігієнічний догляд + породна стрижка, оформлення вух</td>
+                <td style="text-align:right"><span class="dc-price-badge">1100–1250 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Золотистий ретривер</strong></td>
+                <td>Повний гігієнічний догляд + тримінг, оформлення шерсті</td>
+                <td style="text-align:right"><span class="dc-price-badge">1300–1500 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Великий пудель</strong></td>
+                <td>Повний гігієнічний догляд + складна модельна стрижка</td>
+                <td style="text-align:right"><span class="dc-price-badge">від 1500 ₴</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="dc-price-note">
+            <span class="dc-price-note-icon">✨</span>
+            <span>Повний комплекс включає все з гігієнічного догляду плюс: модельну або породну стрижку, повноцінну стрижку хвостика та фінішне полірування шерсті.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Жорсткошерстні -->
+      <div class="dc-price-panel" id="tab-hard">
+        <div class="dc-price-card">
+          <div class="dc-price-card-head">
+            <div class="dc-price-card-icon">🐕</div>
+            <div>
+              <div class="dc-price-card-title">Жорсткошерстні породи та короткошерстні</div>
+              <div class="dc-price-card-desc">Купання, фурмінація, тримінг, полірування</div>
+            </div>
+          </div>
+          <table class="dc-price-table">
+            <thead>
+              <tr>
+                <th>Порода / розмір</th>
+                <th>Послуга</th>
+                <th style="text-align:right">Ціна</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Мопс / Французький бульдог</strong></td>
+                <td>Профшампунь, сушка, стрижка кігтів, чищення вух, складки обличчя</td>
+                <td style="text-align:right"><span class="dc-price-badge">700–800 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Такса</strong></td>
+                <td>Купання, сушка, стрижка кігтів, чищення вух</td>
+                <td style="text-align:right"><span class="dc-price-badge">700–750 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Ягдтер'єр / Фокстер'єр</strong></td>
+                <td>Купання, сушка, тримінг, стрижка кігтів, чищення вух</td>
+                <td style="text-align:right"><span class="dc-price-badge">900–1050 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Нім. вівчарка (Експрес линька)</strong></td>
+                <td>Профшампунь для прискорення линьки, ретельне вичісування, сушка</td>
+                <td style="text-align:right"><span class="dc-price-badge">900 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Хаскі / Лабрадор</strong></td>
+                <td>Купання, сушка, фурмінація, стрижка кігтів, чищення вух</td>
+                <td style="text-align:right"><span class="dc-price-badge">1200–1400 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Велика порода 35+ кг</strong></td>
+                <td>Повний комплекс догляду + стрижка кігтів, чищення вух</td>
+                <td style="text-align:right"><span class="dc-price-badge">від 1600 ₴</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="dc-price-note">
+            <span class="dc-price-note-icon">ℹ️</span>
+            <span>Ціна залежить від ступеня линьки, стану шерсті та поведінки тварини. При вазі, що перевищує вказану категорію, вартість збільшується на 15–20%.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Кішки -->
+      <div class="dc-price-panel" id="tab-cats">
+        <div class="dc-price-card">
+          <div class="dc-price-card-head">
+            <div class="dc-price-card-icon">🐱</div>
+            <div>
+              <div class="dc-price-card-title">Грумінг котів</div>
+              <div class="dc-price-card-desc">Сухе вичісування або повне купання</div>
+            </div>
+          </div>
+          <table class="dc-price-table">
+            <thead>
+              <tr>
+                <th>Порода / тип</th>
+                <th>Послуга</th>
+                <th style="text-align:right">Ціна</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Звичайний кіт (сухе вичісування)</strong></td>
+                <td>Розчісування, вичісування підшерстку, стрижка кігтів</td>
+                <td style="text-align:right"><span class="dc-price-badge">700 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Британець (сухе вичісування)</strong></td>
+                <td>Розчісування, вичісування підшерстку, стрижка кігтів</td>
+                <td style="text-align:right"><span class="dc-price-badge">800 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Звичайний кіт (повний пакет)</strong></td>
+                <td>Купання з профкосметикою, сушка, розчісування, стрижка кігтів</td>
+                <td style="text-align:right"><span class="dc-price-badge">1000 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Британець (повний пакет)</strong></td>
+                <td>Купання з профкосметикою, сушка, розчісування, стрижка кігтів</td>
+                <td style="text-align:right"><span class="dc-price-badge">1100 ₴</span></td>
+              </tr>
+              <tr>
+                <td><strong>Мейн-кун (повний пакет)</strong></td>
+                <td>Купання з профкосметикою, сушка, ретельне розчісування, стрижка кігтів</td>
+                <td style="text-align:right"><span class="dc-price-badge">1400 ₴</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="dc-price-note">
+            <span class="dc-price-note-icon">🐾</span>
+            <span>Для котів рекомендуємо заздалегідь уточнити поведінку вашого улюбленця. При агресії майстер може попросити власника бути присутнім.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Додаткові послуги -->
+      <div class="dc-price-panel" id="tab-extras">
+        <div class="dc-add-grid" id="grm-add-grid">
+          <div class="dc-add-card reveal" style="--reveal-i:0">
+            <div class="dc-add-icon">💅</div>
+            <div class="dc-add-name">Стрижка кігтів</div>
+            <div class="dc-add-price">200 ₴</div>
+          </div>
+          <div class="dc-add-card reveal" style="--reveal-i:1">
+            <div class="dc-add-icon">👂</div>
+            <div class="dc-add-name">Чищення вух</div>
+            <div class="dc-add-price">150 ₴</div>
+          </div>
+          <div class="dc-add-card reveal" style="--reveal-i:2">
+            <div class="dc-add-icon">🪢</div>
+            <div class="dc-add-name">Розколтунювання</div>
+            <div class="dc-add-price">від 250 ₴</div>
+          </div>
+          <div class="dc-add-card reveal" style="--reveal-i:3">
+            <div class="dc-add-icon">🦷</div>
+            <div class="dc-add-name">Чищення зубів (гель)</div>
+            <div class="dc-add-price">170 ₴</div>
+          </div>
+          <div class="dc-add-card reveal" style="--reveal-i:4">
+            <div class="dc-add-icon">✂️</div>
+            <div class="dc-add-name">Стрижка мордочки</div>
+            <div class="dc-add-price">+200 ₴</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ГАЛЕРЕЯ ══ -->
+  <section class="dc-section dc-section-white" id="галерея">
+    <div class="dc-wrap">
+      <div class="dc-section-head dc-section-head--center" style="margin-bottom: 48px;">
+        <div>
+          <div class="dc-eyebrow-text reveal">Наші роботи</div>
+          <h2 class="dc-h2 reveal" style="--reveal-i:1">Галерея <em>грумінгу</em></h2>
+        </div>
+      </div>
+      <div id="grm-slider-wrap" class="reveal" style="--reveal-i:2">
+        <!-- заповнюється з localStorage -->
+      </div>
+    </div>
+    <!-- Lightbox -->
+    <div class="grm-lightbox" id="grm-lightbox" onclick="this.classList.remove('open')">
+      <button class="grm-lb-close" onclick="document.getElementById('grm-lightbox').classList.remove('open')">✕</button>
+      <button class="grm-lb-prev" onclick="event.stopPropagation();grmLbNav(-1)">‹</button>
+      <img class="grm-lb-img" id="grm-lb-img" src="" alt="">
+      <button class="grm-lb-next" onclick="event.stopPropagation();grmLbNav(1)">›</button>
+    </div>
+  </section>
+
+  <!-- wave: white → yellow -->
+  <div class="wave-sep" style="background:#ffffff;">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,0 C400,80 800,40 1440,20 L1440,80 L0,80 Z" fill="#FFD23F"/>
+    </svg>
+  </div>
+
+  <!-- ══ ЯК ЦЕ ПРАЦЮЄ ══ -->
+  <section class="dc-section dc-section-yellow gp-section" id="процес">
+    <div class="gp-inner">
+
+      <!-- Header -->
+      <div class="gp-head">
+        <div class="dc-eyebrow-text reveal" style="color:rgba(26,24,20,.5);justify-content:center;display:flex;">Покроково</div>
+        <h2 class="dc-h2 reveal" style="--reveal-i:1;color:var(--ink);margin-top:10px;">
+          Як проходить <em style="color:rgba(26,24,20,.38);">сеанс</em>
+        </h2>
+      </div>
+
+      <!-- Paw print decorations -->
+      <div class="gp-paws" aria-hidden="true">
+        <svg class="gp-paw" style="left:2%;top:16%;width:88px;transform:rotate(-18deg)" viewBox="0 0 100 100" fill="#1A1814">
+          <ellipse cx="28" cy="34" rx="8" ry="10"/><ellipse cx="72" cy="34" rx="8" ry="10"/>
+          <ellipse cx="12" cy="53" rx="7" ry="9"/><ellipse cx="88" cy="53" rx="7" ry="9"/>
+          <path d="M50 44c-15 0-25 12-25 24 0 9 8 15 16 15 4 0 7-3 9-3s5 3 9 3c8 0 16-6 16-15 0-12-10-24-25-24z"/>
+        </svg>
+        <svg class="gp-paw" style="left:3%;top:56%;width:62px;transform:rotate(14deg)" viewBox="0 0 100 100" fill="#1A1814">
+          <ellipse cx="28" cy="34" rx="8" ry="10"/><ellipse cx="72" cy="34" rx="8" ry="10"/>
+          <ellipse cx="12" cy="53" rx="7" ry="9"/><ellipse cx="88" cy="53" rx="7" ry="9"/>
+          <path d="M50 44c-15 0-25 12-25 24 0 9 8 15 16 15 4 0 7-3 9-3s5 3 9 3c8 0 16-6 16-15 0-12-10-24-25-24z"/>
+        </svg>
+        <svg class="gp-paw" style="right:2%;top:18%;width:78px;transform:rotate(20deg)" viewBox="0 0 100 100" fill="#1A1814">
+          <ellipse cx="28" cy="34" rx="8" ry="10"/><ellipse cx="72" cy="34" rx="8" ry="10"/>
+          <ellipse cx="12" cy="53" rx="7" ry="9"/><ellipse cx="88" cy="53" rx="7" ry="9"/>
+          <path d="M50 44c-15 0-25 12-25 24 0 9 8 15 16 15 4 0 7-3 9-3s5 3 9 3c8 0 16-6 16-15 0-12-10-24-25-24z"/>
+        </svg>
+        <svg class="gp-paw" style="right:3%;top:58%;width:58px;transform:rotate(-10deg)" viewBox="0 0 100 100" fill="#1A1814">
+          <ellipse cx="28" cy="34" rx="8" ry="10"/><ellipse cx="72" cy="34" rx="8" ry="10"/>
+          <ellipse cx="12" cy="53" rx="7" ry="9"/><ellipse cx="88" cy="53" rx="7" ry="9"/>
+          <path d="M50 44c-15 0-25 12-25 24 0 9 8 15 16 15 4 0 7-3 9-3s5 3 9 3c8 0 16-6 16-15 0-12-10-24-25-24z"/>
+        </svg>
+      </div>
+
+      <!-- SVG arc connector (behind everything) -->
+      <svg class="gp-arc" viewBox="0 0 1920 910" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <path d="M 307,810 A 653,600 0 0,1 1613,810"
+              stroke="#1A1814" stroke-width="2.4" fill="none"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+
+<!-- 5 Steps (absolutely positioned) -->
+      <div class="gp-step gp-s1 reveal" style="--reveal-i:0">
+        <div class="gp-num">01</div>
+        <div class="gp-text-wrap">
+          <div class="gp-title">Запис онлайн або по телефону</div>
+          <div class="gp-body">Обираєте зручний час, вказуєте породу та бажані послуги. Підтверджуємо запис протягом кількох хвилин.</div>
+        </div>
+      </div>
+      <div class="gp-step gp-s2 reveal" style="--reveal-i:1">
+        <div class="gp-num">02</div>
+        <div class="gp-text-wrap">
+          <div class="gp-title">Приймання та огляд</div>
+          <div class="gp-body">Майстер оглядає стан шерсті, шкіри та кігтів. Уточнює побажання щодо стрижки і фінального вигляду.</div>
+        </div>
+      </div>
+      <div class="gp-step gp-s3 reveal" style="--reveal-i:2">
+        <div class="gp-num">03</div>
+        <div class="gp-text-wrap">
+          <div class="gp-title">Купання та догляд</div>
+          <div class="gp-body">Купаємо з профшампунем і кондиціонером, сушимо, вичісуємо. Ви можете спостерігати крізь скляні стіни.</div>
+        </div>
+      </div>
+      <div class="gp-step gp-s4 reveal" style="--reveal-i:3">
+        <div class="gp-num">04</div>
+        <div class="gp-text-wrap">
+          <div class="gp-title">Стрижка та фінішний догляд</div>
+          <div class="gp-body">Виконуємо вибрану стрижку, стрижемо кігті, чистимо вуха, поліруємо шерсть для ідеального фінального вигляду.</div>
+        </div>
+      </div>
+      <div class="gp-step gp-s5 reveal" style="--reveal-i:4">
+        <div class="gp-num">05</div>
+        <div class="gp-text-wrap">
+          <div class="gp-title">Повернення щасливим</div>
+          <div class="gp-body">Отримуєте доглянутого і запашного улюбленця. Майстер розповість про стан шерсті та рекомендації по догляду вдома.</div>
+        </div>
+      </div>
+
+      <!-- Dog (inside section) -->
+      <div class="gp-dog-wrap">
+        <img src="dog-process.png" alt="Доглянутий пес" class="gp-dog">
+      </div>
+
+      <!-- Wave (inside section, вище за собаку за z-index) -->
+      <div class="gp-wave" aria-hidden="true">
+        <svg viewBox="0 0 1440 80" height="80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <rect width="1440" height="80" fill="#FFD23F"/>
+          <path d="M0,40 C200,80 400,0 600,40 C800,80 1000,0 1200,40 C1320,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="#ffffff"/>
+        </svg>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ FAQ ══ -->
+  <section class="dc-section dc-section-white">
+    <div class="dc-wrap">
+      <div class="dc-section-head dc-section-head--center">
+        <div>
+          <div class="dc-eyebrow-text reveal">Запитання та відповіді</div>
+          <h2 class="dc-h2 reveal" style="--reveal-i:1">Часті <em>запитання</em></h2>
+        </div>
+      </div>
+      <div class="dc-faq-list" style="max-width: 800px; margin: 0 auto;">
+        <div class="dc-faq-item reveal" style="--reveal-i:0">
+          <button class="dc-faq-q">
+            Як часто потрібно водити собаку на грумінг?
+            <span class="dc-faq-chevron">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>
+          <div class="dc-faq-a"><p>Для довгошерстних порід рекомендуємо кожні 6–8 тижнів. Для короткошерстних — кожні 2–3 місяці або за потреби. Кішок зазвичай 2–4 рази на рік. Точний графік залежить від породи та стилю життя вашого улюбленця.</p></div>
+        </div>
+        <div class="dc-faq-item reveal" style="--reveal-i:1">
+          <button class="dc-faq-q">
+            Чи можу я залишатися під час процедури?
+            <span class="dc-faq-chevron">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>
+          <div class="dc-faq-a"><p>Так! Ми — перша прозора територія грумінгу в місті. Ви можете спостерігати за процесом через скляні стіни. При прояві агресії ми можемо попросити власника бути присутнім у салоні.</p></div>
+        </div>
+        <div class="dc-faq-item reveal" style="--reveal-i:2">
+          <button class="dc-faq-q">
+            Що робити, якщо у собаки колтуни?
+            <span class="dc-faq-chevron">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>
+          <div class="dc-faq-a"><p>Розколтунювання — це окрема послуга, що оплачується додатково від 250 грн. Якщо колтунів дуже багато або вони занадто щільні, майстер може порекомендувати стрижку «під нуль» для комфорту тварини. Ми повідомимо про це ще до початку процедури.</p></div>
+        </div>
+        <div class="dc-faq-item reveal" style="--reveal-i:3">
+          <button class="dc-faq-q">
+            Як підготувати собаку до першого грумінгу?
+            <span class="dc-faq-chevron">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>
+          <div class="dc-faq-a"><p>Перед першим візитом рекомендуємо трохи погуляти, щоб собака була спокійніша. Не годуйте за 2 години до процедури. Принесіть будь-які медичні документи, якщо є алергія або шкірні захворювання. Ми зробимо все, щоб перший досвід був максимально комфортним.</p></div>
+        </div>
+        <div class="dc-faq-item reveal" style="--reveal-i:4">
+          <button class="dc-faq-q">
+            Скільки часу займає процедура?
+            <span class="dc-faq-chevron">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>
+          <div class="dc-faq-a"><p>Гігієнічний догляд для малих порід займає 1–1.5 години. Повний комплекс зі стрижкою — від 2 до 3.5 годин залежно від породи та складності стрижки. Для великих порід може знадобитися більше часу. Уточнюйте при записі.</p></div>
+        </div>
+        <div class="dc-faq-item reveal" style="--reveal-i:5">
+          <button class="dc-faq-q">
+            Чи є знижки при регулярних відвідуваннях?
+            <span class="dc-faq-chevron">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>
+          <div class="dc-faq-a"><p>Для постійних клієнтів ми маємо спеціальні пропозиції та накопичувальну програму лояльності. Уточнюйте деталі у нашого адміністратора під час запису або по телефону.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- wave: white → cream -->
+  <div class="wave-sep" style="background:#ffffff;">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,80 C360,0 720,60 1080,10 C1260,0 1380,40 1440,60 L1440,80 L0,80 Z" fill="#FFFDF0"/>
+    </svg>
+  </div>
+
+  <!-- ══ CTA / КОНТАКТИ ══ -->
+  <section class="dc-section dc-section-cream" id="контакти">
+    <div class="dc-wrap">
+      <div class="dc-cta-band reveal">
+        <div>
+          <h2>Готові до запису? 🐾</h2>
+          <p>Залиште заявку онлайн або телефонуйте — відповімо швидко!</p>
+        </div>
+        <div class="dc-cta-contacts" id="grm-contacts">
+          <a href="tel:+380667235102" class="dc-cta-phone">+380 66 723 51 02</a>
+          <a href="tel:+380989013988" class="dc-cta-phone">+380 98 901 39 88</a>
+          <div class="dc-cta-social">Instagram: @dog_care_grooming_if</div>
+          <div class="dc-cta-social">📍 вул. Молодіжка, 40, Івано-Франківськ</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <button onclick="bkOpen()" class="dc-btn dc-btn-primary" style="justify-content:center;">
+            Записатися
+            <span class="dc-btn-arrow">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>
+          <a id="grm-ig-btn" href="https://www.instagram.com/dog_care_grooming_if" target="_blank" class="dc-btn dc-btn-light" style="justify-content:center;">Instagram</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- wave: cream → ink -->
+  <div class="wave-sep" style="background:#FFFDF0;">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,80 C480,0 960,0 1440,80 L1440,80 L0,80 Z" fill="#1A1814"/>
+    </svg>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="dc-footer">
+    <div class="dc-wrap">
+      <div class="dc-footer-grid">
+        <!-- Logo + desc + socials -->
+        <div>
+          <div class="dc-footer-logo">
+            <svg height="36" viewBox="0 0 555 121" fill="#FFD23F" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0">
+              <path d="M134.484 17.6875H122.319C122.592 15.6577 123.427 13.7474 123.699 11.7177H110.836V0C108.348 0.426409 105.861 2.11499 103.952 3.70123C97.8534 8.73286 95.2294 16.4423 95.2294 24.1348V32.4071C95.2294 34.4368 95.4004 36.0572 94.0194 37.6946C89.9994 42.4192 84.0016 45.6258 78.4814 48.2183C62.3807 55.7743 42.4977 58.1963 26.823 48.2525C15.2373 40.9012 8.43924 29.0299 3.63464 16.5447C2.88494 17.5339 2.56124 18.8302 2.18644 19.9901C1.38564 22.4462 0.72114 25.0046 0.36344 27.5801C-0.36926 32.7312 -0.0625603 38.1039 1.91384 42.982C7.22964 56.1154 22.9895 61.8976 36.2448 60.226C34.4729 61.5905 32.7692 62.8527 31.338 64.5925C26.6867 70.2552 26.0563 77.3336 26.1415 84.3608C26.1755 87.4309 27.7601 90.7399 26.823 93.793C26.4311 95.0722 25.5281 96.3002 24.3184 96.8802C23.4325 97.3066 22.325 97.0337 21.7628 97.9718C19.8886 101.11 18.713 104.931 17.2307 108.274C15.4418 112.316 13.1246 116.444 11.915 120.691H27.0615C27.0615 119.633 27.1637 118.508 26.9422 117.467C26.3118 114.533 24.0629 112.657 21.3198 111.719C24.3525 108.734 27.8964 106.159 31.1846 103.498C32.4625 102.458 34.7626 101.178 35.5293 99.7115C35.8359 99.1145 35.5804 98.347 35.5463 97.7159C35.4952 96.3514 35.4781 94.9357 35.7167 93.5712C36.6026 88.2496 74.9716 74.7922 86.6424 91.9679C87.9544 93.4859 90.4074 96.0956 92.4864 96.4537C93.2534 96.5902 94.0714 96.1979 94.7864 95.9591L99.1484 94.5093C104.634 92.6843 110.256 91.0128 115.674 89.0001C114.414 92.9913 114.942 97.7841 119.576 99.1657C121.297 99.6774 122.881 99.4898 124.619 99.3533V76.0714C120.786 76.0714 116.663 76.7536 112.914 77.453C115.027 75.0139 117.157 72.8307 118.588 69.8629C122.66 61.4882 121.552 51.5614 118.792 42.965C117.855 40.0654 116.254 37.3534 115.419 34.4539C116.407 34.4539 117.702 34.2321 118.622 34.5903C120.036 35.1361 121.161 36.8929 122.541 37.6946C125.607 39.4684 129.032 40.0995 132.405 38.8203C138.692 36.4495 141.214 29.644 140.481 23.4013C140.328 22.0709 140.055 18.9496 139.681 17.6533H134.484V17.6875Z"/>
+              <path d="M49.0743 120.657H64.2209C63.5564 115.506 59.6037 111.805 54.356 111.686C55.3102 108.189 57.4399 104.795 59.3992 101.81C60.3874 100.309 66.9469 89.3412 67.407 87.6014C56.5369 85.7934 45.1727 90.7909 43.1793 93.0253C42.2252 93.6564 46.655 107.302 46.9106 108.718C47.6261 112.675 48.5632 116.666 49.0743 120.657ZM122.508 120.896C122.508 117.246 120.395 114.193 116.766 112.76C115.539 112.283 111.995 112.453 111.552 110.935C110.768 109.861 108.383 98.6199 107.412 95.1745C104.805 95.3962 98.3645 97.6988 98.1085 98.4322C97.9385 98.9269 98.9605 101.605 99.1315 102.049C99.5405 103.123 100.001 104.181 100.41 105.272C101.807 108.957 103.34 112.607 104.72 116.308C105.333 118.321 105.572 118.9 105.981 120.913H122.508V120.896Z"/>
+              <path d="M95.2123 31.1442C95.2123 31.1442 113.221 37.1993 117.259 40.73C123.461 46.1539 129.117 52.2261 122.899 69.9818C117.736 53.8635 100.306 39.2119 93.7983 37.9156C93.0313 37.7451 93.0143 36.8411 93.5083 35.6471C94.0023 34.4532 93.4913 30.6837 95.2123 31.1442Z"/>
+              <path d="M213.191 43.3853C209.033 39.7203 202.434 37.8867 193.317 37.8486L175.694 37.8105C174.893 37.8105 174.168 38.115 173.596 38.6882C173.024 39.2613 172.719 39.9867 172.719 40.8644L172.604 80.1587C172.604 80.9624 172.91 81.6878 173.482 82.2207C174.054 82.7938 174.779 83.0625 175.58 83.0625L193.203 83.1006C202.32 83.1386 208.957 81.3431 213.115 77.7161C217.272 74.0869 219.37 68.3598 219.409 60.5686C219.409 52.7796 217.349 47.0526 213.191 43.3853ZM204.418 71.1092C202.358 73.1712 198.505 74.2033 192.86 74.1652L184.468 74.1249L184.544 46.7459L192.936 46.7839C198.581 46.7839 202.434 47.8541 204.456 49.9161C206.478 51.9781 207.507 55.5289 207.469 60.5305C207.469 65.5344 206.439 69.0472 204.418 71.1092Z"/>
+              <path d="M271.772 42.5662C267.5 38.7848 261.206 36.875 252.89 36.875C244.574 36.875 238.28 38.7086 233.932 42.4498C229.621 46.1932 227.447 52.1888 227.409 60.3607C227.371 68.5326 229.507 74.5282 233.817 78.3074C238.128 82.0889 244.422 83.9986 252.737 84.0367C261.053 84.0748 267.347 82.2031 271.657 78.4216C275.968 74.6424 278.142 68.6848 278.142 60.5129C278.18 52.3411 276.044 46.3454 271.772 42.5662ZM258.001 51.3873C258.154 47.4537 260.328 44.3215 262.846 44.3976C265.402 44.4737 267.347 47.7581 267.195 51.6918C267.042 55.6255 264.868 58.7554 262.35 58.6793C259.794 58.6032 257.849 55.3188 258.001 51.3873ZM247.397 40.9609C249.839 39.893 253.195 42.0692 254.874 45.8865C256.552 49.706 255.942 53.6396 253.5 54.7479C251.059 55.8158 247.702 53.6396 246.024 49.8201C244.346 46.0028 244.956 42.0311 247.397 40.9609ZM246.367 69.4863C245.49 71.8931 241.79 72.7327 238.09 71.358C234.39 70.0214 232.101 66.9676 232.94 64.5989C233.818 62.1921 237.518 61.3525 241.218 62.7272C244.918 64.0638 247.245 67.0818 246.367 69.4863ZM245.986 59.7876C244.079 61.6593 240.15 60.7413 237.251 57.7636C234.351 54.7859 233.589 50.8522 235.496 48.9805C237.403 47.1088 241.332 48.0268 244.231 51.0045C247.13 53.9822 247.893 57.9159 245.986 59.7876ZM269.903 69.2199C267.614 71.8931 263.075 70.3259 260.023 72.4662C260.023 72.4662 260.023 72.4662 259.985 72.5043H259.947C256.857 74.5282 256.59 79.3015 253.233 80.4456C249.877 81.5538 246.482 78.3836 248.122 70.9371C249.266 65.8594 247.855 62.0779 251.288 59.6353C254.836 57.3808 257.811 60.092 262.96 60.9338C270.551 62.154 272.192 66.5467 269.903 69.2199Z"/>
+              <path d="M332.718 58.6049L316.888 58.5668C316.087 58.5668 315.362 58.8333 314.79 59.4445C314.218 60.0176 313.913 60.705 313.913 61.5445V63.9894C313.913 64.7909 314.18 65.5163 314.79 66.0894C315.362 66.6626 316.049 66.9671 316.888 66.9671L324.021 67.0051C323.983 69.4119 323.22 71.2836 321.77 72.5799C320.321 73.8784 317.88 74.5277 314.523 74.4896L308.076 74.4516C304.3 74.4516 301.668 73.4217 300.219 71.3978C298.769 69.3738 298.044 65.7066 298.044 60.3982C298.044 55.0921 298.883 51.4629 300.524 49.477C302.164 47.4912 305.292 46.5374 309.907 46.5374H315.515C319.749 46.5374 322.381 47.6076 323.449 49.6696C324.517 51.7316 325.967 52.7615 327.759 52.7615H331.498C332.184 52.7615 332.909 52.495 333.634 51.9599C334.358 51.4248 334.74 50.5472 334.74 49.2867C334.74 45.9643 332.909 43.1769 329.171 40.9626C325.433 38.7484 321.275 37.6021 316.621 37.6021L309.602 37.564C301.821 37.526 295.946 39.3977 292.056 43.1007C288.165 46.8038 286.181 52.5711 286.143 60.3221C286.105 68.0753 287.974 73.8404 291.674 77.6218C295.374 81.401 300.753 83.3108 307.733 83.3108L314.828 83.3488C321.656 83.3869 326.844 81.7839 330.391 78.6517C333.939 75.4837 335.693 70.9769 335.732 65.0954V61.5826C335.732 60.7811 335.465 60.0557 334.854 59.4825C334.244 58.9094 333.557 58.643 332.718 58.6049Z"/>
+              <path d="M389.697 66.0134H385.958C384.013 66.0134 382.488 67.1574 381.42 69.4881C379.894 72.8106 377.3 74.4517 373.676 74.4517H367.42C362.805 74.4517 359.715 73.4218 358.075 71.4359C356.434 69.4501 355.633 65.7828 355.633 60.4364C355.633 55.09 356.473 51.4249 358.113 49.4771C359.753 47.4912 362.881 46.5375 367.497 46.5375H373.104C376.728 46.5375 379.283 48.2166 380.847 51.5391C381.915 53.8698 383.403 55.0138 385.349 55.0138H389.086C389.773 55.0138 390.499 54.7474 391.222 54.2123C391.947 53.6772 392.33 52.7996 392.33 51.5391C392.33 47.2248 390.537 43.8262 386.874 41.3433C383.212 38.8604 379.017 37.6022 374.21 37.6022L367.192 37.5641C359.41 37.5238 353.535 39.3955 349.645 43.1008C345.754 46.8039 343.77 52.5712 343.732 60.3603C343.694 68.1515 345.639 73.9166 349.53 77.66C353.421 81.4011 359.257 83.2728 367.039 83.3108L374.744 83.3489C379.512 83.3489 383.746 82.1265 387.409 79.6839C391.07 77.239 392.901 73.8404 392.939 69.5262C392.939 68.6463 392.673 67.8448 392.061 67.1194C391.453 66.3559 390.689 66.0134 389.697 66.0134Z"/>
+              <path d="M447.02 37.8496L430.044 37.8115C418.219 37.8115 411.24 41.8975 409.064 50.0693L401.053 80.0835C400.977 80.3522 400.939 80.6567 400.939 81.0395C400.939 81.4201 401.091 81.803 401.474 82.2978C401.817 82.7567 402.428 83.0232 403.23 83.0232H409.447C410.248 83.0232 411.048 82.7567 411.773 82.1836C412.498 81.6104 412.993 80.9231 413.184 80.0455L415.322 72.102L437.751 72.1781L437.713 80.1216C437.713 80.9993 437.979 81.6866 438.552 82.2597C439.123 82.8329 439.81 83.1015 440.688 83.1015H446.601C447.4 83.1015 448.126 82.8329 448.699 82.2597C449.27 81.6866 449.574 80.9992 449.574 80.1977L449.691 40.7892C449.691 40.0258 449.422 39.3384 448.927 38.7272C448.43 38.1541 447.783 37.8496 447.02 37.8496ZM437.751 63.2428L417.686 63.1667L420.509 53.047C421.042 51.0992 422.072 49.5723 423.561 48.426C425.047 47.2819 426.841 46.7088 428.862 46.7088L437.865 46.7468L437.751 63.2428Z"/>
+              <path d="M498.431 71.1124C497.056 68.972 495.836 67.3309 494.768 66.1846C493.7 65.0406 492.518 64.2749 491.26 63.7801C499.192 62.2509 503.16 58.4337 503.16 52.2857C503.16 47.8931 501.635 44.3803 498.583 41.7832C495.532 39.1862 491.564 37.8899 486.758 37.8496L460.742 37.7734C459.943 37.7734 459.217 38.0801 458.644 38.6533C458.073 39.2242 457.807 39.9518 457.807 40.7534L457.69 80.0477C457.69 80.8492 457.997 81.5746 458.568 82.1477C459.141 82.7209 459.867 83.0254 460.666 83.0254H466.579C467.38 83.0254 468.106 82.7589 468.677 82.1477C469.25 81.5746 469.554 80.8873 469.554 80.0477L469.592 66.4914L477.298 66.5294C480.426 66.5294 483.097 68.2847 485.271 71.7213L490.611 80.1238C491.105 80.9634 491.831 81.6507 492.785 82.2238C493.738 82.797 494.616 83.1015 495.418 83.1015L502.969 83.1396C504.037 83.1396 504.572 82.6828 504.572 81.803C504.572 81.3082 504.42 80.7731 504.075 80.1999L498.431 71.1124ZM488.817 56.4097C487.179 57.2493 485.271 57.7083 483.097 57.6702L469.668 57.6322L469.706 46.7871L483.135 46.8252C485.309 46.8252 487.217 47.2819 488.855 48.1237C490.497 49.0013 491.336 50.376 491.336 52.2477C491.336 54.1171 490.497 55.5321 488.817 56.4097Z"/>
+              <path d="M552.014 46.8229C552.816 46.8229 553.541 46.5565 554.112 45.9453C554.685 45.3721 554.99 44.6848 554.99 43.8452V40.8653C554.99 40.0638 554.723 39.3384 554.112 38.7652C553.541 38.1921 552.854 37.8876 552.014 37.8876L515.662 37.7734C514.86 37.7734 514.137 38.0399 513.564 38.613C512.991 39.1862 512.686 39.8735 512.686 40.675L512.572 79.9693C512.572 80.847 512.877 81.5343 513.45 82.1455C514.021 82.7187 514.746 83.0254 515.548 83.0254L551.748 83.1396C552.549 83.1396 553.273 82.8709 553.846 82.2597C554.417 81.6888 554.723 81.0014 554.723 80.1596V77.1439C554.723 76.3423 554.455 75.617 553.884 75.0438C553.311 74.4707 552.626 74.2043 551.824 74.2043L524.436 74.1259L524.474 64.81L548.123 64.8861C548.925 64.8861 549.65 64.6174 550.221 64.0085C550.794 63.4353 551.099 62.748 551.099 61.9061V58.9285C551.099 58.127 550.832 57.4016 550.221 56.8284C549.65 56.2553 548.963 55.9508 548.123 55.9508L524.474 55.8724L524.512 46.7087L552.014 46.8229Z"/>
+            </svg>
+          </div>
+          <p class="dc-footer-desc">Грумінг‑салон у самому серці міста. Прозоро, дбайливо і з любов'ю до кожного улюбленця.</p>
+          <div class="dc-socials">
+            <a href="viber://chat?number=%2B380989013988" class="dc-social" aria-label="Viber">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.006 0h-.016C5.37 0 0 5.37 0 12c0 2.102.548 4.073 1.508 5.785L.527 23.473a.527.527 0 0 0 .648.648l5.688-.981A11.955 11.955 0 0 0 12.006 24C18.63 24 24 18.63 24 12S18.63 0 12.006 0zm5.543 16.538c-.245.686-.942 1.261-1.707 1.428-.455.097-.906.145-1.358.145-1.254 0-2.468-.317-3.604-.94-1.63-.894-3.083-2.231-4.122-3.803C6.04 12.3 5.5 10.934 5.5 9.604c0-.792.275-1.52.792-2.083.455-.497.999-.76 1.574-.76.222 0 .446.047.644.14.253.115.474.305.614.555l1.262 2.24c.166.295.19.655.064.96-.094.224-.243.41-.437.547l-.274.19c-.095.067-.154.173-.16.29-.005.117.043.23.131.31.27.246.53.505.78.756.25.25.51.51.756.78.08.088.193.136.31.131.117-.006.223-.065.29-.16l.19-.274c.137-.194.323-.343.547-.437.305-.126.665-.102.96.064l2.24 1.262c.25.14.44.361.555.614.093.198.14.422.14.644 0 .282-.058.55-.174.8zm-2.47-6.093a.527.527 0 0 1-.527-.527c0-1.12-.435-2.173-1.224-2.962-.789-.79-1.838-1.225-2.956-1.225a.527.527 0 0 1 0-1.054c1.4 0 2.716.545 3.705 1.535.989.989 1.535 2.304 1.535 3.706 0 .291-.236.527-.527.527zm-2.105 0a.527.527 0 0 1-.527-.527c0-1.159-.944-2.103-2.103-2.103a.527.527 0 0 1 0-1.054c1.742 0 3.157 1.415 3.157 3.157a.527.527 0 0 1-.527.527z"/></svg>
+            </a>
+            <a href="https://t.me/dogcare888" target="_blank" rel="noopener" class="dc-social" aria-label="Telegram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            </a>
+          </div>
+        </div>
+        <!-- Послуги -->
+        <div>
+          <h4>Послуги</h4>
+          <ul>
+            <li><a href="#послуги">Гігієнічний догляд</a></li>
+            <li><a href="#послуги">Повний комплекс</a></li>
+            <li><a href="#послуги">Грумінг котів</a></li>
+            <li><a href="#послуги">Додаткові послуги</a></li>
+          </ul>
+        </div>
+        <!-- Навігація -->
+        <div>
+          <h4>Навігація</h4>
+          <ul>
+            <li><a href="index.html">Головна</a></li>
+            <li><a href="#послуги">Ціни</a></li>
+            <li><a href="#процес">Як це працює</a></li>
+            <li><a href="#галерея">Галерея</a></li>
+            <li><a href="#контакти">Контакти</a></li>
+          </ul>
+        </div>
+        <!-- Контакти -->
+        <div>
+          <h4>Контакти</h4>
+          <ul>
+            <li><a href="tel:+380667235102">+380 66 723 51 02</a></li>
+            <li><a href="tel:+380989013988">+380 98 901 39 88</a></li>
+            <li><a href="mailto:dogcare8888@gmail.com">dogcare8888@gmail.com</a></li>
+            <li><a href="https://maps.google.com/?q=вул.+Молодіжна+40,+Івано-Франківськ" target="_blank" rel="noopener">вул. Молодіжна 40, Івано-Франківськ</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="dc-footer-bottom">
+        <div>© 2026 Dog Care. Усі права захищені.</div>
+        <div style="display:flex;gap:24px;align-items:center;">
+          <a href="#">Політика конфіденційності</a>
+          <a href="#">Умови</a>
+          <a href="admin.html" target="_blank" rel="noopener" style="opacity:.35;font-size:11px;letter-spacing:.03em">адмін</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /.dc-app -->
+
+<!-- ══ BOOKING MODAL ══ -->
+<div id="booking-modal" class="bk-overlay" aria-hidden="true">
+  <div class="bk-modal" role="dialog" aria-modal="true" aria-labelledby="bk-title">
+    <button class="bk-close" onclick="bkClose()" aria-label="Закрити">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <h3 id="bk-title" class="bk-title">Записатися на грумінг</h3>
+    <p class="bk-subtitle">Заповніть форму — ми передзвонимо для підтвердження</p>
+
+    <form id="bk-form" class="bk-form" onsubmit="bkSubmit(event)">
+      <div class="bk-row">
+        <div class="bk-field" id="bk-field-name">
+          <label for="bk-name">Ваше ім'я *</label>
+          <input type="text" id="bk-name" required placeholder="Марія" autocomplete="given-name">
+          <span class="bk-error-msg">Введіть ваше ім'я (мінімум 2 символи)</span>
+        </div>
+        <div class="bk-field" id="bk-field-phone">
+          <label for="bk-phone">Телефон *</label>
+          <input type="tel" id="bk-phone" required placeholder="+380..." autocomplete="tel">
+          <span class="bk-error-msg">Введіть коректний номер телефону (+380XXXXXXXXX)</span>
+        </div>
+      </div>
+      <div class="bk-row">
+        <div class="bk-field">
+          <label for="bk-pet">Тип тваринки</label>
+          <select id="bk-pet">
+            <option value="Собака">🐕 Собака</option>
+            <option value="Кіт">🐈 Кіт</option>
+          </select>
+        </div>
+        <div class="bk-field">
+          <label for="bk-breed">Порода</label>
+          <input type="text" id="bk-breed" placeholder="Лабрадор...">
+        </div>
+      </div>
+      <div class="bk-row">
+        <div class="bk-field">
+          <label for="bk-service">Послуга</label>
+          <select id="bk-service">
+            <option>Гігієнічний догляд</option>
+            <option>Повний комплекс</option>
+            <option>Жорсткошерстні породи</option>
+            <option>Грумінг кішок</option>
+            <option>Додаткова послуга</option>
+          </select>
+        </div>
+        <div class="bk-field">
+          <label for="bk-datetime">Бажана дата та час</label>
+          <input type="datetime-local" id="bk-datetime">
+        </div>
+      </div>
+      <div class="bk-field">
+        <label for="bk-comment">Коментар</label>
+        <textarea id="bk-comment" rows="3" placeholder="Будь-яка додаткова інформація..."></textarea>
+      </div>
+      <div id="bk-send-error" class="bk-send-error"></div>
+      <button type="submit" class="dc-btn dc-btn-primary bk-submit">
+        <span id="bk-btn-text">Надіслати заявку</span>
+        <span class="dc-btn-arrow">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+    </form>
+
+    <div id="bk-success" class="bk-success bk-hidden">
+      <div class="bk-success-icon">✓</div>
+      <h4>Заявку отримано!</h4>
+      <p>Ми передзвонимо найближчим часом для підтвердження запису.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── Nav scroll ── */
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  /* ── Burger menu ── */
+  const burger = document.getElementById('burger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const menuClose = document.getElementById('menuClose');
+
+  burger.addEventListener('click', () => {
+    burger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  menuClose.addEventListener('click', () => {
+    burger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+  });
+  mobileMenu.addEventListener('click', (e) => {
+    if (e.target === mobileMenu) {
+      burger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    }
+  });
+
+  /* ── Price tabs ── */
+  document.querySelectorAll('.dc-price-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const key = tab.dataset.tab;
+      document.querySelectorAll('.dc-price-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.dc-price-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + key).classList.add('active');
+    });
+  });
+
+  /* ── FAQ accordion ── */
+  document.querySelectorAll('.dc-faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.dc-faq-item');
+      const opening = !item.classList.contains('open');
+      item.classList.toggle('open');
+      if (opening) {
+        setTimeout(() => item.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+      }
+    });
+  });
+
+  /* ── Scroll reveal ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); observer.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+<script>
+/* ── Sync з адмінки (localStorage) ── */
+(function () {
+  const EXTRA_ICONS = ['💅','👂','🪢','🦷','✂️','✨','🐾','🧴','💆','🌟'];
+
+  const DEFAULT_GROOMING = [
+    { id:'hygiene', icon:'🛁', label:'Гігієнічний догляд', desc:'Купання, сушка, базовий догляд — для довгошерстних порід',
+      note:'Включає: купання з профкосметикою та кондиціонером, сушку з розчісуванням, стрижку подушечок лап та паху, чищення вух, стрижку кігтів, протирання очей, мінімальне розколтунювання.',
+      rows:[
+        {name:"Йоркширський тер'єр", price:'800 ₴'},
+        {name:'Мальтезе', price:'800 ₴'},
+        {name:'Той-пудель', price:'800–850 ₴'},
+        {name:'Метис до 10 кг', price:'650–750 ₴'},
+        {name:'Метис 10–25 кг', price:'900–1050 ₴'},
+        {name:'Метис 25–45 кг', price:'1100–1200 ₴'}
+      ]},
+    { id:'full', icon:'✂️', label:'Повний комплекс', desc:'Гігієнічний догляд + модельна/породна стрижка',
+      note:'Повний комплекс включає все з гігієнічного догляду плюс: модельну або породну стрижку, повноцінну стрижку хвостика та фінішне полірування шерсті.',
+      rows:[
+        {name:"Йоркширський тер'єр", price:'900–1000 ₴'},
+        {name:'Мальтезе', price:'950–1050 ₴'},
+        {name:'Мініатюрний пудель', price:'1000–1100 ₴'},
+        {name:'Кокер-спанієль', price:'1100–1250 ₴'},
+        {name:'Золотистий ретривер', price:'1300–1500 ₴'},
+        {name:'Великий пудель', price:'від 1500 ₴'}
+      ]},
+    { id:'hard', icon:'🐕', label:'Жорсткошерстні та короткошерстні', desc:'Купання, фурмінація, тримінг, полірування',
+      note:'Ціна залежить від ступеня линьки, стану шерсті та поведінки тварини. При перевищенні вагової категорії — +15–20% до ціни.',
+      rows:[
+        {name:'Мопс / Французький бульдог', price:'700–800 ₴'},
+        {name:'Такса', price:'700–750 ₴'},
+        {name:"Ягдтер'єр / Фокстер'єр", price:'900–1050 ₴'},
+        {name:'Нім. вівчарка (Експрес линька)', price:'900 ₴'},
+        {name:'Хаскі / Лабрадор', price:'1200–1400 ₴'},
+        {name:'Велика порода 35+ кг', price:'від 1600 ₴'}
+      ]},
+    { id:'cats', icon:'🐱', label:'Кішки', desc:'Сухе вичісування або повне купання',
+      note:'Для котів рекомендуємо заздалегідь уточнити поведінку. При агресії майстер може попросити власника бути присутнім.',
+      rows:[
+        {name:'Звичайний кіт (сухе вичісування)', price:'700 ₴'},
+        {name:'Британець (сухе вичісування)', price:'800 ₴'},
+        {name:'Звичайний кіт (повний пакет)', price:'1000 ₴'},
+        {name:'Британець (повний пакет)', price:'1100 ₴'},
+        {name:'Мейн-кун (повний пакет)', price:'1400 ₴'}
+      ]},
+    { id:'extra', icon:'➕', label:'Додаткові послуги', desc:'Послуги à la carte', note:'',
+      rows:[
+        {name:'Стрижка кігтів', price:'200 ₴'},
+        {name:'Чищення вух', price:'150 ₴'},
+        {name:'Розколтунювання', price:'від 250 ₴'},
+        {name:'Чищення зубів (гель)', price:'170 ₴'},
+        {name:'Стрижка мордочки', price:'+200 ₴'}
+      ]}
+  ];
+
+  const DEFAULT_META = {
+    subtitle: 'Місце де ваш улюбленець почуває себе комфортно',
+    stats: [{num:'5+',label:'років досвіду'},{num:'500+',label:'щасливих клієнтів'},{num:'100%',label:'прозорість'}],
+    phone1: '+380 66 723 51 02', phone2: '+380 98 901 39 88',
+    instagram: 'dog_care_grooming_if', address: 'вул. Молодіжка, 40, Івано-Франківськ'
+  };
+
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function renderPanel(cat, active) {
+    const rows = (cat.rows||[]).map(r =>
+      `<tr><td><strong>${esc(r.name)}</strong></td><td style="text-align:right"><span class="dc-price-badge">${esc(r.price)}</span></td></tr>`
+    ).join('');
+    return `<div class="dc-price-panel${active?' active':''}">
+      <div class="dc-price-card">
+        <div class="dc-price-card-head">
+          <div class="dc-price-card-icon">${esc(cat.icon||'✂️')}</div>
+          <div>
+            <div class="dc-price-card-title">${esc(cat.label)}</div>
+            <div class="dc-price-card-desc">${esc(cat.desc||'')}</div>
+          </div>
+        </div>
+        <table class="dc-price-table">
+          <thead><tr><th>Порода / послуга</th><th style="text-align:right">Ціна</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        ${cat.note ? `<div class="dc-price-note"><span class="dc-price-note-icon">ℹ️</span><span>${esc(cat.note)}</span></div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  function initGroomingPage() {
+    /* Читаємо з localStorage, або беремо дефолтні дані */
+    let grm  = DEFAULT_GROOMING;
+    let meta = Object.assign({}, DEFAULT_META);
+    try {
+      const raw = localStorage.getItem('dc_grooming');
+      if (raw) grm = JSON.parse(raw);
+    } catch(e) {}
+    try {
+      const rawMeta = localStorage.getItem('dc_grooming_meta');
+      if (rawMeta) meta = Object.assign({}, DEFAULT_META, JSON.parse(rawMeta));
+    } catch(e) {}
+
+    /* Hero subtitle */
+    const OLD_SUBTITLE = 'Спостерігайте за доглядом вашого улюбленця в режимі реального часу. Скляні стіни, відкритий простір, повна прозорість.';
+    if (meta.subtitle === OLD_SUBTITLE) meta.subtitle = DEFAULT_META.subtitle;
+    const subEl = document.getElementById('grm-sub');
+    if (subEl) subEl.textContent = meta.subtitle;
+
+    /* Stats */
+    const statsEl = document.getElementById('grm-stats');
+    if (statsEl && meta.stats) {
+      statsEl.innerHTML = meta.stats.map(s =>
+        `<div><div class="dc-stat-num">${esc(s.num)}</div><div class="dc-stat-label">${esc(s.label)}</div></div>`
+      ).join('');
+    }
+
+    /* Pricing tabs + panels — завжди рендеримо */
+    const mainCats = grm;
+    const extraCat = null;
+    const wrap = document.getElementById('grm-pricing-section-wrap');
+
+    if (wrap && mainCats.length) {
+      const tabsBar = wrap.querySelector('.dc-price-tabs');
+      /* Запам'ятовуємо активний таб перед перерендером */
+      const activeBtnIdx = tabsBar
+        ? [...tabsBar.querySelectorAll('.dc-price-tab')].findIndex(b => b.classList.contains('active'))
+        : 0;
+      const activeIdx = activeBtnIdx >= 0 ? activeBtnIdx : 0;
+
+      if (tabsBar) {
+        tabsBar.innerHTML = mainCats.map((cat, i) =>
+          `<button class="dc-price-tab${i===activeIdx?' active':''}" data-idx="${i}">${esc(cat.label)}</button>`
+        ).join('');
+      }
+      wrap.querySelectorAll('.dc-price-panel').forEach(p => p.remove());
+      mainCats.forEach((cat, i) => {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = renderPanel(cat, i === activeIdx);
+        wrap.appendChild(tmp.firstElementChild);
+      });
+      if (tabsBar) {
+        const getPanels = () => wrap.querySelectorAll('.dc-price-panel');
+        tabsBar.querySelectorAll('.dc-price-tab').forEach(btn => {
+          btn.addEventListener('click', () => {
+            tabsBar.querySelectorAll('.dc-price-tab').forEach(b => b.classList.remove('active'));
+            getPanels().forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            getPanels()[parseInt(btn.dataset.idx)].classList.add('active');
+          });
+        });
+      }
+    }
+
+    /* Additional services — rendered inside tab panel via renderPanel */
+    if (false) {
+    }
+
+    /* CTA contacts */
+    const contacts = document.getElementById('grm-contacts');
+    if (contacts) {
+      const ph1  = meta.phone1 || '';
+      const ph2  = meta.phone2 || '';
+      const ig   = (meta.instagram || '').replace(/^@/, '');
+      const addr = meta.address || '';
+      contacts.innerHTML =
+        (ph1  ? `<a href="tel:${ph1.replace(/\s/g,'')}" class="dc-cta-phone">${esc(ph1)}</a>` : '') +
+        (ph2  ? `<a href="tel:${ph2.replace(/\s/g,'')}" class="dc-cta-phone">${esc(ph2)}</a>` : '') +
+        (ig   ? `<div class="dc-cta-social">Instagram: @${esc(ig)}</div>` : '') +
+        (addr ? `<div class="dc-cta-social">📍 ${esc(addr)}</div>` : '');
+    }
+
+    const ph1 = meta.phone1 || '';
+    const callBtn = document.getElementById('grm-call-btn');
+    if (callBtn && ph1) callBtn.href = 'tel:' + ph1.replace(/\s/g,'');
+
+    const igBtn = document.getElementById('grm-ig-btn');
+    const ig = (meta.instagram || '').replace(/^@/, '');
+    if (igBtn && ig) igBtn.href = 'https://www.instagram.com/' + ig;
+
+    /* Карусель */
+    renderCarousel();
+  }
+
+  /* ── Карусель ── */
+  var CAR_OFFSET  = 0;   /* скільки позицій зсунуто вліво */
+  var CAR_TIMER   = null;
+  var CAR_VISIBLE = 4;   /* фото на екрані */
+
+  function carVisible() {
+    return window.innerWidth <= 600 ? 2 : window.innerWidth <= 900 ? 3 : 4;
+  }
+
+  /* CAR_REAL — кількість оригінальних фото, CAR_CLONES — кількість клонів з кожного боку */
+  var CAR_REAL   = 0;
+  var CAR_CLONES = 0;
+
+  async function renderCarousel() {
+    const wrap = document.getElementById('grm-slider-wrap');
+    if (!wrap) return;
+    let photos = [];
+    try {
+      const snap = await firebase.firestore().collection('grm_photos').orderBy('createdAt').get();
+      photos = snap.docs.map(d => d.data().url);
+    } catch(e) {
+      try { photos = JSON.parse(localStorage.getItem('dc_grm_photos')) || []; } catch(_) {}
+    }
+
+    if (!photos.length) {
+      clearInterval(CAR_TIMER);
+      wrap.innerHTML = '<div class="grm-carousel-empty">Фото з\'являться тут після додавання в адмінці</div>';
+      return;
+    }
+
+    const existing = wrap.querySelector('.grm-carousel');
+    const existingCount = existing ? existing.getAttribute('data-real') : -1;
+    if (parseInt(existingCount) === photos.length) return;
+
+    CAR_VISIBLE = carVisible();
+    CAR_REAL    = photos.length;
+    CAR_CLONES  = CAR_VISIBLE;
+
+    /* Клонуємо: останні V фото на початок, перші V фото в кінець */
+    const before = photos.slice(-CAR_CLONES);
+    const after  = photos.slice(0, CAR_CLONES);
+    const all    = [...before, ...photos, ...after];
+
+    /* Стартова позиція — перше реальне фото */
+    CAR_OFFSET = CAR_CLONES;
+
+    const needControls = CAR_REAL > CAR_VISIBLE;
+    wrap.innerHTML = `
+      <div class="grm-carousel" id="grm-carousel" data-real="${CAR_REAL}">
+        <div class="grm-carousel-track" id="grm-carousel-track">
+          ${all.map((src, i) => {
+            const realIdx = ((i - CAR_CLONES) % CAR_REAL + CAR_REAL) % CAR_REAL;
+            return `<div class="grm-carousel-item" onclick="grmLbOpen(${realIdx})">
+              <img src="${src}" alt="Фото" loading="lazy">
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      ${needControls ? `
+      <div class="grm-carousel-controls">
+        <button class="grm-carousel-btn" onclick="carNav(-1)">‹</button>
+        <button class="grm-carousel-btn" onclick="carNav(1)">›</button>
+      </div>` : ''}`;
+
+    requestAnimationFrame(function() { carMove(false); }); /* після layout */
+    clearInterval(CAR_TIMER);
+    if (needControls) {
+      CAR_TIMER = setInterval(function() { carNav(1); }, 4000);
+    }
+  }
+
+  function carItemPx() {
+    const carousel = document.getElementById('grm-carousel');
+    if (!carousel) return 0;
+    const gap = 16;
+    return (carousel.offsetWidth - (CAR_VISIBLE - 1) * gap) / CAR_VISIBLE;
+  }
+
+  function carSetItemWidths() {
+    const px = carItemPx();
+    if (!px) return;
+    const track = document.getElementById('grm-carousel-track');
+    if (track) track.style.setProperty('--car-item-w', px + 'px');
+  }
+
+  function carMove(animate) {
+    const track = document.getElementById('grm-carousel-track');
+    if (!track) return;
+    carSetItemWidths();
+    const step = carItemPx() + 16;
+    if (!animate) {
+      track.style.transition = 'none';
+      track.offsetHeight; /* force reflow */
+    } else {
+      track.style.transition = '';
+    }
+    track.style.transform = `translateX(${-CAR_OFFSET * step}px)`;
+  }
+
+  function carApply() { carMove(true); }
+
+  function carNav(dir) {
+    CAR_OFFSET += dir;
+    carMove(true);
+    setTimeout(function() {
+      if (CAR_OFFSET >= CAR_CLONES + CAR_REAL) {
+        CAR_OFFSET -= CAR_REAL;
+        carMove(false);
+      } else if (CAR_OFFSET < CAR_CLONES) {
+        CAR_OFFSET += CAR_REAL;
+        carMove(false);
+      }
+    }, 650);
+  }
+
+  window.addEventListener('resize', function() {
+    carSetItemWidths();
+    carMove(false);
+  });
+
+  /* Лайтбокс */
+  var LB_PHOTOS = [];
+  var LB_IDX = 0;
+  async function grmLbOpen(i) {
+    try {
+      const snap = await firebase.firestore().collection('grm_photos').orderBy('createdAt').get();
+      LB_PHOTOS = snap.docs.map(d => d.data().url);
+    } catch(e) {
+      try { LB_PHOTOS = JSON.parse(localStorage.getItem('dc_grm_photos')) || []; } catch(_) { LB_PHOTOS = []; }
+    }
+    LB_IDX = i;
+    document.getElementById('grm-lb-img').src = LB_PHOTOS[LB_IDX] || '';
+    document.getElementById('grm-lightbox').classList.add('open');
+    clearInterval(CAR_TIMER);
+  }
+  function grmLbNav(dir) {
+    LB_IDX = (LB_IDX + dir + LB_PHOTOS.length) % LB_PHOTOS.length;
+    document.getElementById('grm-lb-img').src = LB_PHOTOS[LB_IDX] || '';
+  }
+  document.addEventListener('keydown', function(e) {
+    const lb = document.getElementById('grm-lightbox');
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') {
+      lb.classList.remove('open');
+      const total = document.querySelectorAll('.grm-carousel-item').length;
+      if (total > carVisible()) CAR_TIMER = setInterval(function() { carNav(1); }, 4000);
+    }
+    if (e.key === 'ArrowLeft')  grmLbNav(-1);
+    if (e.key === 'ArrowRight') grmLbNav(1);
+  });
+
+  /* ── Booking modal ── */
+  function bkOpen() {
+    var modal = document.getElementById('booking-modal');
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    /* Reset form state */
+    document.getElementById('bk-form').classList.remove('bk-hidden');
+    document.getElementById('bk-form').reset();
+    document.getElementById('bk-success').classList.add('bk-hidden');
+    document.querySelectorAll('#bk-form .bk-has-error').forEach(function(el) { el.classList.remove('bk-has-error'); });
+    var errEl = document.getElementById('bk-send-error');
+    if (errEl) errEl.style.display = 'none';
+    var btn = document.querySelector('.bk-submit');
+    if (btn) btn.disabled = false;
+    document.getElementById('bk-btn-text').textContent = 'Надіслати заявку';
+  }
+  window.bkOpen = bkOpen;
+
+  function bkClose() {
+    var modal = document.getElementById('booking-modal');
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  window.bkClose = bkClose;
+
+  document.getElementById('booking-modal').addEventListener('click', function(e) {
+    if (e.target === this) bkClose();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('booking-modal').classList.contains('open')) bkClose();
+  });
+
+  function bkValidPhone(raw) {
+    var digits = raw.replace(/\D/g, '');
+    /* 380XXXXXXXXX (12), 0XXXXXXXXX (10), or bare 9-digit operator number */
+    return /^(380\d{9}|0\d{9}|\d{9})$/.test(digits);
+  }
+
+  function bkSetError(fieldId, hasError) {
+    var field = document.getElementById(fieldId);
+    if (!field) return;
+    field.classList.toggle('bk-has-error', hasError);
+  }
+
+  function bkValidateName() {
+    var val = document.getElementById('bk-name').value.trim();
+    var ok = val.length >= 2;
+    bkSetError('bk-field-name', !ok);
+    return ok;
+  }
+
+  function bkValidatePhone() {
+    var val = document.getElementById('bk-phone').value.trim();
+    var ok = val.length > 0 && bkValidPhone(val);
+    bkSetError('bk-field-phone', !ok);
+    return ok;
+  }
+
+  /* Real-time validation on blur */
+  document.getElementById('bk-name').addEventListener('blur', bkValidateName);
+  document.getElementById('bk-phone').addEventListener('blur', bkValidatePhone);
+  /* Clear error as soon as user starts typing again */
+  document.getElementById('bk-name').addEventListener('input', function() { if (this.value.trim().length >= 2) bkSetError('bk-field-name', false); });
+  document.getElementById('bk-phone').addEventListener('input', function() { if (bkValidPhone(this.value)) bkSetError('bk-field-phone', false); });
+
+  async function bkSubmit(e) {
+    e.preventDefault();
+
+    /* Validate all required fields before sending */
+    var nameOk  = bkValidateName();
+    var phoneOk = bkValidatePhone();
+    if (!nameOk || !phoneOk) {
+      /* Scroll first error into view */
+      var firstErr = document.querySelector('#bk-form .bk-has-error input');
+      if (firstErr) firstErr.focus();
+      return;
+    }
+
+    var token  = '8960301998:AAF6-JiLZ-qsB_GlVC3QbFldlQKvkMQ_ezo';
+    var chatId = '8613591177';
+
+    var name    = document.getElementById('bk-name').value.trim();
+    var phone   = document.getElementById('bk-phone').value.trim();
+    var pet     = document.getElementById('bk-pet').value;
+    var breed   = document.getElementById('bk-breed').value.trim();
+    var service = document.getElementById('bk-service').value;
+    var dt      = document.getElementById('bk-datetime').value;
+    var comment = document.getElementById('bk-comment').value.trim();
+
+    var dtStr = dt
+      ? new Date(dt).toLocaleString('uk-UA', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+      : 'не вказано';
+
+    /* Plain text — no parse_mode to avoid Markdown breaking on +, _, etc. */
+    var text = '📋 Нова заявка на грумінг\n\n' +
+      '👤 Ім\'я: ' + name + '\n' +
+      '📞 Телефон: ' + phone + '\n' +
+      '🐾 Тваринка: ' + pet + (breed ? ' (' + breed + ')' : '') + '\n' +
+      '✂️ Послуга: ' + service + '\n' +
+      '📅 Дата: ' + dtStr + '\n' +
+      (comment ? '💬 Коментар: ' + comment + '\n' : '');
+
+    var btnText = document.getElementById('bk-btn-text');
+    var btn = document.querySelector('.bk-submit');
+    var errEl = document.getElementById('bk-send-error');
+    errEl.style.display = 'none';
+    btnText.textContent = 'Надсилаємо…';
+    btn.disabled = true;
+
+    if (!token || !chatId) {
+      btnText.textContent = 'Надіслати заявку';
+      btn.disabled = false;
+      errEl.textContent = 'Telegram-бот не налаштований. Перейдіть в адмінку → Соцмережі та вкажіть Bot Token і Chat ID.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      var res = await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: text })
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.description || 'Помилка API');
+      bkShowSuccess();
+    } catch(err) {
+      console.error('Telegram sendMessage error:', err);
+      btnText.textContent = 'Надіслати заявку';
+      btn.disabled = false;
+      errEl.textContent = 'Не вдалося надіслати: ' + (err.message || 'невідома помилка') + '. Перевірте Bot Token та Chat ID в адмінці.';
+      errEl.style.display = 'block';
+    }
+  }
+  window.bkSubmit = bkSubmit;
+
+  function bkShowSuccess() {
+    document.getElementById('bk-form').classList.add('bk-hidden');
+    document.getElementById('bk-success').classList.remove('bk-hidden');
+    setTimeout(bkClose, 4000);
+  }
+
+  initGroomingPage();
+
+})();
+</script>
+
+<script>
+  // Завантажити карусель після ініціалізації Firebase
+  renderCarousel();
+</script>
+</body>
+</html>

@@ -1736,8 +1736,8 @@
         </div>
         <div class="bk-field" id="bk-field-phone">
           <label for="bk-phone">Телефон *</label>
-          <input type="tel" id="bk-phone" required placeholder="+380..." autocomplete="tel">
-          <span class="bk-error-msg">Введіть коректний номер телефону (+380XXXXXXXXX)</span>
+          <input type="tel" id="bk-phone" inputmode="numeric" required placeholder="+380 XX XXX XX XX" autocomplete="tel" value="+380 ">
+          <span class="bk-error-msg">Введіть номер: +380 XX XXX XX XX</span>
         </div>
       </div>
       <div class="bk-row">
@@ -2265,10 +2265,22 @@
     if (e.key === 'Escape' && document.getElementById('booking-modal').classList.contains('open')) bkClose();
   });
 
+  function bkFormatPhone(raw) {
+    var digits = raw.replace(/\D/g, '');
+    if (digits.startsWith('380')) digits = digits.slice(3);
+    else if (digits.startsWith('0')) digits = digits.slice(1);
+    digits = digits.slice(0, 9);
+    var out = '+380';
+    if (digits.length > 0) out += ' ' + digits.slice(0, 2);
+    if (digits.length > 2) out += ' ' + digits.slice(2, 5);
+    if (digits.length > 5) out += ' ' + digits.slice(5, 7);
+    if (digits.length > 7) out += ' ' + digits.slice(7, 9);
+    return out;
+  }
+
   function bkValidPhone(raw) {
     var digits = raw.replace(/\D/g, '');
-    /* 380XXXXXXXXX (12), 0XXXXXXXXX (10), or bare 9-digit operator number */
-    return /^(380\d{9}|0\d{9}|\d{9})$/.test(digits);
+    return /^380\d{9}$/.test(digits);
   }
 
   function bkSetError(fieldId, hasError) {
@@ -2296,7 +2308,11 @@
   document.getElementById('bk-phone').addEventListener('blur', bkValidatePhone);
   /* Clear error as soon as user starts typing again */
   document.getElementById('bk-name').addEventListener('input', function() { if (this.value.trim().length >= 2) bkSetError('bk-field-name', false); });
-  document.getElementById('bk-phone').addEventListener('input', function() { if (bkValidPhone(this.value)) bkSetError('bk-field-phone', false); });
+  document.getElementById('bk-phone').addEventListener('input', function() {
+    var formatted = bkFormatPhone(this.value);
+    this.value = formatted;
+    if (bkValidPhone(this.value)) bkSetError('bk-field-phone', false);
+  });
 
   async function bkSubmit(e) {
     e.preventDefault();

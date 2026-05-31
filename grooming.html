@@ -1984,7 +1984,9 @@
     let meta = Object.assign({}, DEFAULT_META);
     try {
       const raw = localStorage.getItem('dc_grooming');
-      if (raw) grm = JSON.parse(raw);
+      if (raw) {
+        grm = JSON.parse(raw).filter(c => c.id !== 'bathing' && c.id !== 'haircut_only');
+      }
     } catch(e) {}
     try {
       const rawMeta = localStorage.getItem('dc_grooming_meta');

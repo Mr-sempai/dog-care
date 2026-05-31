@@ -1926,9 +1926,13 @@
           JSON.parse(localStorage.getItem("dc_socials")) ||
           JSON.parse(JSON.stringify(DEFAULT_SOCIALS));
         const rawGrooming = JSON.parse(localStorage.getItem("dc_grooming"));
-        DB.grooming = rawGrooming
-          ? migrateGrooming(rawGrooming)
-          : JSON.parse(JSON.stringify(DEFAULT_GROOMING));
+        if (rawGrooming) {
+          const migrated = migrateGrooming(rawGrooming);
+          DB.grooming = migrated;
+          localStorage.setItem("dc_grooming", JSON.stringify(migrated));
+        } else {
+          DB.grooming = JSON.parse(JSON.stringify(DEFAULT_GROOMING));
+        }
         DB.grooming_meta =
           JSON.parse(localStorage.getItem("dc_grooming_meta")) ||
           JSON.parse(JSON.stringify(DEFAULT_GROOMING_META));

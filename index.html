@@ -1515,14 +1515,6 @@ button.dc-trainer { border: none; background: var(--white); }
 #kinolog .dc-service-price-unit { color: rgba(255,254,247,0.6); }
 #kinolog .dc-service-price-num { color: var(--cream); }
 
-.dc-kinolog-waves {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
-}
-#kinolog > .dc-wrap { position: relative; z-index: 1; }
 .dc-kinolog-desc {
   color: var(--ink-2);
   font-size: 17px;
@@ -3265,19 +3257,8 @@ const KINOLOG_FEATURES = [
 
 function KinologVisit() {
   return (
-    <section className="dc-section dc-section-yellow dc-section-with-wave" id="kinolog">
+    <section className="dc-section dc-section-yellow dc-section-with-wave" id="kinolog" style={{ background: '#ef233c' }}>
       <WaveDivider from="#FFFFFF" variant="soft" height={80} />
-      <svg className="dc-kinolog-waves" aria-hidden="true" viewBox="0 0 1440 560" preserveAspectRatio="none">
-        {[70, 150, 230, 310, 390, 470].map((y, i) => (
-          <path key={i}
-            d={`M0 ${y} C120 ${y + (i%2===0?-28:28)}, 240 ${y + (i%2===0?28:-28)}, 360 ${y}
-                C480 ${y + (i%2===0?-28:28)}, 600 ${y + (i%2===0?28:-28)}, 720 ${y}
-                C840 ${y + (i%2===0?-28:28)}, 960 ${y + (i%2===0?28:-28)}, 1080 ${y}
-                C1200 ${y + (i%2===0?-28:28)}, 1320 ${y + (i%2===0?28:-28)}, 1440 ${y}`}
-            fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5"
-          />
-        ))}
-      </svg>
       <div className="dc-wrap">
         <div className="dc-kinolog-layout">
           <div>

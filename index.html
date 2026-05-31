@@ -3428,7 +3428,7 @@ function Marquee() {
 
 function ContactForm() {
   const [data, setData] = useState({
-    name: "", phone: "", pet: "", service: "Курс кінології", message: "",
+    name: "", phone: "+380 ", pet: "", service: "Курс кінології", message: "",
   });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
@@ -3500,8 +3500,10 @@ function ContactForm() {
               <div>
                 <div className="dc-input-wrap">
                   <span className="dc-input-label">Телефон *</span>
-                  <input className={`dc-input${errors.phone ? " dc-input-err" : ""}`} placeholder="+380 99 123 45 67"
-                    value={data.phone} onChange={e => { setData({ ...data, phone: e.target.value }); setErrors({ ...errors, phone: "" }); }} />
+                  <input type="tel" inputMode="numeric" className={`dc-input${errors.phone ? " dc-input-err" : ""}`}
+                    placeholder="+380 XX XXX XX XX" value={data.phone}
+                    onFocus={() => { if (!data.phone) setData({ ...data, phone: '+380 ' }); }}
+                    onChange={e => { setData({ ...data, phone: formatPhone(e.target.value) }); setErrors({ ...errors, phone: "" }); }} />
                 </div>
                 {errors.phone && <div className="lead-err">{errors.phone}</div>}
               </div>
@@ -3855,19 +3857,32 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "buttonShape": "pill"
 }/*EDITMODE-END*/;
 
+function formatPhone(raw) {
+  let digits = raw.replace(/\D/g, '');
+  if (digits.startsWith('380')) digits = digits.slice(3);
+  else if (digits.startsWith('0')) digits = digits.slice(1);
+  digits = digits.slice(0, 9);
+  let out = '+380';
+  if (digits.length > 0) out += ' ' + digits.slice(0, 2);
+  if (digits.length > 2) out += ' ' + digits.slice(2, 5);
+  if (digits.length > 5) out += ' ' + digits.slice(5, 7);
+  if (digits.length > 7) out += ' ' + digits.slice(7, 9);
+  return out;
+}
+
 function validateLeadForm(data) {
   const errors = {};
   if (!data.name.trim() || data.name.trim().length < 2)
     errors.name = "Введіть ім'я (мінімум 2 символи)";
   const phone = data.phone.replace(/[\s\-()]/g, "");
-  if (!phone || !/^(\+380\d{9}|0\d{9})$/.test(phone))
-    errors.phone = "Некоректний номер. Формат: +380XXXXXXXXX або 0XXXXXXXXX";
+  if (!phone || phone === '+380' || !/^\+380\d{9}$/.test(phone))
+    errors.phone = "Введіть номер: +380 XX XXX XX XX";
   return errors;
 }
 
 function LeadModal() {
   const SERVICES = ["Курс кінології", "Кінолог на виїзд", "Грумінг", "Зоо‑готель", "Зооняня", "Консультація"];
-  const empty = { name: "", phone: "", pet: "", service: "Курс кінології", message: "" };
+  const empty = { name: "", phone: "+380 ", pet: "", service: "Курс кінології", message: "" };
   const [open, setOpen] = useState(false);
   const [data, setData] = useState(empty);
   const [errors, setErrors] = useState({});
@@ -3957,9 +3972,10 @@ function LeadModal() {
               <div>
                 <div className="dc-input-wrap">
                   <span className="dc-input-label">Телефон *</span>
-                  <input className={`dc-input${errors.phone ? " dc-input-err" : ""}`}
-                    placeholder="+380 99 123 45 67" value={data.phone}
-                    onChange={(e) => { setData({ ...data, phone: e.target.value }); setErrors({ ...errors, phone: "" }); }} />
+                  <input type="tel" inputMode="numeric" className={`dc-input${errors.phone ? " dc-input-err" : ""}`}
+                    placeholder="+380 XX XXX XX XX" value={data.phone}
+                    onFocus={() => { if (!data.phone) setData({ ...data, phone: '+380 ' }); }}
+                    onChange={(e) => { setData({ ...data, phone: formatPhone(e.target.value) }); setErrors({ ...errors, phone: "" }); }} />
                 </div>
                 {errors.phone && <div className="lead-err">{errors.phone}</div>}
               </div>

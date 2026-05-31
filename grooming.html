@@ -322,6 +322,64 @@
     .dc-price-note-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
 
     /* ============ Additional services grid ============ */
+    /* ── Extras groups ── */
+    .dc-extras-groups {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 4px;
+    }
+    .dc-extras-group {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 28px 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .dc-extras-group-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .dc-extras-group-icon { font-size: 24px; }
+    .dc-extras-group-title {
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--ink);
+    }
+    .dc-extras-group-note {
+      font-size: 12.5px;
+      color: var(--ink-2);
+      margin: 0 0 14px;
+      font-style: italic;
+    }
+    .dc-extras-rows {
+      list-style: none;
+      padding: 0; margin: 12px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .dc-extras-rows li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(26,24,20,.07);
+      font-size: 14px;
+    }
+    .dc-extras-rows li:last-child { border-bottom: none; }
+    .dc-extras-row-name { color: var(--ink-2); }
+    .dc-extras-row-price {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--accent-deep, #1a1814);
+      white-space: nowrap;
+    }
+    @media (max-width: 600px) {
+      .dc-extras-groups { grid-template-columns: 1fr; }
+    }
+
     .dc-add-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
     .dc-add-card {
       background: var(--white); border-radius: var(--radius-md);
@@ -1267,28 +1325,64 @@
 
       <!-- Додаткові послуги -->
       <div class="dc-price-panel" id="tab-extras">
-        <div class="dc-add-grid" id="grm-add-grid">
-          <div class="dc-add-card reveal" style="--reveal-i:0">
+
+        <!-- Групові прайси -->
+        <div class="dc-extras-groups reveal" style="--reveal-i:0">
+
+          <div class="dc-extras-group">
+            <div class="dc-extras-group-head">
+              <span class="dc-extras-group-icon">🛁</span>
+              <span class="dc-extras-group-title">Купання</span>
+            </div>
+            <ul class="dc-extras-rows">
+              <li><span class="dc-extras-row-name">до 7 кг</span><span class="dc-extras-row-price">600 ₴</span></li>
+              <li><span class="dc-extras-row-name">від 7 кг</span><span class="dc-extras-row-price">від 700 ₴</span></li>
+              <li><span class="dc-extras-row-name">від 15–45 кг</span><span class="dc-extras-row-price">від 900 ₴</span></li>
+            </ul>
+          </div>
+
+          <div class="dc-extras-group">
+            <div class="dc-extras-group-head">
+              <span class="dc-extras-group-icon">✂️</span>
+              <span class="dc-extras-group-title">Стрижка без купання</span>
+            </div>
+            <p class="dc-extras-group-note">якщо песик попередньо чистий</p>
+            <ul class="dc-extras-rows">
+              <li><span class="dc-extras-row-name">Йоркширський тер'єр</span><span class="dc-extras-row-price">700 ₴</span></li>
+              <li><span class="dc-extras-row-name">Бівер йорк. тер'єр</span><span class="dc-extras-row-price">750 ₴</span></li>
+              <li><span class="dc-extras-row-name">Пікінес</span><span class="dc-extras-row-price">700 ₴</span></li>
+              <li><span class="dc-extras-row-name">Болонка</span><span class="dc-extras-row-price">700 ₴</span></li>
+              <li><span class="dc-extras-row-name">Шит-цу</span><span class="dc-extras-row-price">750 ₴</span></li>
+              <li><span class="dc-extras-row-name">Кавалер-чарльз-кінг</span><span class="dc-extras-row-price">750 ₴</span></li>
+              <li><span class="dc-extras-row-name">Спаніель</span><span class="dc-extras-row-price">900 ₴</span></li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Картки дрібних доп. послуг -->
+        <div class="dc-add-grid" id="grm-add-grid" style="margin-top: 24px;">
+          <div class="dc-add-card reveal" style="--reveal-i:1">
             <div class="dc-add-icon">💅</div>
             <div class="dc-add-name">Стрижка кігтів</div>
             <div class="dc-add-price">200 ₴</div>
           </div>
-          <div class="dc-add-card reveal" style="--reveal-i:1">
+          <div class="dc-add-card reveal" style="--reveal-i:2">
             <div class="dc-add-icon">👂</div>
             <div class="dc-add-name">Чищення вух</div>
             <div class="dc-add-price">150 ₴</div>
           </div>
-          <div class="dc-add-card reveal" style="--reveal-i:2">
+          <div class="dc-add-card reveal" style="--reveal-i:3">
             <div class="dc-add-icon">🪢</div>
             <div class="dc-add-name">Розколтунювання</div>
             <div class="dc-add-price">від 250 ₴</div>
           </div>
-          <div class="dc-add-card reveal" style="--reveal-i:3">
+          <div class="dc-add-card reveal" style="--reveal-i:4">
             <div class="dc-add-icon">🦷</div>
             <div class="dc-add-name">Чищення зубів (гель)</div>
             <div class="dc-add-price">170 ₴</div>
           </div>
-          <div class="dc-add-card reveal" style="--reveal-i:4">
+          <div class="dc-add-card reveal" style="--reveal-i:5">
             <div class="dc-add-icon">✂️</div>
             <div class="dc-add-name">Стрижка мордочки</div>
             <div class="dc-add-price">+200 ₴</div>

@@ -1876,6 +1876,22 @@
         {name:'Мейн-кун (повний пакет)', price:'1400 ₴'}
       ]},
     { id:'extra', icon:'➕', label:'Додаткові послуги', desc:'Послуги à la carte', note:'',
+      groups:[
+        { icon:'🛁', title:'Купання', note:'', rows:[
+          {name:'до 7 кг', price:'600 ₴'},
+          {name:'від 7 кг', price:'від 700 ₴'},
+          {name:'від 15–45 кг', price:'від 900 ₴'}
+        ]},
+        { icon:'✂️', title:'Стрижка без купання', note:'якщо песик попередньо чистий', rows:[
+          {name:"Йоркширський тер'єр", price:'700 ₴'},
+          {name:"Бівер йорк. тер'єр", price:'750 ₴'},
+          {name:'Пікінес', price:'700 ₴'},
+          {name:'Болонка', price:'700 ₴'},
+          {name:'Шит-цу', price:'750 ₴'},
+          {name:'Кавалер-чарльз-кінг', price:'750 ₴'},
+          {name:'Спаніель', price:'900 ₴'}
+        ]}
+      ],
       rows:[
         {name:'Стрижка кігтів', price:'200 ₴'},
         {name:'Чищення вух', price:'150 ₴'},
@@ -1900,6 +1916,33 @@
     const rows = (cat.rows||[]).map(r =>
       `<tr><td><strong>${esc(r.name)}</strong></td><td style="text-align:right"><span class="dc-price-badge">${esc(r.price)}</span></td></tr>`
     ).join('');
+
+    /* Спеціальний рендер для вкладки "Додаткові послуги" */
+    if (cat.id === 'extra') {
+      const groupsHtml = (cat.groups||[]).map(g => `
+        <div class="dc-extras-group">
+          <div class="dc-extras-group-head">
+            <span class="dc-extras-group-icon">${esc(g.icon)}</span>
+            <span class="dc-extras-group-title">${esc(g.title)}</span>
+          </div>
+          ${g.note ? `<p class="dc-extras-group-note">${esc(g.note)}</p>` : ''}
+          <ul class="dc-extras-rows">
+            ${(g.rows||[]).map(r => `<li><span class="dc-extras-row-name">${esc(r.name)}</span><span class="dc-extras-row-price">${esc(r.price)}</span></li>`).join('')}
+          </ul>
+        </div>`).join('');
+
+      return `<div class="dc-price-panel${active?' active':''}">
+        ${groupsHtml ? `<div class="dc-extras-groups">${groupsHtml}</div>` : ''}
+        ${rows ? `<div class="dc-add-grid" style="margin-top:24px">${
+          (cat.rows||[]).map((r,i) => `
+            <div class="dc-add-card">
+              <div class="dc-add-name">${esc(r.name)}</div>
+              <div class="dc-add-price">${esc(r.price)}</div>
+            </div>`).join('')
+        }</div>` : ''}
+      </div>`;
+    }
+
     return `<div class="dc-price-panel${active?' active':''}">
       <div class="dc-price-card">
         <div class="dc-price-card-head">

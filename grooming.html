@@ -1985,7 +1985,13 @@
     try {
       const raw = localStorage.getItem('dc_grooming');
       if (raw) {
-        grm = JSON.parse(raw).filter(c => c.id !== 'bathing' && c.id !== 'haircut_only');
+        grm = JSON.parse(raw)
+          .filter(c => c.id !== 'bathing' && c.id !== 'haircut_only')
+          .map(c => {
+            const def = DEFAULT_GROOMING.find(d => d.id === c.id);
+            if (def && def.groups && !c.groups) return Object.assign({}, c, { groups: def.groups });
+            return c;
+          });
       }
     } catch(e) {}
     try {

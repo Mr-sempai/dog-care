@@ -1990,10 +1990,8 @@
       }
 
       async function saveDB() {
-        if (!USE_SERVER) {
-          saveToLocalStorage();
-          return;
-        }
+        saveToLocalStorage();
+        if (!USE_SERVER) return;
         try {
           await fetch("/api/data", {
             method: "POST",
@@ -2001,8 +1999,7 @@
             body: JSON.stringify(DB),
           });
         } catch (e) {
-          alert("Помилка збереження: " + e.message + "\n\nПеревір, чи запущений сервер.");
-          throw e;
+          // server unavailable — localStorage already saved above, continue silently
         }
       }
 

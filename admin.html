@@ -1848,6 +1848,34 @@
             { name: "Стрижка мордочки", price: "+200 ₴" },
           ],
         },
+        {
+          id: "bathing",
+          icon: "🚿",
+          label: "Купання",
+          desc: "Купання без стрижки",
+          note: "",
+          rows: [
+            { name: "до 7 кг", price: "600 ₴" },
+            { name: "від 7 кг", price: "700+ ₴" },
+            { name: "від 15–45 кг", price: "900+ ₴" },
+          ],
+        },
+        {
+          id: "haircut_only",
+          icon: "✂️",
+          label: "Стрижка без купання",
+          desc: "Тільки стрижка (для попередньо чистого песика)",
+          note: "",
+          rows: [
+            { name: "Йоркширський тер'єр", price: "700 ₴" },
+            { name: "Бівер йорк. тер'єр", price: "750 ₴" },
+            { name: "Пікінес", price: "700 ₴" },
+            { name: "Болонка", price: "700 ₴" },
+            { name: "Шит-цу", price: "750 ₴" },
+            { name: "Кавалер-чарльз-кінг", price: "750 ₴" },
+            { name: "Спаніель", price: "900 ₴" },
+          ],
+        },
       ];
 
       const DEFAULT_SOCIALS = {
@@ -1884,6 +1912,14 @@
         return p;
       }
 
+      function migrateGrooming(g) {
+        const existing = new Set(g.map((c) => c.id));
+        DEFAULT_GROOMING.forEach((def) => {
+          if (!existing.has(def.id)) g.push(JSON.parse(JSON.stringify(def)));
+        });
+        return g;
+      }
+
       const USE_SERVER = window.location.protocol !== "file:";
 
       function loadFromLocalStorage() {
@@ -1904,9 +1940,10 @@
         DB.socials =
           JSON.parse(localStorage.getItem("dc_socials")) ||
           JSON.parse(JSON.stringify(DEFAULT_SOCIALS));
-        DB.grooming =
-          JSON.parse(localStorage.getItem("dc_grooming")) ||
-          JSON.parse(JSON.stringify(DEFAULT_GROOMING));
+        const rawGrooming = JSON.parse(localStorage.getItem("dc_grooming"));
+        DB.grooming = rawGrooming
+          ? migrateGrooming(rawGrooming)
+          : JSON.parse(JSON.stringify(DEFAULT_GROOMING));
         DB.grooming_meta =
           JSON.parse(localStorage.getItem("dc_grooming_meta")) ||
           JSON.parse(JSON.stringify(DEFAULT_GROOMING_META));

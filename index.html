@@ -120,7 +120,7 @@ input:not([type]), textarea, .dc-input { cursor: text; }
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; touch-action: manipulation; }
 body {
   font-family: var(--body);
   color: var(--ink);
@@ -4219,6 +4219,19 @@ function AboutBlock() {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
+  </script>
+  <script>
+    // Prevent pinch-zoom (iOS Safari ignores user-scalable=no since iOS 10)
+    document.addEventListener('touchmove', function(e) {
+      if (e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+    // Prevent double-tap zoom
+    var _lastTap = 0;
+    document.addEventListener('touchend', function(e) {
+      var now = Date.now();
+      if (now - _lastTap < 300) e.preventDefault();
+      _lastTap = now;
+    }, { passive: false });
   </script>
 </body>
 </html>

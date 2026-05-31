@@ -33,7 +33,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; }
+    html, body { margin: 0; padding: 0; touch-action: manipulation; }
     body {
       font-family: var(--body);
       color: var(--ink);
@@ -2399,6 +2399,17 @@
 <script>
   // Завантажити карусель після ініціалізації Firebase
   renderCarousel();
+</script>
+<script>
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+  var _lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    var now = Date.now();
+    if (now - _lastTap < 300) e.preventDefault();
+    _lastTap = now;
+  }, { passive: false });
 </script>
 </body>
 </html>

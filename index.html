@@ -373,25 +373,24 @@
         display: none;
         width: 44px;
         height: 44px;
-        background: transparent;
-        border: 1.5px solid rgba(255, 255, 255, 0.4);
-        border-radius: 14px;
-        padding: 12px 10px;
+        background: var(--yellow);
+        border: none;
+        border-radius: 50%;
+        padding: 0;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 5px;
-        transition:
-          background 0.15s,
-          border-color 0.15s;
+        transition: background 0.15s, transform 0.15s;
+        flex-shrink: 0;
       }
       .dc-burger:hover {
-        background: rgba(255, 255, 255, 0.12);
-        border-color: #fff;
+        background: var(--yellow-deep);
+        transform: scale(1.06);
       }
       .dc-burger span {
         display: block;
-        width: 22px;
+        width: 20px;
         height: 2px;
         background: #fff;
         border-radius: 2px;

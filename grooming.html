@@ -599,47 +599,67 @@
     .dc-rules-eyebrow::before { content: ''; display: block; width: 28px; height: 2px; background: var(--accent); border-radius: 2px; }
     .dc-rules-title {
       font-family: var(--display); font-size: clamp(26px, 4vw, 38px);
-      font-weight: 800; color: #fff; margin: 0 0 48px;
+      font-weight: 800; color: #fff; margin: 0 0 40px;
       letter-spacing: -.02em; line-height: 1.15;
     }
-    .dc-rules-grid {
+    .dc-rules-body {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
+      grid-template-columns: 1fr 200px;
+      gap: 48px;
+      align-items: end;
     }
-    .dc-rule-card {
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 18px;
-      padding: 22px 24px;
-      display: flex; gap: 16px; align-items: flex-start;
+    .dc-rules-list {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-direction: column; gap: 0;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      overflow: hidden;
     }
-    .dc-rule-icon {
-      font-size: 22px; flex-shrink: 0;
-      width: 44px; height: 44px;
-      background: rgba(255,255,255,.08);
-      border-radius: 12px;
+    .dc-rules-list li {
+      display: flex; align-items: baseline; gap: 14px;
+      padding: 16px 24px;
+      font-size: 14.5px; line-height: 1.55;
+      color: rgba(255,254,247,.8);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      transition: background .15s;
+    }
+    .dc-rules-list li:last-child { border-bottom: none; }
+    .dc-rules-list li:hover { background: rgba(255,255,255,.04); }
+    .dc-rules-num {
+      flex-shrink: 0;
+      width: 24px; height: 24px;
+      background: var(--accent);
+      border-radius: 50%;
       display: grid; place-items: center;
-    }
-    .dc-rule-text {
-      font-size: 14px; line-height: 1.6;
-      color: rgba(255,254,247,.75);
-    }
-    .dc-rule-text strong {
-      display: block; color: #fff;
-      font-size: 13px; font-weight: 700;
-      margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em;
+      font-size: 11px; font-weight: 800;
+      color: #fff;
+      margin-top: 1px;
     }
     .dc-rules-footer {
-      text-align: center;
-      font-size: 15px; font-weight: 600;
-      color: var(--accent);
+      font-size: 13px; font-weight: 600;
+      color: rgba(255,254,247,.5);
       letter-spacing: .01em;
-      margin-top: 8px;
+      padding: 14px 24px;
+      background: rgba(239,35,60,.12);
+      border-top: 1px solid rgba(239,35,60,.25);
     }
-    @media (max-width: 600px) {
-      .dc-rules-grid { grid-template-columns: 1fr; }
+    /* Stamp */
+    .dc-rules-stamp {
+      display: flex; justify-content: center; align-items: center;
+      opacity: .92;
+    }
+    .dc-rules-stamp svg {
+      width: 190px; height: 190px;
+      filter: drop-shadow(0 0 18px rgba(239,35,60,.35));
+      animation: stamp-wobble 6s ease-in-out infinite;
+    }
+    @keyframes stamp-wobble {
+      0%,100% { transform: rotate(-4deg); }
+      50% { transform: rotate(2deg); }
+    }
+    @media (max-width: 700px) {
+      .dc-rules-body { grid-template-columns: 1fr; }
+      .dc-rules-stamp { margin-top: 32px; }
       .dc-rules-section { padding: 60px 0 52px; }
     }
 
@@ -1159,74 +1179,54 @@
     <div class="dc-wrap">
       <div class="dc-rules-eyebrow">Правила запису на грумінг</div>
       <h2 class="dc-rules-title">Що важливо<br>знати перед візитом</h2>
-      <div class="dc-rules-grid">
-
-        <div class="dc-rule-card">
-          <div class="dc-rule-icon">💉</div>
-          <div class="dc-rule-text">
-            <strong>Вакцинація</strong>
-            Приймаємо лише вакцинованих тварин.
-          </div>
+      <div class="dc-rules-body">
+        <div>
+          <ul class="dc-rules-list">
+            <li><span class="dc-rules-num">1</span>Приймаємо лише вакцинованих тварин.</li>
+            <li><span class="dc-rules-num">2</span>У випадку запізнення на 15 хв і більше майстер надає послугу, на яку вистачить часу.</li>
+            <li><span class="dc-rules-num">3</span>Якщо собака схильний до агресії — просимо приносити намордник і бути присутніми весь грумінг.</li>
+            <li><span class="dc-rules-num">4</span>Грумер має право відмовити в комплексі або не доробити маніпуляцію, якщо це може зашкодити тварині чи майстру. Можлива заміна на адаптацію.</li>
+            <li><span class="dc-rules-num">5</span>Знижка хвостикам, які ходять кожні 3 тижні.</li>
+            <li><span class="dc-rules-num">6</span>При агресії тварини до майстра (укуси / подряпини) — +15–30% до суми комплексу на розсуд майстра.</li>
+            <li><span class="dc-rules-num">7</span>Якщо є ковтунці — вкажіть заздалегідь, щоб майстер розрахував час. Вичіс ковтунів оплачується окремо.</li>
+            <li><span class="dc-rules-num">8</span>Якщо грумер чекає вас 30 хв і більше після завершення — кожні 30 хв рахується 150 грн.</li>
+            <li style="background:rgba(239,35,60,.08); color:rgba(255,254,247,.6); font-style:italic; font-size:13.5px; border-top: 1px solid rgba(239,35,60,.2);">
+              <span style="font-size:16px; flex-shrink:0;">🐾</span>
+              Дякуємо за розуміння і чекаємо ваших хвостиків на грумінг!
+            </li>
+          </ul>
         </div>
 
-        <div class="dc-rule-card">
-          <div class="dc-rule-icon">⏰</div>
-          <div class="dc-rule-text">
-            <strong>Запізнення</strong>
-            У випадку запізнення на 15 хв і більше майстер надає послугу, на яку вистачить часу.
-          </div>
+        <div class="dc-rules-stamp">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- outer ring -->
+            <circle cx="100" cy="100" r="94" fill="none" stroke="#ef233c" stroke-width="4" stroke-dasharray="6 3"/>
+            <circle cx="100" cy="100" r="84" fill="none" stroke="#ef233c" stroke-width="1.5" opacity=".4"/>
+            <!-- curved top text -->
+            <path id="top-arc" d="M 18,100 a82,82 0 0,1 164,0" fill="none"/>
+            <text font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.5" fill="#ef233c" text-anchor="middle">
+              <textPath href="#top-arc" startOffset="50%">DOG CARE • GROOMING • IF</textPath>
+            </text>
+            <!-- curved bottom text -->
+            <path id="bot-arc" d="M 18,100 a82,82 0 0,0 164,0" fill="none"/>
+            <text font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="2" fill="#ef233c" text-anchor="middle" opacity=".8">
+              <textPath href="#bot-arc" startOffset="50%">ПРАВИЛА ПОГОДЖЕНО</textPath>
+            </text>
+            <!-- center paw -->
+            <g transform="translate(100,100)" fill="#ef233c">
+              <!-- toe beans -->
+              <ellipse cx="-18" cy="-22" rx="6" ry="7.5" opacity=".9"/>
+              <ellipse cx="-7"  cy="-29" rx="6" ry="7.5" opacity=".9"/>
+              <ellipse cx="7"   cy="-29" rx="6" ry="7.5" opacity=".9"/>
+              <ellipse cx="18"  cy="-22" rx="6" ry="7.5" opacity=".9"/>
+              <!-- main pad -->
+              <path d="M0,-10 C-16,-10 -22,2 -20,14 C-18,24 -10,30 0,30 C10,30 18,24 20,14 C22,2 16,-10 0,-10 Z" opacity=".9"/>
+            </g>
+            <!-- checkmark -->
+            <path d="M82,96 L94,110 L118,84" fill="none" stroke="#ef233c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-
-        <div class="dc-rule-card">
-          <div class="dc-rule-icon">🐕</div>
-          <div class="dc-rule-text">
-            <strong>Агресивні тварини</strong>
-            Якщо собака схильний до агресії — просимо приносити намордник і бути присутніми весь грумінг.
-          </div>
-        </div>
-
-        <div class="dc-rule-card">
-          <div class="dc-rule-icon">✂️</div>
-          <div class="dc-rule-text">
-            <strong>Право відмови</strong>
-            Грумер має право відмовити в комплексі або не доробити маніпуляцію, якщо це може зашкодити тварині чи майстру. Можлива заміна на адаптацію.
-          </div>
-        </div>
-
-        <div class="dc-rule-card">
-          <div class="dc-rule-icon">🎁</div>
-          <div class="dc-rule-text">
-            <strong>Знижка для постійних</strong>
-            Знижка хвостикам, які ходять кожні 3 тижні.
-          </div>
-        </div>
-
-        <div class="dc-rule-card">
-          <div class="dc-rule-icon">⚠️</div>
-          <div class="dc-rule-text">
-            <strong>Укуси / подряпини</strong>
-            При агресії тварини до майстра — +15–30% до суми комплексу на розсуд майстра.
-          </div>
-        </div>
-
-        <div class="dc-rule-card">
-          <div class="dc-rule-icon">🪢</div>
-          <div class="dc-rule-text">
-            <strong>Ковтунці</strong>
-            Якщо є ковтунці — вкажіть заздалегідь, щоб майстер розрахував час. На вичіс ковтунів — окремий час та оплата.
-          </div>
-        </div>
-
-        <div class="dc-rule-card">
-          <div class="dc-rule-icon">🕐</div>
-          <div class="dc-rule-text">
-            <strong>Очікування після грумінгу</strong>
-            Якщо грумер чекає вас 30 хв і більше після завершення — кожні 30 хв рахується 150 грн.
-          </div>
-        </div>
-
       </div>
-      <div class="dc-rules-footer">🐾 Дякуємо за розуміння і чекаємо ваших хвостиків на грумінг!</div>
     </div>
   </section>
 

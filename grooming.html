@@ -703,7 +703,7 @@
       transition: none;
     }
     .dc-rules-stamp img.stamp-hit {
-      animation: stamp-drop .55s cubic-bezier(.22,.68,0,1.4) forwards;
+      animation: stamp-drop .55s cubic-bezier(.22,.68,0,1.4) .6s forwards;
     }
     @keyframes stamp-drop {
       0%   { transform: rotate(-8deg) translateY(-120px) scale(1.15); opacity: 0; }
@@ -2613,7 +2613,7 @@
           observer.disconnect();
         }
       });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.5, rootMargin: '-20% 0px -20% 0px' });
     observer.observe(stampImg);
   })();
 </script>

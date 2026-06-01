@@ -304,6 +304,9 @@
         padding: 7px 7px 7px 22px;
         box-shadow: 0 4px 28px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.07);
         transition: box-shadow .2s;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
       }
       .dc-nav.scrolled .dc-nav-inner {
         box-shadow: 0 8px 36px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08);
@@ -3115,6 +3118,10 @@
         .dc-wrap {
           padding: 0 18px;
         }
+        .dc-h1 { font-size: clamp(28px, 8.5vw, 40px); }
+        .dc-hero-ctas { flex-direction: column; align-items: stretch; }
+        .dc-hero-ctas .dc-btn { justify-content: center; width: 100%; }
+        .dc-nav { overflow: hidden; }
 
         /* Nav */
         .dc-nav {
@@ -3124,7 +3131,7 @@
           font-size: 18px;
           gap: 8px;
         }
-        .dc-logo svg { height: 34px !important; width: auto !important; }
+        .dc-logo svg { height: 32px !important; width: 169px !important; }
         .dc-logo-mark {
           width: 32px;
           height: 32px;

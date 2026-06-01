@@ -646,16 +646,13 @@
     /* Stamp */
     .dc-rules-stamp {
       display: flex; justify-content: center; align-items: center;
-      opacity: .92;
     }
-    .dc-rules-stamp svg {
+    .dc-rules-stamp img {
       width: 190px; height: 190px;
-      filter: drop-shadow(0 0 18px rgba(239,35,60,.35));
-      animation: stamp-wobble 6s ease-in-out infinite;
-    }
-    @keyframes stamp-wobble {
-      0%,100% { transform: rotate(-4deg); }
-      50% { transform: rotate(2deg); }
+      border-radius: 50%;
+      object-fit: cover;
+      transform: rotate(-8deg);
+      filter: drop-shadow(0 4px 24px rgba(239,35,60,.4));
     }
     @media (max-width: 700px) {
       .dc-rules-body { grid-template-columns: 1fr; }

@@ -290,20 +290,23 @@
         position: sticky;
         top: 0;
         z-index: 50;
-        padding: 18px 0;
-        transition:
-          backdrop-filter 0.2s,
-          background 0.2s;
+        padding: 14px 0;
+        transition: padding .2s;
       }
-      .dc-nav.scrolled {
-        background: rgba(239, 35, 60, 0.85);
-        backdrop-filter: blur(12px);
-      }
+      .dc-nav.scrolled { padding: 10px 0; }
       .dc-nav-inner {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 32px;
+        gap: 24px;
+        background: #fff;
+        border-radius: 999px;
+        padding: 7px 7px 7px 22px;
+        box-shadow: 0 4px 28px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.07);
+        transition: box-shadow .2s;
+      }
+      .dc-nav.scrolled .dc-nav-inner {
+        box-shadow: 0 8px 36px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08);
       }
       .dc-logo {
         display: flex;
@@ -313,6 +316,7 @@
         font-weight: 700;
         font-size: 22px;
         letter-spacing: -0.02em;
+        color: var(--ink);
       }
       .dc-logo-mark {
         width: 38px;
@@ -326,44 +330,40 @@
       }
       .dc-nav-links {
         display: flex;
-        gap: 8px;
+        gap: 4px;
         align-items: center;
       }
       .dc-nav-link {
         padding: 10px 16px;
         border-radius: 999px;
         font-weight: 600;
-        font-size: 14.5px;
-        color: #fff;
-        transition:
-          background 0.15s,
-          color 0.15s;
+        font-size: 14px;
+        color: var(--ink-2);
+        transition: background .15s, color .15s;
       }
       .dc-nav-link:hover {
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(26,24,20,0.07);
+        color: var(--ink);
       }
       .dc-nav-link.active {
-        background: var(--white);
-        color: var(--yellow);
+        background: var(--yellow);
+        color: #fff;
       }
-      .dc-nav-cta {
-        margin-left: 12px;
-      }
-      /* Nav CTA: white pill with red text (inverts to dark on hover via .dc-btn-light:hover) */
+      .dc-nav-cta { margin-left: 4px; }
       .dc-nav .dc-btn-light {
-        background: var(--white);
-        color: var(--yellow);
+        background: var(--ink);
+        color: #fff;
       }
       .dc-nav .dc-btn-light:hover {
-        background: var(--ink);
-        color: var(--white);
+        background: var(--yellow);
+        color: #fff;
       }
       .dc-nav .dc-btn-light .dc-btn-arrow {
         background: var(--yellow);
-        color: var(--white);
+        color: #fff;
       }
       .dc-nav .dc-btn-light:hover .dc-btn-arrow {
-        background: var(--white);
+        background: #fff;
         color: var(--yellow);
       }
 

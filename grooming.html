@@ -583,6 +583,66 @@
       padding-bottom: 32px;
     }
 
+    /* ============ Rules section ============ */
+    .dc-rules-section {
+      background: var(--ink);
+      padding: 80px 0 72px;
+      position: relative;
+      overflow: hidden;
+    }
+    .dc-rules-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .dc-rules-eyebrow::before { content: ''; display: block; width: 28px; height: 2px; background: var(--accent); border-radius: 2px; }
+    .dc-rules-title {
+      font-family: var(--display); font-size: clamp(26px, 4vw, 38px);
+      font-weight: 800; color: #fff; margin: 0 0 48px;
+      letter-spacing: -.02em; line-height: 1.15;
+    }
+    .dc-rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .dc-rule-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px;
+      padding: 22px 24px;
+      display: flex; gap: 16px; align-items: flex-start;
+    }
+    .dc-rule-icon {
+      font-size: 22px; flex-shrink: 0;
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,.08);
+      border-radius: 12px;
+      display: grid; place-items: center;
+    }
+    .dc-rule-text {
+      font-size: 14px; line-height: 1.6;
+      color: rgba(255,254,247,.75);
+    }
+    .dc-rule-text strong {
+      display: block; color: #fff;
+      font-size: 13px; font-weight: 700;
+      margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em;
+    }
+    .dc-rules-footer {
+      text-align: center;
+      font-size: 15px; font-weight: 600;
+      color: var(--accent);
+      letter-spacing: .01em;
+      margin-top: 8px;
+    }
+    @media (max-width: 600px) {
+      .dc-rules-grid { grid-template-columns: 1fr; }
+      .dc-rules-section { padding: 60px 0 52px; }
+    }
+
     /* ============ CTA banner ============ */
     .dc-cta-band {
       background: var(--ink); border-radius: var(--radius-xl);
@@ -1087,8 +1147,91 @@
     </div>
   </section>
 
-  <!-- wave: cream → white -->
+  <!-- wave: cream → ink (rules) -->
   <div class="wave-sep" style="background:#FFFDF0;">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,20 C360,0 720,80 1080,40 C1260,20 1380,50 1440,20 L1440,80 L0,80 Z" fill="var(--ink)"/>
+    </svg>
+  </div>
+
+  <!-- ══ ПРАВИЛА ══ -->
+  <section class="dc-rules-section">
+    <div class="dc-wrap">
+      <div class="dc-rules-eyebrow">Правила запису на грумінг</div>
+      <h2 class="dc-rules-title">Що важливо<br>знати перед візитом</h2>
+      <div class="dc-rules-grid">
+
+        <div class="dc-rule-card">
+          <div class="dc-rule-icon">💉</div>
+          <div class="dc-rule-text">
+            <strong>Вакцинація</strong>
+            Приймаємо лише вакцинованих тварин.
+          </div>
+        </div>
+
+        <div class="dc-rule-card">
+          <div class="dc-rule-icon">⏰</div>
+          <div class="dc-rule-text">
+            <strong>Запізнення</strong>
+            У випадку запізнення на 15 хв і більше майстер надає послугу, на яку вистачить часу.
+          </div>
+        </div>
+
+        <div class="dc-rule-card">
+          <div class="dc-rule-icon">🐕</div>
+          <div class="dc-rule-text">
+            <strong>Агресивні тварини</strong>
+            Якщо собака схильний до агресії — просимо приносити намордник і бути присутніми весь грумінг.
+          </div>
+        </div>
+
+        <div class="dc-rule-card">
+          <div class="dc-rule-icon">✂️</div>
+          <div class="dc-rule-text">
+            <strong>Право відмови</strong>
+            Грумер має право відмовити в комплексі або не доробити маніпуляцію, якщо це може зашкодити тварині чи майстру. Можлива заміна на адаптацію.
+          </div>
+        </div>
+
+        <div class="dc-rule-card">
+          <div class="dc-rule-icon">🎁</div>
+          <div class="dc-rule-text">
+            <strong>Знижка для постійних</strong>
+            Знижка хвостикам, які ходять кожні 3 тижні.
+          </div>
+        </div>
+
+        <div class="dc-rule-card">
+          <div class="dc-rule-icon">⚠️</div>
+          <div class="dc-rule-text">
+            <strong>Укуси / подряпини</strong>
+            При агресії тварини до майстра — +15–30% до суми комплексу на розсуд майстра.
+          </div>
+        </div>
+
+        <div class="dc-rule-card">
+          <div class="dc-rule-icon">🪢</div>
+          <div class="dc-rule-text">
+            <strong>Ковтунці</strong>
+            Якщо є ковтунці — вкажіть заздалегідь, щоб майстер розрахував час. На вичіс ковтунів — окремий час та оплата.
+          </div>
+        </div>
+
+        <div class="dc-rule-card">
+          <div class="dc-rule-icon">🕐</div>
+          <div class="dc-rule-text">
+            <strong>Очікування після грумінгу</strong>
+            Якщо грумер чекає вас 30 хв і більше після завершення — кожні 30 хв рахується 150 грн.
+          </div>
+        </div>
+
+      </div>
+      <div class="dc-rules-footer">🐾 Дякуємо за розуміння і чекаємо ваших хвостиків на грумінг!</div>
+    </div>
+  </section>
+
+  <!-- wave: ink → white -->
+  <div class="wave-sep" style="background:var(--ink);">
     <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
       <path d="M0,20 C360,0 720,80 1080,40 C1260,20 1380,50 1440,20 L1440,80 L0,80 Z" fill="#ffffff"/>
     </svg>

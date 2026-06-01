@@ -606,7 +606,7 @@
     .dc-rules-body {
       display: grid;
       grid-template-columns: 1fr 200px;
-      gap: 48px;
+      gap: 0;
       align-items: end;
     }
     .dc-rules-list {
@@ -646,12 +646,16 @@
     }
     /* Stamp */
     .dc-rules-stamp {
-      display: flex; justify-content: center; align-items: center;
+      display: flex; justify-content: center; align-items: flex-end;
+      position: relative;
+      margin-left: -60px;
     }
     .dc-rules-stamp img {
       width: 210px; height: 210px;
       transform: rotate(-8deg);
       filter: drop-shadow(0 0 14px rgba(255,210,30,.6)) drop-shadow(0 0 32px rgba(255,190,0,.3));
+      position: relative;
+      z-index: 2;
     }
     @media (max-width: 700px) {
       .dc-rules-body { grid-template-columns: 1fr; }

@@ -228,6 +228,7 @@
         margin: 0;
         padding: 0;
         touch-action: manipulation;
+        overflow-x: hidden;
       }
       body {
         font-family: var(--body);
@@ -3003,10 +3004,12 @@
           display: none;
         }
         .dc-nav-inner {
-          grid-template-columns: 1fr auto;
+          grid-template-columns: auto 1fr;
+          padding: 6px 6px 6px 14px;
         }
         .dc-burger {
           display: flex;
+          margin-left: auto;
         }
         /* Process: switch from absolute-positioned bubbles around a circle
      to a clean vertical stack with the dog photo on top. */
@@ -3121,6 +3124,7 @@
           font-size: 18px;
           gap: 8px;
         }
+        .dc-logo svg { height: 34px !important; width: auto !important; }
         .dc-logo-mark {
           width: 32px;
           height: 32px;
@@ -3160,6 +3164,7 @@
         .dc-hero-ctas {
           gap: 10px;
           justify-content: center;
+          flex-wrap: wrap;
         }
         .dc-hero-stats {
           justify-content: center;

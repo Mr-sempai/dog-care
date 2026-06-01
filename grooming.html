@@ -644,6 +644,47 @@
       background: rgba(239,35,60,.12);
       border-top: 1px solid rgba(239,35,60,.25);
     }
+    /* Cancellation block */
+    .dc-cancel-block {
+      margin-top: 16px;
+      border: 1px solid rgba(239,35,60,.3);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .dc-cancel-title {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      font-size: 13px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(239,35,60,.1);
+      border-bottom: 1px solid rgba(239,35,60,.2);
+    }
+    .dc-cancel-icon { font-size: 16px; }
+    .dc-cancel-list {
+      list-style: none; margin: 0; padding: 0;
+    }
+    .dc-cancel-list li {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 20px;
+      font-size: 13.5px; line-height: 1.5;
+      color: rgba(255,254,247,.75);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .dc-cancel-list li:last-child { border-bottom: none; }
+    .dc-cancel-badge {
+      flex-shrink: 0; min-width: 76px;
+      padding: 4px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 800; text-align: center; letter-spacing: .03em;
+    }
+    .dc-cancel-free { background: rgba(34,197,94,.15); color: #4ade80; }
+    .dc-cancel-half { background: rgba(251,191,36,.15); color: #fbbf24; }
+    .dc-cancel-full { background: rgba(239,35,60,.2); color: #f87171; }
+    .dc-cancel-note {
+      font-style: italic; font-size: 12.5px !important;
+      color: rgba(255,254,247,.45) !important;
+      background: rgba(239,35,60,.06);
+    }
+
     /* Stamp */
     .dc-rules-stamp {
       display: flex; justify-content: center; align-items: flex-end;
@@ -1191,6 +1232,30 @@
               Дякуємо за розуміння і чекаємо ваших хвостиків на грумінг!
             </li>
           </ul>
+
+          <div class="dc-cancel-block">
+            <div class="dc-cancel-title">
+              <span class="dc-cancel-icon">🚫</span>
+              Правила скасування комплексу
+            </div>
+            <ul class="dc-cancel-list">
+              <li>
+                <span class="dc-cancel-badge dc-cancel-free">✓ Безкоштовно</span>
+                Якщо попередили за <strong>24 години</strong> до комплексу.
+              </li>
+              <li>
+                <span class="dc-cancel-badge dc-cancel-half">50%</span>
+                Якщо попередили за <strong>3 години</strong> до початку — оплата 50% від вартості.
+              </li>
+              <li>
+                <span class="dc-cancel-badge dc-cancel-full">100%</span>
+                Якщо не прийшли на запис — оплата 100% вартості комплексу.
+              </li>
+              <li class="dc-cancel-note">
+                ⚠️ При несплаті — наступний візит лише з передоплатою 100%.
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div class="dc-rules-stamp">

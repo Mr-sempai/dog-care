@@ -4053,7 +4053,8 @@
         return (
           <>
             <nav className={"dc-nav" + (scrolled ? " scrolled" : "")}>
-              <div className="dc-wrap dc-nav-inner">
+              <div className="dc-wrap">
+              <div className="dc-nav-inner">
                 <div className="dc-logo">
                   <LogoNav height={44} />
                 </div>
@@ -4099,6 +4100,7 @@
                   <span></span>
                   <span></span>
                 </button>
+              </div>
               </div>
             </nav>
             {menuOpen && (

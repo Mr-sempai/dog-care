@@ -588,7 +588,7 @@
 
     /* ============ Rules section ============ */
     .dc-rules-section {
-      background: var(--ink);
+      background: var(--accent);
       padding: 80px 0 72px;
       position: relative;
       overflow: hidden;
@@ -596,14 +596,14 @@
     .dc-rules-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
       font-size: 12px; font-weight: 700; letter-spacing: .1em;
-      text-transform: uppercase; color: var(--accent);
-      margin-bottom: 14px;
+      text-transform: uppercase; color: var(--ink);
+      opacity: .55; margin-bottom: 14px;
     }
-    .dc-rules-eyebrow::before { content: ''; display: block; width: 28px; height: 2px; background: var(--accent); border-radius: 2px; }
+    .dc-rules-eyebrow::before { content: ''; display: block; width: 28px; height: 2px; background: var(--ink); border-radius: 2px; opacity: .4; }
     .dc-rules-title {
       font-family: var(--display); font-size: clamp(26px, 4vw, 38px);
-      font-weight: 800; color: #fff; margin: 0 0 40px;
-      letter-spacing: -.02em; line-height: 1.15;
+      font-weight: 800; color: var(--ink); margin: 0 0 40px;
+      letter-spacing: -.02em; line-height: 1.15; text-align: center;
     }
     .dc-rules-body {
       display: grid;
@@ -612,54 +612,48 @@
       align-items: end;
     }
     .dc-rules-list {
-      list-style: none; margin: 0; padding: 0;
+      list-style: none; margin: 0 auto; padding: 0;
       display: flex; flex-direction: column; gap: 0;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 20px;
-      overflow: hidden;
+      max-width: 640px;
     }
     .dc-rules-list li {
-      display: flex; align-items: baseline; gap: 14px;
-      padding: 16px 24px;
-      font-size: 14.5px; line-height: 1.55;
-      color: rgba(255,254,247,.8);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      transition: background .15s;
+      display: flex; align-items: baseline; gap: 16px;
+      padding: 15px 0;
+      font-size: 15px; line-height: 1.55;
+      color: var(--ink);
+      border-bottom: 1px solid rgba(26,24,20,.12);
     }
     .dc-rules-list li:last-child { border-bottom: none; }
-    .dc-rules-list li:hover { background: rgba(255,255,255,.04); }
     .dc-rules-num {
       flex-shrink: 0;
-      width: 24px; height: 24px;
-      background: var(--accent);
-      border-radius: 50%;
-      display: grid; place-items: center;
-      font-size: 11px; font-weight: 800;
-      color: #1A1814;
-      margin-top: 1px;
+      font-size: 12px; font-weight: 800;
+      color: var(--ink); opacity: .35;
+      min-width: 20px; text-align: right;
+      margin-top: 2px;
     }
     .dc-rules-footer {
-      font-size: 13px; font-weight: 600;
-      color: rgba(255,254,247,.5);
+      font-size: 13.5px; font-weight: 600;
+      color: var(--ink); opacity: .6;
       letter-spacing: .01em;
-      padding: 14px 24px;
-      background: rgba(239,35,60,.12);
-      border-top: 1px solid rgba(239,35,60,.25);
+      text-align: center;
+      padding: 20px 0 0;
     }
     /* Cancellation block */
     .dc-cancel-block {
-      margin-top: 16px;
-      border: 1px solid rgba(239,35,60,.3);
-      border-radius: 16px;
+      margin-top: 40px;
+      background: rgba(255,255,255,.7);
+      border-radius: 20px;
       overflow: hidden;
+      backdrop-filter: blur(4px);
+      max-width: 640px;
+      margin-left: auto; margin-right: auto;
     }
     .dc-cancel-title {
       display: flex; align-items: center; gap: 10px;
-      padding: 14px 20px;
+      padding: 16px 24px;
       font-size: 13px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
-      color: var(--accent);
-      background: rgba(239,35,60,.1);
-      border-bottom: 1px solid rgba(239,35,60,.2);
+      color: var(--ink);
+      border-bottom: 1px solid rgba(26,24,20,.1);
     }
     .dc-cancel-icon { font-size: 16px; }
     .dc-cancel-list {
@@ -667,24 +661,24 @@
     }
     .dc-cancel-list li {
       display: flex; align-items: center; gap: 12px;
-      padding: 12px 20px;
-      font-size: 13.5px; line-height: 1.5;
-      color: rgba(255,254,247,.75);
-      border-bottom: 1px solid rgba(255,255,255,.07);
+      padding: 13px 24px;
+      font-size: 14px; line-height: 1.5;
+      color: var(--ink);
+      border-bottom: 1px solid rgba(26,24,20,.07);
     }
     .dc-cancel-list li:last-child { border-bottom: none; }
     .dc-cancel-badge {
-      flex-shrink: 0; min-width: 76px;
-      padding: 4px 10px; border-radius: 999px;
+      flex-shrink: 0; min-width: 86px;
+      padding: 5px 12px; border-radius: 999px;
       font-size: 11px; font-weight: 800; text-align: center; letter-spacing: .03em;
     }
-    .dc-cancel-free { background: rgba(34,197,94,.15); color: #4ade80; }
-    .dc-cancel-half { background: rgba(251,191,36,.15); color: #fbbf24; }
-    .dc-cancel-full { background: rgba(239,35,60,.2); color: #f87171; }
+    .dc-cancel-free { background: rgba(34,197,94,.15); color: #15803d; }
+    .dc-cancel-half { background: rgba(180,130,0,.15); color: #92700a; }
+    .dc-cancel-full { background: rgba(220,38,38,.12); color: #b91c1c; }
     .dc-cancel-note {
-      font-style: italic; font-size: 12.5px !important;
-      color: rgba(255,254,247,.45) !important;
-      background: rgba(239,35,60,.06);
+      font-style: italic; font-size: 13px !important;
+      color: rgba(26,24,20,.5) !important;
+      background: rgba(26,24,20,.04);
     }
 
     /* Stamp */
@@ -697,7 +691,7 @@
       width: 210px; height: 210px;
       transform: rotate(-8deg) translateY(-120px);
       opacity: 0;
-      filter: drop-shadow(0 0 14px rgba(255,210,30,.6)) drop-shadow(0 0 32px rgba(255,190,0,.3));
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,.25));
       position: relative;
       z-index: 2;
       transition: none;
@@ -1217,10 +1211,10 @@
     </div>
   </section>
 
-  <!-- wave: cream → ink (rules) -->
+  <!-- wave: cream → accent/yellow (rules) -->
   <div class="wave-sep" style="background:#FFFDF0;">
     <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M0,20 C360,0 720,80 1080,40 C1260,20 1380,50 1440,20 L1440,80 L0,80 Z" fill="var(--ink)"/>
+      <path d="M0,20 C360,0 720,80 1080,40 C1260,20 1380,50 1440,20 L1440,80 L0,80 Z" fill="var(--accent)"/>
     </svg>
   </div>
 
@@ -1278,8 +1272,8 @@
     </div>
   </section>
 
-  <!-- wave: ink → white -->
-  <div class="wave-sep" style="background:var(--ink);">
+  <!-- wave: accent/yellow → white -->
+  <div class="wave-sep" style="background:var(--accent);">
     <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
       <path d="M0,20 C360,0 720,80 1080,40 C1260,20 1380,50 1440,20 L1440,80 L0,80 Z" fill="#ffffff"/>
     </svg>

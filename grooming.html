@@ -675,7 +675,7 @@
       width: 120px; height: 120px; display: block;
       transform: rotate(-8deg) translateY(-60px);
       opacity: 0;
-      filter: brightness(0) invert(1) sepia(1) hue-rotate(300deg) saturate(5) brightness(0.5);
+      filter: url(#stamp-red);
       transition: none;
     }
     .dc-rules-stamp img.stamp-hit {
@@ -1225,6 +1225,13 @@
             <li>Не прийшли — 100% вартості комплексу.</li>
           </ul>
           <p class="dc-cancel-warning">⚠️ При несплаті — наступний візит лише з передоплатою 100%</p>
+          <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+            <defs>
+              <filter id="stamp-red">
+                <feColorMatrix type="matrix" values="0 0 0 0 0.8  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+              </filter>
+            </defs>
+          </svg>
           <div class="dc-rules-stamp">
             <img src="штамп1.png" alt="Печатка Dog Care Grooming" width="120" height="120" loading="lazy" />
           </div>

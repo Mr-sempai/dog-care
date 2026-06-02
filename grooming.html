@@ -696,6 +696,61 @@
       .dc-cancel-step { padding: 20px 16px; }
       .dc-cancel-pct { font-size: 28px; }
     }
+    /* Cancel paper — same scalloped style */
+    .dc-cancel-paper {
+      background: #FFFDF0;
+      position: relative;
+      padding: 52px 0 52px;
+    }
+    .dc-cancel-paper::before,
+    .dc-cancel-paper::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 22px;
+      background-size: 28px 22px;
+      background-repeat: repeat-x;
+    }
+    .dc-cancel-paper::before {
+      top: -21px;
+      background-image: radial-gradient(circle at 50% 100%, #FFFDF0 12px, #1A1814 12.5px);
+      background-position: 0 0;
+    }
+    .dc-cancel-paper::after {
+      bottom: -21px;
+      background-image: radial-gradient(circle at 50% 0, #FFFDF0 12px, #1A1814 12.5px);
+      background-position: 0 100%;
+    }
+    /* Gap between papers */
+    .dc-rules-gap { height: 84px; }
+    /* Stamp */
+    .dc-rules-stamp {
+      position: absolute;
+      top: -28px;
+      right: clamp(16px, 5vw, 80px);
+      z-index: 4;
+      pointer-events: none;
+    }
+    .dc-rules-stamp img {
+      width: 120px; height: 120px; display: block;
+      transform: rotate(-8deg) translateY(-60px);
+      opacity: 0;
+      filter: brightness(0);
+      transition: none;
+    }
+    .dc-rules-stamp img.stamp-hit {
+      animation: stamp-drop .55s cubic-bezier(.22,.68,0,1.4) .6s forwards;
+    }
+    @keyframes stamp-drop {
+      0%   { transform: rotate(-8deg) translateY(-60px) scale(1.15); opacity: 0; }
+      60%  { transform: rotate(-8deg) translateY(8px)   scale(.96);  opacity: 1; }
+      80%  { transform: rotate(-8deg) translateY(-4px)  scale(1.02); opacity: 1; }
+      100% { transform: rotate(-8deg) translateY(0)     scale(1);    opacity: 1; }
+    }
+    @media (max-width: 600px) {
+      .dc-rules-stamp { right: 10px; top: -16px; }
+      .dc-rules-stamp img { width: 90px; height: 90px; }
+    }
 
     /* ============ CTA banner ============ */
     .dc-cta-band {
@@ -1206,6 +1261,8 @@
 
   <!-- ══ ПРАВИЛА ══ -->
   <section class="dc-rules-section">
+
+    <!-- Папір 1: правила -->
     <div class="dc-rules-paper">
       <div class="dc-wrap">
         <h2 class="dc-rules-title">Що важливо<br>знати перед візитом</h2>
@@ -1221,34 +1278,42 @@
             <li>Кожні 30 хв очікування після завершення — 150 грн.</li>
             <li class="dc-rules-footer">🐾 Дякуємо за розуміння і чекаємо ваших хвостиків!</li>
           </ul>
-
-          <div class="dc-cancel-block">
-            <div class="dc-cancel-title">
-              <span class="dc-cancel-icon">🚫</span>
-              Правила скасування комплексу
-            </div>
-            <div class="dc-cancel-timeline">
-              <div class="dc-cancel-step dc-cancel-step-free">
-                <div class="dc-cancel-time">за 24+ години</div>
-                <div class="dc-cancel-pct">0%</div>
-                <div class="dc-cancel-desc">Безкоштовне скасування</div>
-              </div>
-              <div class="dc-cancel-step dc-cancel-step-half">
-                <div class="dc-cancel-time">за 3 години</div>
-                <div class="dc-cancel-pct">50%</div>
-                <div class="dc-cancel-desc">Половина вартості комплексу</div>
-              </div>
-              <div class="dc-cancel-step dc-cancel-step-full">
-                <div class="dc-cancel-time">не прийшли</div>
-                <div class="dc-cancel-pct">100%</div>
-                <div class="dc-cancel-desc">Повна вартість комплексу</div>
-              </div>
-            </div>
-            <div class="dc-cancel-warning">⚠️ При несплаті — наступний візит лише з передоплатою 100%</div>
-          </div>
         </div>
       </div>
     </div>
+
+    <div class="dc-rules-gap"></div>
+
+    <!-- Папір 2: скасування + штамп -->
+    <div class="dc-cancel-paper">
+      <div class="dc-rules-stamp">
+        <img src="штамп1.png" alt="Печатка Dog Care Grooming" width="120" height="120" loading="lazy" />
+      </div>
+      <div class="dc-wrap">
+        <h2 class="dc-rules-title">Правила<br>скасування</h2>
+        <div class="dc-rules-body">
+          <div class="dc-cancel-timeline">
+            <div class="dc-cancel-step dc-cancel-step-free">
+              <div class="dc-cancel-time">за 24+ години</div>
+              <div class="dc-cancel-pct">0%</div>
+              <div class="dc-cancel-desc">Безкоштовне скасування</div>
+            </div>
+            <div class="dc-cancel-step dc-cancel-step-half">
+              <div class="dc-cancel-time">за 3 години</div>
+              <div class="dc-cancel-pct">50%</div>
+              <div class="dc-cancel-desc">Половина вартості комплексу</div>
+            </div>
+            <div class="dc-cancel-step dc-cancel-step-full">
+              <div class="dc-cancel-time">не прийшли</div>
+              <div class="dc-cancel-pct">100%</div>
+              <div class="dc-cancel-desc">Повна вартість комплексу</div>
+            </div>
+          </div>
+          <div class="dc-cancel-warning">⚠️ При несплаті — наступний візит лише з передоплатою 100%</div>
+        </div>
+      </div>
+    </div>
+
   </section>
 
   <!-- wave: dark → white -->

@@ -622,7 +622,7 @@
       font-weight: 800; color: var(--ink); margin: 0 0 36px;
       letter-spacing: -.02em; line-height: 1.15; text-align: center;
     }
-    .dc-rules-body { max-width: 580px; margin: 0 auto; }
+    .dc-rules-body { max-width: 580px; margin: 0 auto; position: relative; }
     /* Numbered list */
     .dc-rules-list {
       list-style: none; margin: 0; padding: 0;
@@ -663,11 +663,11 @@
       margin-top: 16px;
       font-size: 13px; color: rgba(26,24,20,.55); font-style: italic; text-align: center;
     }
-    /* Stamp — overlaps last line of paper */
+    /* Stamp — overlaps last line of text body */
     .dc-rules-stamp {
       position: absolute;
-      bottom: 36px;
-      right: clamp(16px, 5vw, 72px);
+      bottom: -10px;
+      right: -10px;
       z-index: 3;
       pointer-events: none;
     }
@@ -688,7 +688,7 @@
       100% { transform: rotate(-8deg) translateY(0)     scale(1);    opacity: 1; }
     }
     @media (max-width: 600px) {
-      .dc-rules-stamp { right: 8px; bottom: 24px; }
+      .dc-rules-stamp { right: -4px; bottom: -4px; }
       .dc-rules-stamp img { width: 88px; height: 88px; }
     }
 
@@ -1225,10 +1225,10 @@
             <li>Не прийшли — 100% вартості комплексу.</li>
           </ul>
           <p class="dc-cancel-warning">⚠️ При несплаті — наступний візит лише з передоплатою 100%</p>
+          <div class="dc-rules-stamp">
+            <img src="штамп1.png" alt="Печатка Dog Care Grooming" width="120" height="120" loading="lazy" />
+          </div>
         </div>
-      </div>
-      <div class="dc-rules-stamp">
-        <img src="штамп1.png" alt="Печатка Dog Care Grooming" width="120" height="120" loading="lazy" />
       </div>
     </div>
   </section>

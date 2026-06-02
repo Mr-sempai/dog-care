@@ -610,29 +610,26 @@
       max-width: 860px;
       margin: 0 auto;
     }
-    /* Cards grid */
+    /* Simple list */
     .dc-rules-list {
       list-style: none; margin: 0; padding: 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
+      display: flex; flex-direction: column; gap: 0;
     }
     .dc-rules-list li {
-      background: rgba(255,255,255,.75);
-      border-radius: 18px;
-      padding: 22px 20px 20px;
-      display: flex; flex-direction: column; gap: 8px;
-      backdrop-filter: blur(4px);
-      transition: transform .15s, box-shadow .15s;
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(26,24,20,.1);
     }
-    .dc-rules-list li:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0,0,0,.1);
+    .dc-rules-list li:first-child { border-top: 1px solid rgba(26,24,20,.1); }
+    .dc-rules-list li:last-child {
+      border-bottom: none;
+      justify-content: center; align-items: center;
+      padding: 20px 0 0;
+      font-style: italic; color: rgba(26,24,20,.55); font-size: 14px; gap: 8px;
     }
-    .dc-rules-list li:last-child { grid-column: 1 / -1; flex-direction: row; align-items: center; background: rgba(255,255,255,.4); justify-content: center; font-style: italic; color: rgba(26,24,20,.6); font-size: 14px; }
-    .dc-rules-icon { font-size: 28px; line-height: 1; }
-    .dc-rules-label { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); opacity: .45; }
-    .dc-rules-text { font-size: 14px; line-height: 1.55; color: var(--ink); }
+    .dc-rules-icon { font-size: 22px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+    .dc-rules-label { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); opacity: .45; margin-bottom: 3px; }
+    .dc-rules-text { font-size: 15px; line-height: 1.55; color: var(--ink); }
     .dc-rules-num { display: none; }
     /* Cancel timeline */
     .dc-cancel-block {
@@ -663,7 +660,7 @@
       z-index: 1;
     }
     .dc-cancel-step-free  { background: #15803d; }
-    .dc-cancel-step-half  { background: #b45309; }
+    .dc-cancel-step-half  { background: #F97316; }
     .dc-cancel-step-full  { background: #b91c1c; }
     .dc-cancel-time {
       font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
@@ -683,14 +680,10 @@
       font-style: italic;
     }
     @media (max-width: 700px) {
-      .dc-rules-list { grid-template-columns: 1fr 1fr; }
       .dc-cancel-timeline { flex-direction: column; border-radius: 16px; }
       .dc-cancel-step:not(:last-child)::after { content: '↓'; right: auto; left: 50%; top: auto; bottom: -12px; transform: translateX(-50%); }
       .dc-cancel-step { padding: 20px 16px; }
       .dc-cancel-pct { font-size: 28px; }
-    }
-    @media (max-width: 420px) {
-      .dc-rules-list { grid-template-columns: 1fr; }
     }
 
     /* Stamp */
@@ -1239,43 +1232,35 @@
         <ul class="dc-rules-list">
           <li>
             <div class="dc-rules-icon">💉</div>
-            <div class="dc-rules-label">Вакцинація</div>
-            <div class="dc-rules-text">Приймаємо лише вакцинованих тварин.</div>
+            <div><div class="dc-rules-label">Вакцинація</div><div class="dc-rules-text">Приймаємо лише вакцинованих тварин.</div></div>
           </li>
           <li>
             <div class="dc-rules-icon">⏰</div>
-            <div class="dc-rules-label">Запізнення</div>
-            <div class="dc-rules-text">При запізненні на 15+ хв майстер надає послугу на час, що залишився.</div>
+            <div><div class="dc-rules-label">Запізнення</div><div class="dc-rules-text">При запізненні на 15+ хв майстер надає послугу на час, що залишився.</div></div>
           </li>
           <li>
             <div class="dc-rules-icon">🦮</div>
-            <div class="dc-rules-label">Агресія</div>
-            <div class="dc-rules-text">Агресивний собака? Приносьте намордник і будьте присутні весь грумінг.</div>
+            <div><div class="dc-rules-label">Агресія</div><div class="dc-rules-text">Агресивний собака? Приносьте намордник і будьте присутні весь грумінг.</div></div>
           </li>
           <li>
             <div class="dc-rules-icon">✂️</div>
-            <div class="dc-rules-label">Право відмови</div>
-            <div class="dc-rules-text">Грумер може відмовити або замінити комплекс на адаптацію, якщо це безпечніше.</div>
+            <div><div class="dc-rules-label">Право відмови</div><div class="dc-rules-text">Грумер може відмовити або замінити комплекс на адаптацію, якщо це безпечніше.</div></div>
           </li>
           <li>
             <div class="dc-rules-icon">🎁</div>
-            <div class="dc-rules-label">Знижка</div>
-            <div class="dc-rules-text">Знижка постійним хвостикам, які ходять кожні 3 тижні.</div>
+            <div><div class="dc-rules-label">Знижка</div><div class="dc-rules-text">Знижка постійним хвостикам, які ходять кожні 3 тижні.</div></div>
           </li>
           <li>
             <div class="dc-rules-icon">⚠️</div>
-            <div class="dc-rules-label">Укуси / подряпини</div>
-            <div class="dc-rules-text">+15–30% до суми комплексу при агресії тварини до майстра.</div>
+            <div><div class="dc-rules-label">Укуси / подряпини</div><div class="dc-rules-text">+15–30% до суми комплексу при агресії тварини до майстра.</div></div>
           </li>
           <li>
             <div class="dc-rules-icon">🪢</div>
-            <div class="dc-rules-label">Ковтунці</div>
-            <div class="dc-rules-text">Є ковтунці — вкажіть заздалегідь. Вичіс оплачується окремо.</div>
+            <div><div class="dc-rules-label">Ковтунці</div><div class="dc-rules-text">Є ковтунці — вкажіть заздалегідь. Вичіс оплачується окремо.</div></div>
           </li>
           <li>
             <div class="dc-rules-icon">🕐</div>
-            <div class="dc-rules-label">Очікування</div>
-            <div class="dc-rules-text">Кожні 30 хв очікування після завершення — 150 грн.</div>
+            <div><div class="dc-rules-label">Очікування</div><div class="dc-rules-text">Кожні 30 хв очікування після завершення — 150 грн.</div></div>
           </li>
           <li>
             <span style="font-size:18px;">🐾</span>

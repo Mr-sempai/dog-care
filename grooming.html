@@ -688,7 +688,12 @@
       100% { transform: rotate(-8deg) translateY(0)     scale(1);    opacity: 1; }
     }
     @media (max-width: 600px) {
-      .dc-rules-stamp { right: -4px; bottom: -4px; }
+      .dc-rules-stamp {
+        position: static;
+        display: flex;
+        justify-content: center;
+        margin-top: 24px;
+      }
       .dc-rules-stamp img { width: 88px; height: 88px; }
     }
 

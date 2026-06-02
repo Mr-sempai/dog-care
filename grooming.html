@@ -649,86 +649,26 @@
       border-bottom: none; padding: 20px 0 0;
     }
     .dc-rules-list > li.dc-rules-footer::before { content: none; }
-    /* Cancel timeline */
-    .dc-cancel-block { margin-top: 40px; }
-    .dc-cancel-title {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
-      color: var(--ink); opacity: .6; margin-bottom: 28px;
+    /* Cancel subsection within rules paper */
+    .dc-rules-divider {
+      border: none; border-top: 2px dashed rgba(26,24,20,.15);
+      margin: 36px 0 32px;
     }
-    .dc-cancel-icon { font-size: 16px; }
-    .dc-cancel-timeline {
-      display: flex; align-items: stretch; gap: 0;
-      border-radius: 20px; overflow: hidden;
-      box-shadow: 0 4px 24px rgba(0,0,0,.1);
+    .dc-rules-subtitle {
+      font-family: var(--display); font-size: clamp(20px, 3vw, 28px);
+      font-weight: 800; color: var(--ink); margin: 0 0 24px;
+      letter-spacing: -.02em; line-height: 1.2; text-align: center;
     }
-    .dc-cancel-step {
-      flex: 1; padding: 28px 20px 24px;
-      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
-      position: relative;
-    }
-    .dc-cancel-step:not(:last-child)::after {
-      content: '→';
-      position: absolute; right: -10px; top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px; font-weight: 700; color: rgba(255,255,255,.6); z-index: 1;
-    }
-    .dc-cancel-step-free  { background: #15803d; }
-    .dc-cancel-step-half  { background: #F97316; }
-    .dc-cancel-step-full  { background: #b91c1c; }
-    .dc-cancel-time {
-      font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
-      color: rgba(255,255,255,.7);
-    }
-    .dc-cancel-pct {
-      font-family: var(--display); font-size: 36px; font-weight: 900;
-      color: #fff; line-height: 1; letter-spacing: -.02em;
-    }
-    .dc-cancel-desc { font-size: 12.5px; color: rgba(255,255,255,.8); line-height: 1.4; }
     .dc-cancel-warning {
-      margin-top: 16px; padding: 12px 20px;
-      background: rgba(0,0,0,.08); border-radius: 12px;
-      font-size: 13px; color: rgba(26,24,20,.6); text-align: center; font-style: italic;
+      margin-top: 16px;
+      font-size: 13px; color: rgba(26,24,20,.55); font-style: italic; text-align: center;
     }
-    @media (max-width: 700px) {
-      .dc-cancel-timeline { flex-direction: column; border-radius: 16px; }
-      .dc-cancel-step:not(:last-child)::after { content: '↓'; right: auto; left: 50%; top: auto; bottom: -12px; transform: translateX(-50%); }
-      .dc-cancel-step { padding: 20px 16px; }
-      .dc-cancel-pct { font-size: 28px; }
-    }
-    /* Cancel paper — same scalloped style */
-    .dc-cancel-paper {
-      background: #FFFDF0;
-      position: relative;
-      padding: 52px 0 52px;
-    }
-    .dc-cancel-paper::before,
-    .dc-cancel-paper::after {
-      content: '';
-      position: absolute;
-      left: 0; right: 0;
-      height: 22px;
-      background-size: 28px 22px;
-      background-repeat: repeat-x;
-    }
-    .dc-cancel-paper::before {
-      top: -21px;
-      background-image: radial-gradient(circle at 50% 100%, #FFFDF0 12px, #1A1814 12.5px);
-      background-position: 0 0;
-    }
-    .dc-cancel-paper::after {
-      bottom: -21px;
-      background-image: radial-gradient(circle at 50% 0, #FFFDF0 12px, #1A1814 12.5px);
-      background-position: 0 100%;
-    }
-    /* Gap between papers */
-    .dc-rules-gap { height: 84px; }
-    /* Stamp */
+    /* Stamp — overlaps last line of paper */
     .dc-rules-stamp {
       position: absolute;
-      top: -28px;
-      right: clamp(16px, 5vw, 80px);
-      z-index: 4;
+      bottom: 36px;
+      right: clamp(16px, 5vw, 72px);
+      z-index: 3;
       pointer-events: none;
     }
     .dc-rules-stamp img {
@@ -748,8 +688,8 @@
       100% { transform: rotate(-8deg) translateY(0)     scale(1);    opacity: 1; }
     }
     @media (max-width: 600px) {
-      .dc-rules-stamp { right: 10px; top: -16px; }
-      .dc-rules-stamp img { width: 90px; height: 90px; }
+      .dc-rules-stamp { right: 8px; bottom: 24px; }
+      .dc-rules-stamp img { width: 88px; height: 88px; }
     }
 
     /* ============ CTA banner ============ */
@@ -1261,8 +1201,6 @@
 
   <!-- ══ ПРАВИЛА ══ -->
   <section class="dc-rules-section">
-
-    <!-- Папір 1: правила -->
     <div class="dc-rules-paper">
       <div class="dc-wrap">
         <h2 class="dc-rules-title">Що важливо<br>знати перед візитом</h2>
@@ -1278,42 +1216,21 @@
             <li>Кожні 30 хв очікування після завершення — 150 грн.</li>
             <li class="dc-rules-footer">🐾 Дякуємо за розуміння і чекаємо ваших хвостиків!</li>
           </ul>
+
+          <hr class="dc-rules-divider">
+          <h3 class="dc-rules-subtitle">Правила скасування</h3>
+          <ul class="dc-rules-list">
+            <li>За 24+ години — безкоштовне скасування.</li>
+            <li>За 3 години — 50% вартості комплексу.</li>
+            <li>Не прийшли — 100% вартості комплексу.</li>
+          </ul>
+          <p class="dc-cancel-warning">⚠️ При несплаті — наступний візит лише з передоплатою 100%</p>
         </div>
       </div>
-    </div>
-
-    <div class="dc-rules-gap"></div>
-
-    <!-- Папір 2: скасування + штамп -->
-    <div class="dc-cancel-paper">
       <div class="dc-rules-stamp">
         <img src="штамп1.png" alt="Печатка Dog Care Grooming" width="120" height="120" loading="lazy" />
       </div>
-      <div class="dc-wrap">
-        <h2 class="dc-rules-title">Правила<br>скасування</h2>
-        <div class="dc-rules-body">
-          <div class="dc-cancel-timeline">
-            <div class="dc-cancel-step dc-cancel-step-free">
-              <div class="dc-cancel-time">за 24+ години</div>
-              <div class="dc-cancel-pct">0%</div>
-              <div class="dc-cancel-desc">Безкоштовне скасування</div>
-            </div>
-            <div class="dc-cancel-step dc-cancel-step-half">
-              <div class="dc-cancel-time">за 3 години</div>
-              <div class="dc-cancel-pct">50%</div>
-              <div class="dc-cancel-desc">Половина вартості комплексу</div>
-            </div>
-            <div class="dc-cancel-step dc-cancel-step-full">
-              <div class="dc-cancel-time">не прийшли</div>
-              <div class="dc-cancel-pct">100%</div>
-              <div class="dc-cancel-desc">Повна вартість комплексу</div>
-            </div>
-          </div>
-          <div class="dc-cancel-warning">⚠️ При несплаті — наступний візит лише з передоплатою 100%</div>
-        </div>
-      </div>
     </div>
-
   </section>
 
   <!-- wave: dark → white -->

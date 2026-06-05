@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <style>
     /* ============ Design tokens — YELLOW theme ============ */
     :root {
@@ -968,6 +970,80 @@
     .grm-lb-prev:hover, .grm-lb-next:hover { background: rgba(255,255,255,.3); }
     .grm-lb-prev { left: 20px; }
     .grm-lb-next { right: 20px; }
+
+    /* ============ Scatter Gallery ============ */
+
+    /* Tall wrapper gives the scroll travel while section is pinned.
+       240vh → section is sticky for (240-100)=140vh worth of scrolling. */
+    /* ── Scroll-driven gallery (GSAP + ScrollTrigger) ── */
+
+    /* Tall wrapper = scroll travel distance while pinned.
+       380vh → pinning lasts 280vh of scrolling. */
+    .grm-scroll-wrapper {
+      height: 380vh;
+      position: relative;
+    }
+
+    /* Sticky scene — stays on screen the entire time */
+    .grm-sticky-scene {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--white);
+    }
+
+    /* Track moves as one unit — GSAP shifts it left on scroll */
+    .grm-photos-track {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      will-change: transform;
+      z-index: 1; /* keeps all cards below the headline (z-index: 20) */
+    }
+
+    /* Cards sit inside the track at fixed positions */
+    .grm-photo-card {
+      position: absolute;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(26,24,20,.15);
+      background: var(--accent-soft);
+      cursor: pointer;
+      pointer-events: all;
+      transition: box-shadow .3s;
+    }
+    .grm-photo-card:hover {
+      box-shadow: 0 22px 58px rgba(26,24,20,.28);
+    }
+    .grm-photo-card img {
+      display: block; width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .4s ease;
+      pointer-events: none;
+    }
+    .grm-photo-card:hover img { transform: scale(1.06); }
+
+    /* Fixed title — never moves, always on top */
+    .grm-scene-title {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 20;
+      text-align: center;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .grm-scene-title .dc-h2 { max-width: 560px; }
+    .grm-scene-title .dc-eyebrow-text { justify-content: center; }
+
+    @media (max-width: 768px) {
+      .grm-scroll-wrapper { height: 280vh; }
+      .grm-scene-title { white-space: normal; }
+      .grm-scene-title .dc-h2 { max-width: 300px; }
+    }
+
   </style>
   <!-- Firebase SDK (завантажується першим) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1568,18 +1644,18 @@
   </section>
 
   <!-- ══ ГАЛЕРЕЯ ══ -->
-  <section class="dc-section dc-section-white" id="галерея">
-    <div class="dc-wrap">
-      <div class="dc-section-head dc-section-head--center" style="margin-bottom: 48px;">
-        <div>
-          <div class="dc-eyebrow-text reveal">Наші роботи</div>
-          <h2 class="dc-h2 reveal" style="--reveal-i:1">Галерея <em>грумінгу</em></h2>
-        </div>
-      </div>
-      <div id="grm-slider-wrap" class="reveal" style="--reveal-i:2">
-        <!-- заповнюється з localStorage -->
-      </div>
+  <div class="grm-scroll-wrapper" id="grm-scroll-wrapper">
+  <section class="grm-sticky-scene" id="галерея">
+
+    <!-- Track: GSAP moves this left; cards stream through one by one -->
+    <div class="grm-photos-track" id="grm-photos-track"></div>
+
+    <!-- Static title: never moves -->
+    <div class="grm-scene-title">
+      <div class="dc-eyebrow-text">Наші роботи</div>
+      <h2 class="dc-h2">Галерея <em>грумінгу</em></h2>
     </div>
+
     <!-- Lightbox -->
     <div class="grm-lightbox" id="grm-lightbox" onclick="this.classList.remove('open')">
       <button class="grm-lb-close" onclick="document.getElementById('grm-lightbox').classList.remove('open')">✕</button>
@@ -1588,6 +1664,7 @@
       <button class="grm-lb-next" onclick="event.stopPropagation();grmLbNav(1)">›</button>
     </div>
   </section>
+  </div>
 
   <!-- wave: white → yellow -->
   <div class="wave-sep" style="background:#ffffff;">
@@ -2234,157 +2311,194 @@
     const ig = (meta.instagram || '').replace(/^@/, '');
     if (igBtn && ig) igBtn.href = 'https://www.instagram.com/' + ig;
 
-    /* Карусель */
-    renderCarousel();
+    /* Стрічка фотографій */
+    renderStrips();
   }
 
-  /* ── Карусель ── */
-  var CAR_OFFSET  = 0;   /* скільки позицій зсунуто вліво */
-  var CAR_TIMER   = null;
-  var CAR_VISIBLE = 4;   /* фото на екрані */
+  /* ── Stream Gallery: centre line → spread around title → centre line ── */
+  var STRIP_PHOTOS = [];
 
-  function carVisible() {
-    return window.innerWidth <= 600 ? 2 : window.innerWidth <= 900 ? 3 : 4;
-  }
+  /*
+   * [band, w, h, baseRot, maxY, peakOff, halfDur, peakRot]
+   *
+   * band     — 'top' arcs above headline, 'bot' arcs below
+   * baseRot  — resting rotation (deg)
+   * maxY     — peak vertical spread (px, scaled)
+   * peakOff  — shifts the bell-curve peak early/late (timeline units ±)
+   * halfDur  — duration of each half of rise/fall (timeline units)
+   * peakRot  — extra rotation added at peak (creates wobble)
+   *
+   * Every value is intentionally different so nothing feels synchronised.
+   */
+  /*
+   * Larger maxY + wider halfDur: cards begin spreading BEFORE
+   * reaching the headline and return to centre AFTER passing it.
+   */
+  var CARD_CONFIGS = [
+    ['bot', 248, 175,  -6, 250, -0.06, 0.42,  -12],
+    ['top', 220, 158,   4, 310, +0.09, 0.50,    9],
+    ['bot', 268, 190,   8, 260, -0.04, 0.38,   14],
+    ['top', 206, 150,  -9, 290, +0.07, 0.46,   -8],
+    ['bot', 252, 180,   3, 240, -0.10, 0.44,    7],
+    ['top', 232, 166,  -5, 325, +0.05, 0.54,  -11],
+    ['bot', 216, 156,   6, 265, -0.08, 0.40,   16],
+    ['top', 244, 174,  -4, 300, +0.11, 0.48,   -6],
+    ['bot', 230, 163,   5, 248, -0.03, 0.46,   10],
+    ['top', 258, 185,  -3, 305, +0.08, 0.42,   -9],
+  ];
 
-  /* CAR_REAL — кількість оригінальних фото, CAR_CLONES — кількість клонів з кожного боку */
-  var CAR_REAL   = 0;
-  var CAR_CLONES = 0;
+  async function renderStrips() {
+    var track = document.getElementById('grm-photos-track');
+    if (!track) return;
 
-  async function renderCarousel() {
-    const wrap = document.getElementById('grm-slider-wrap');
-    if (!wrap) return;
-    let photos = [];
+    var photos = [];
     try {
       const snap = await firebase.firestore().collection('grm_photos').orderBy('createdAt').get();
-      photos = snap.docs.map(d => d.data().url);
+      photos = snap.docs.map(function(d) { return d.data().url; });
     } catch(e) {
       try { photos = JSON.parse(localStorage.getItem('dc_grm_photos')) || []; } catch(_) {}
     }
-
     if (!photos.length) {
-      clearInterval(CAR_TIMER);
-      wrap.innerHTML = '<div class="grm-carousel-empty">Фото з\'являться тут після додавання в адмінці</div>';
-      return;
+      photos = ['2.jpg','3.jpg','4.jpg','5.jpg','6.jpg','7.jpg'];
+    }
+    STRIP_PHOTOS = photos;
+
+    var vw      = window.innerWidth;
+    var sc      = vw < 480 ? 0.56 : vw < 768 ? 0.72 : 1.0;
+    var spacing = Math.round(210 * sc); /* px between card starts — overlap ~30–50px */
+    var count   = Math.min(photos.length, CARD_CONFIGS.length);
+    track.innerHTML = '';
+
+    for (var i = 0; i < count; i++) {
+      var cfg = CARD_CONFIGS[i];
+      var w   = Math.round(cfg[1] * sc);
+      var h   = Math.round(cfg[2] * sc);
+      var lx  = i * spacing;
+
+      var card = document.createElement('div');
+      card.className    = 'grm-photo-card';
+      card.dataset.left = lx;
+      card.dataset.w    = w;
+      card.dataset.band = cfg[0];
+      card.dataset.rot  = cfg[3];
+      /* vertical centre: top:50% + negative margin  (GSAP controls y offset) */
+      card.style.left       = lx + 'px';
+      card.style.top        = '50%';
+      card.style.width      = w  + 'px';
+      card.style.height     = h  + 'px';
+      card.style.marginTop  = (-h / 2) + 'px';
+      card.setAttribute('onclick',  'grmLbOpen(' + i + ')');
+      card.setAttribute('role',     'button');
+      card.setAttribute('tabindex', '0');
+
+      var img     = document.createElement('img');
+      img.src     = photos[i];
+      img.alt     = 'Грумінг фото';
+      img.loading = 'lazy';
+      card.appendChild(img);
+      track.appendChild(card);
     }
 
-    const existing = wrap.querySelector('.grm-carousel');
-    const existingCount = existing ? existing.getAttribute('data-real') : -1;
-    if (parseInt(existingCount) === photos.length) return;
-
-    CAR_VISIBLE = carVisible();
-    CAR_REAL    = photos.length;
-    CAR_CLONES  = CAR_VISIBLE;
-
-    /* Клонуємо: останні V фото на початок, перші V фото в кінець */
-    const before = photos.slice(-CAR_CLONES);
-    const after  = photos.slice(0, CAR_CLONES);
-    const all    = [...before, ...photos, ...after];
-
-    /* Стартова позиція — перше реальне фото */
-    CAR_OFFSET = CAR_CLONES;
-
-    const needControls = CAR_REAL > CAR_VISIBLE;
-    wrap.innerHTML = `
-      <div class="grm-carousel" id="grm-carousel" data-real="${CAR_REAL}">
-        <div class="grm-carousel-track" id="grm-carousel-track">
-          ${all.map((src, i) => {
-            const realIdx = ((i - CAR_CLONES) % CAR_REAL + CAR_REAL) % CAR_REAL;
-            return `<div class="grm-carousel-item" onclick="grmLbOpen(${realIdx})">
-              <img src="${src}" alt="Фото" loading="lazy">
-            </div>`;
-          }).join('')}
-        </div>
-      </div>
-      ${needControls ? `
-      <div class="grm-carousel-controls">
-        <button class="grm-carousel-btn" onclick="carNav(-1)">‹</button>
-        <button class="grm-carousel-btn" onclick="carNav(1)">›</button>
-      </div>` : ''}`;
-
-    requestAnimationFrame(function() { carMove(false); }); /* після layout */
-    clearInterval(CAR_TIMER);
-    if (needControls) {
-      CAR_TIMER = setInterval(function() { carNav(1); }, 4000);
-    }
+    /* Track width: last card right edge + small right margin */
+    var last = track.lastChild;
+    track.style.width = (parseInt(last.dataset.left) + parseInt(last.dataset.w) +
+                         Math.round(vw * 0.10)) + 'px';
+    initGalleryScroll();
   }
 
-  function carItemPx() {
-    const carousel = document.getElementById('grm-carousel');
-    if (!carousel) return 0;
-    const gap = 16;
-    return (carousel.offsetWidth - (CAR_VISIBLE - 1) * gap) / CAR_VISIBLE;
-  }
+  function initGalleryScroll() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
-  function carSetItemWidths() {
-    const px = carItemPx();
-    if (!px) return;
-    const track = document.getElementById('grm-carousel-track');
-    if (track) track.style.setProperty('--car-item-w', px + 'px');
-  }
+    gsap.registerPlugin(ScrollTrigger);
 
-  function carMove(animate) {
-    const track = document.getElementById('grm-carousel-track');
-    if (!track) return;
-    carSetItemWidths();
-    const step = carItemPx() + 16;
-    if (!animate) {
-      track.style.transition = 'none';
-      track.offsetHeight; /* force reflow */
-    } else {
-      track.style.transition = '';
-    }
-    track.style.transform = `translateX(${-CAR_OFFSET * step}px)`;
-  }
+    var wrapper = document.getElementById('grm-scroll-wrapper');
+    var scene   = document.querySelector('.grm-sticky-scene');
+    var track   = document.getElementById('grm-photos-track');
+    if (!wrapper || !scene || !track) return;
 
-  function carApply() { carMove(true); }
+    var cards = Array.from(track.querySelectorAll('.grm-photo-card'));
+    if (!cards.length) return;
 
-  function carNav(dir) {
-    CAR_OFFSET += dir;
-    carMove(true);
-    setTimeout(function() {
-      if (CAR_OFFSET >= CAR_CLONES + CAR_REAL) {
-        CAR_OFFSET -= CAR_REAL;
-        carMove(false);
-      } else if (CAR_OFFSET < CAR_CLONES) {
-        CAR_OFFSET += CAR_REAL;
-        carMove(false);
+    var vw         = window.innerWidth;
+    var sc         = vw < 480 ? 0.56 : vw < 768 ? 0.72 : 1.0;
+    var trackWidth = track.offsetWidth || 3000;
+    var startX     = vw;
+    var endX       = -(trackWidth + vw * 0.08);
+    var totalDur   = 2;
+
+    var tl = gsap.timeline({
+      scrollTrigger: {
+        trigger:             wrapper,
+        /* pin handled by CSS sticky — GSAP only drives the scrub */
+        start:               'top 50%',   /* animation starts when section top hits viewport centre */
+        end:                 'bottom bottom',
+        scrub:               1.2,
+        invalidateOnRefresh: true,
       }
-    }, 650);
-  }
+    });
 
-  window.addEventListener('resize', function() {
-    carSetItemWidths();
-    carMove(false);
-  });
+    /* ① Constant-speed track movement */
+    tl.fromTo(track,
+      { x: startX },
+      { x: endX, duration: totalDur, ease: 'none' },
+      0
+    );
+
+    /* ② Per-card chaotic bell-curve (each card has unique params) */
+    cards.forEach(function(card, i) {
+      var cfg      = CARD_CONFIGS[i % CARD_CONFIGS.length];
+      var baseRot  = cfg[3];
+      var maxY     = Math.round(cfg[4] * sc) * (cfg[0] === 'top' ? -1 : 1);
+      var peakOff  = cfg[5];   /* shifts peak early/late                   */
+      var halfDur  = cfg[6];   /* unique rise/fall speed per card           */
+      var peakRot  = baseRot + cfg[7]; /* rotation at peak                 */
+
+      var lx = parseFloat(card.dataset.left);
+      var w  = parseFloat(card.dataset.w);
+
+      /* Natural peak: when this card's centre crosses the viewport centre */
+      var p     = (vw / 2 - lx - w / 2 - startX) / (endX - startX);
+      var peakT = Math.max(halfDur, Math.min(totalDur - halfDur,
+                    p * totalDur + peakOff));
+
+      /* Explicit fromTo on both halves so scale reverses cleanly on scroll-up */
+
+      /* rise: rest → peak */
+      tl.fromTo(card,
+        { y: 0,    rotation: baseRot, scale: 1    },
+        { y: maxY, rotation: peakRot, scale: 1.22,
+          duration: halfDur, ease: 'sine.inOut' },
+        peakT - halfDur
+      );
+      /* fall: peak → rest */
+      tl.fromTo(card,
+        { y: maxY, rotation: peakRot, scale: 1.22 },
+        { y: 0,    rotation: baseRot, scale: 1,
+          duration: halfDur, ease: 'sine.inOut' },
+        peakT
+      );
+    });
+  }
 
   /* Лайтбокс */
   var LB_PHOTOS = [];
-  var LB_IDX = 0;
-  async function grmLbOpen(i) {
-    try {
-      const snap = await firebase.firestore().collection('grm_photos').orderBy('createdAt').get();
-      LB_PHOTOS = snap.docs.map(d => d.data().url);
-    } catch(e) {
-      try { LB_PHOTOS = JSON.parse(localStorage.getItem('dc_grm_photos')) || []; } catch(_) { LB_PHOTOS = []; }
-    }
-    LB_IDX = i;
+  var LB_IDX    = 0;
+  function grmLbOpen(i) {
+    LB_PHOTOS = STRIP_PHOTOS.length ? STRIP_PHOTOS : [];
+    LB_IDX    = i;
     document.getElementById('grm-lb-img').src = LB_PHOTOS[LB_IDX] || '';
     document.getElementById('grm-lightbox').classList.add('open');
-    clearInterval(CAR_TIMER);
   }
   function grmLbNav(dir) {
+    if (!LB_PHOTOS.length) return;
     LB_IDX = (LB_IDX + dir + LB_PHOTOS.length) % LB_PHOTOS.length;
     document.getElementById('grm-lb-img').src = LB_PHOTOS[LB_IDX] || '';
   }
   document.addEventListener('keydown', function(e) {
-    const lb = document.getElementById('grm-lightbox');
+    var lb = document.getElementById('grm-lightbox');
     if (!lb.classList.contains('open')) return;
-    if (e.key === 'Escape') {
-      lb.classList.remove('open');
-      const total = document.querySelectorAll('.grm-carousel-item').length;
-      if (total > carVisible()) CAR_TIMER = setInterval(function() { carNav(1); }, 4000);
-    }
+    if (e.key === 'Escape') lb.classList.remove('open');
     if (e.key === 'ArrowLeft')  grmLbNav(-1);
     if (e.key === 'ArrowRight') grmLbNav(1);
   });
@@ -2555,8 +2669,8 @@
 </script>
 
 <script>
-  // Завантажити карусель після ініціалізації Firebase
-  renderCarousel();
+  // Завантажити стрічку фото після ініціалізації Firebase
+  renderStrips();
 </script>
 <script>
   document.addEventListener('touchmove', function(e) {
@@ -2583,6 +2697,7 @@
     }, { threshold: 0.5, rootMargin: '-20% 0px -20% 0px' });
     observer.observe(stampImg);
   })();
+
 </script>
 </body>
 </html>

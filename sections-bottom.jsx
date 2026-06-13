@@ -35,6 +35,13 @@ const PRICING_GROUPS = [
       { service: "У школі", duration: "1 година", price: "700 ₴" },
       { service: "На виїзд", duration: "1 година", price: "~900 ₴", note: "без пального" },
     ],
+    includes: [
+      "Оцінка поведінки та темпераменту собаки",
+      "Складання індивідуального плану корекції",
+      "Письмові рекомендації після сеансу",
+      "Відповіді на всі запитання власника",
+      "Консультація щодо харчування і режиму",
+    ],
   },
   {
     id: "group",
@@ -45,6 +52,13 @@ const PRICING_GROUPS = [
       { service: "1 раз на тиждень · 1 год · школа", duration: "1 заняття", price: "350 ₴" },
     ],
     footnote: "Для діючих учнів школи DOG CARE тренування безкоштовні.",
+    includes: [
+      "Соціалізація з іншими собаками",
+      "Навчання базових і розширених команд",
+      "Корекція поведінки в соціальному середовищі",
+      "Домашнє завдання і матеріали після заняття",
+      "Рекомендації кінолога між заняттями",
+    ],
   },
   {
     id: "nanny",
@@ -72,6 +86,13 @@ const PRICING_GROUPS = [
     rows: [
       { service: "Загальний курс", duration: "мін. 3–4 міс · 12 занять/міс", price: "180 €/міс" },
       { service: "Курс охорони", duration: "1–2 міс · 12 занять/міс", price: "230 €/міс" },
+    ],
+    includes: [
+      "12 індивідуальних занять на місяць",
+      "Персональна програма навчання",
+      "Письмовий план і звіти прогресу",
+      "Чат з кінологом між заняттями",
+      "Фінальна атестація з сертифікатом",
     ],
   },
   {
@@ -108,85 +129,58 @@ const PRICING_GROUPS = [
         ],
       },
     ],
+    includes: [
+      "Окреме комфортне місце для відпочинку",
+      "Прогулянки 3 рази на день",
+      "Годування за розкладом власника",
+      "Відеоспостереження 24/7",
+      "Щоденні фото- та відеозвіти",
+    ],
   },
 ];
 
-function PriceTable({ rows }) {
-  return (
-    <div className="dc-pricetable">
-      {rows.map((r, i) => (
-        <div key={i} className="dc-pricerow">
-          <div className="dc-pricerow-service">
-            <div className="dc-pricerow-name">{r.service}</div>
-            {r.duration && <div className="dc-pricerow-dur">{r.duration}</div>}
-          </div>
-          <div className="dc-pricerow-price">
-            {r.price}
-            {r.note && <span className="dc-pricerow-note">{r.note}</span>}
-          </div>
-        </div>
-      ))}
-    </div>
+function PriceIcon({ id, size = 22 }) {
+  if (id === "consult") return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
   );
-}
-
-function PriceGroupCard({ group, hotelTab, setHotelTab }) {
-  return (
-    <div className={"dc-pricegroup" + (group.id === "hotel" ? " dc-pricegroup-wide" : "")}>
-      <div className="dc-pricegroup-head">
-        <div className="dc-pricegroup-icon">{group.icon}</div>
-        <div>
-          <h3 className="dc-pricegroup-title">{group.label}</h3>
-          <p className="dc-pricegroup-desc">{group.desc}</p>
-        </div>
-      </div>
-
-      {group.weightTabs ? (
-        <>
-          <div className="dc-weighttabs">
-            {group.weightTabs.map((w, i) => (
-              <button key={w.label}
-                className={"dc-weighttab" + (hotelTab === i ? " active" : "")}
-                onClick={() => setHotelTab(i)}>
-                {w.label}
-              </button>
-            ))}
-          </div>
-          <PriceTable rows={group.weightTabs[hotelTab].rows} />
-        </>
-      ) : (
-        <PriceTable rows={group.rows} />
-      )}
-
-      {group.includes && (
-        <div className="dc-pricegroup-includes">
-          <div className="dc-pricegroup-includes-head">Що входить:</div>
-          <ul>
-            {group.includes.map(f => (
-              <li key={f}>
-                <span className="dc-check">
-                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                    <path d="M2 6.5L5 9.5L10 3.5" stroke="#1A1814" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-                {f}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {group.footnote && (
-        <div className="dc-pricegroup-footnote">
-          <span className="dc-pricegroup-footnote-mark">★</span> {group.footnote}
-        </div>
-      )}
-    </div>
+  if (id === "group") return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
   );
+  if (id === "nanny") return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="5" r="2" />
+      <path d="M5 22v-3a7 7 0 0 1 14 0v3" />
+      <path d="M12 9v4l2 2" />
+    </svg>
+  );
+  if (id === "courses") return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+    </svg>
+  );
+  if (id === "hotel") return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  );
+  return null;
 }
 
 function Pricing() {
+  const [activeTab, setActiveTab] = useState(0);
   const [hotelTab, setHotelTab] = useState(0);
+  const group = PRICING_GROUPS[activeTab];
+  const rows = group.weightTabs ? group.weightTabs[hotelTab].rows : group.rows;
+
   return (
     <section className="dc-section dc-section-white dc-section-with-wave" id="pricing">
       <WaveDivider from="#D80032" variant="pebble" height={80} />
@@ -196,12 +190,95 @@ function Pricing() {
           title={<>Прозорі ціни <em>без сюрпризів</em> у чеку</>}
           subtitle="Школа, зооготель та грумінг у Івано‑Франківську. Для діючих учнів школи тренування — безкоштовні."
         />
-        <div className="dc-pricegrid">
-          {PRICING_GROUPS.map(g => (
-            <PriceGroupCard key={g.id} group={g}
-              hotelTab={hotelTab} setHotelTab={setHotelTab} />
+
+        <div className="dc-price-tabs">
+          {PRICING_GROUPS.map((g, i) => (
+            <button
+              key={g.id}
+              className={"dc-price-tab" + (activeTab === i ? " active" : "")}
+              onClick={() => setActiveTab(i)}
+              aria-pressed={activeTab === i}
+            >
+              <span className="dc-price-tab-icon"><PriceIcon id={g.id} size={16} /></span>
+              {g.label}
+            </button>
           ))}
         </div>
+
+        <div className="dc-price-panel">
+          {/* Full-width dark header */}
+          <div className="dc-price-header">
+            <div className="dc-price-header-icon"><PriceIcon id={group.id} size={26} /></div>
+            <div className="dc-price-header-text">
+              <h3 className="dc-price-header-title">{group.label}</h3>
+              <p className="dc-price-header-desc">{group.desc}</p>
+            </div>
+            {group.footnote && (
+              <div className="dc-price-header-note">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="8" />
+                  <line x1="12" y1="12" x2="12" y2="16" />
+                </svg>
+                {group.footnote}
+              </div>
+            )}
+            <a href="#contact" className="dc-btn dc-btn-primary" style={{ flexShrink: 0 }}
+              onClick={(e) => { e.preventDefault(); document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); }}>
+              Записатися <span className="dc-btn-arrow"><Arrow /></span>
+            </a>
+          </div>
+
+          {/* Cream body */}
+          <div className={"dc-price-body" + (group.includes ? " dc-price-body-split" : "")}>
+            <div>
+              {group.weightTabs && (
+                <div className="dc-weighttabs">
+                  {group.weightTabs.map((w, i) => (
+                    <button key={w.label}
+                      className={"dc-weighttab" + (hotelTab === i ? " active" : "")}
+                      onClick={() => setHotelTab(i)}>
+                      {w.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="dc-price-rows">
+                {rows.map((r, i) => (
+                  <div key={i} className="dc-price-row">
+                    <div className="dc-price-row-left">
+                      <div className="dc-price-row-name">{r.service}</div>
+                      {r.duration && <div className="dc-price-row-dur">{r.duration}</div>}
+                    </div>
+                    <div className="dc-price-row-right">
+                      <div className="dc-price-row-amount">{r.price}</div>
+                      {r.note && <div className="dc-price-row-note">{r.note}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {group.includes && (
+              <div className="dc-price-features-area">
+                <div className="dc-price-features-label">Що входить:</div>
+                <ul className="dc-price-features">
+                  {group.includes.map(f => (
+                    <li key={f}>
+                      <span className="dc-check">
+                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                          <path d="M2 6.5L5 9.5L10 3.5" stroke="#1A1814" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="dc-pricing-cta">
           <div>
             <h4>Залишились запитання?</h4>

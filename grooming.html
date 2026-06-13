@@ -50,7 +50,7 @@
     img { display: block; max-width: 100%; }
 
     /* ============ Layout ============ */
-    .dc-app { min-height: 100vh; background: var(--accent); overflow-x: hidden; position: relative; }
+    .dc-app { min-height: 100vh; background: var(--accent); overflow-x: clip; position: relative; }
     .dc-wrap { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
 
     /* ============ Scroll reveal ============ */
@@ -61,26 +61,69 @@
       transition-delay: calc(var(--reveal-i,0) * 90ms);
     }
     .reveal.in-view { opacity: 1; transform: none; }
-    @media (prefers-reduced-motion: reduce) { .reveal { opacity:1!important; transform:none!important; transition:none!important; } }
+    /* Blur-in variant (used for plain text paragraphs) */
+    .reveal.reveal-blur {
+      transform: translateY(38px) scale(0.96);
+      filter: blur(12px);
+      transition: opacity .9s cubic-bezier(.22,1,.36,1),
+                  transform .9s cubic-bezier(.22,1,.36,1),
+                  filter .9s cubic-bezier(.22,1,.36,1);
+      transition-delay: calc(var(--reveal-i,0) * 100ms);
+    }
+    .reveal.reveal-blur.in-view { filter: blur(0); transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity:1!important; transform:none!important; filter:none!important; transition:none!important; }
+      .dc-hero-reveal .line-in { transform:none!important; opacity:1!important; filter:none!important; transition:none!important; }
+      .dc-btn:hover, .dc-btn:active { transform: none; }
+      .dc-btn:hover .dc-btn-arrow { transform: none; }
+    }
 
     /* ============ Nav ============ */
     .dc-nav {
-      position: sticky; top: 0; z-index: 50;
-      padding: 10px 0 4px;
-      transition: padding .2s;
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 50;
+      padding: 0;
+      transition: padding .45s cubic-bezier(.4,0,.2,1);
     }
-    .dc-nav.scrolled { padding: 8px 0 4px; }
+    /* Nav ignores the page wrap so the bar can span the full width */
+    .dc-nav .dc-wrap { max-width: none; padding: 0; }
+    .dc-nav.scrolled { padding: 10px clamp(16px, calc((100vw - 1180px) / 2), 400px); }
     .dc-nav-inner {
       display: flex; align-items: center; justify-content: space-between; gap: 24px;
-      background: #fff;
-      border-radius: 999px;
-      padding: 7px 7px 7px 22px;
-      box-shadow: 0 4px 28px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.07);
-      transition: box-shadow .2s;
+      /* Top state: full-width, square, blurred dark tint over the video */
+      background: rgba(20, 16, 12, 0.22);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 0 solid rgba(255, 255, 255, 0.55);
+      border-radius: 0;
+      padding: 14px 40px;
+      box-shadow: none;
+      box-sizing: border-box; width: 100%; min-width: 0;
+      transition: background .45s ease, border-radius .45s ease,
+        border-width .45s ease, border-color .45s ease,
+        padding .45s cubic-bezier(.4,0,.2,1), box-shadow .45s ease;
     }
     .dc-nav.scrolled .dc-nav-inner {
+      background: rgba(255, 255, 255, 0.85);
+      border-width: 5px;
+      border-radius: 999px;
+      padding: 7px 7px 7px 22px;
       box-shadow: 0 8px 36px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08);
     }
+    /* Smooth logo recolor between states */
+    .dc-logo svg circle, .dc-logo svg path { transition: fill .45s ease; }
+    /* Top (non-scrolled) — light logo / links / CTA over the video */
+    .dc-nav:not(.scrolled) .dc-logo svg circle { fill: #fff; }
+    .dc-nav:not(.scrolled) .dc-logo svg path[fill="#FFD23F"] { fill: #1A1814; }
+    .dc-nav:not(.scrolled) .dc-logo svg path[fill="#1A1814"] { fill: #fff; }
+    .dc-nav:not(.scrolled) .dc-nav-link { color: rgba(255,255,255,0.92); }
+    .dc-nav:not(.scrolled) .dc-nav-link:hover { background: rgba(255,255,255,0.16); color: #fff; }
+    .dc-nav:not(.scrolled) .dc-nav-link.active { background: rgba(255,255,255,0.20); color: #fff; }
+    .dc-nav:not(.scrolled) .dc-nav-cta.dc-btn-light {
+      background-color: transparent; background-image: none;
+      color: #fff; border: 1.5px solid rgba(255,255,255,0.85);
+    }
+    .dc-nav:not(.scrolled) .dc-nav-cta.dc-btn-light:hover { background-color: rgba(255,255,255,0.16); color: #fff; }
+    .dc-nav:not(.scrolled) .dc-nav-cta.dc-btn-light .dc-btn-arrow { background: #fff; color: var(--ink); }
     .dc-logo {
       display: flex; align-items: center; gap: 10px;
       font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -.02em;
@@ -143,51 +186,97 @@
       display: inline-flex; align-items: center; gap: 10px;
       padding: 14px 26px; border-radius: 999px;
       font-weight: 700; font-size: 15px;
-      transition: transform .15s, background .15s, color .15s, box-shadow .15s;
+      position: relative;
+      background-repeat: no-repeat; background-position: center bottom; background-size: 100% 0;
+      transition:
+        transform .35s cubic-bezier(.34, 1.56, .64, 1),
+        box-shadow .3s ease,
+        background-size .35s ease,
+        background-color .25s ease,
+        color .25s ease;
       white-space: nowrap;
     }
-    .dc-btn:hover { transform: translateY(-1px); }
+    /* Springy lift + scale */
+    .dc-btn:hover { transform: translateY(-2px) scale(1.04); }
+    .dc-btn:active { transform: translateY(0) scale(.97); transition-duration: .1s; }
+    /* Arrow glides to the right on hover */
+    .dc-btn:hover .dc-btn-arrow { transform: translateX(3px); }
     .dc-btn-primary { background: var(--ink); color: #fff; }
-    .dc-btn-primary:hover { background: #333; }
+    .dc-btn-primary:hover { background: #333; box-shadow: 0 12px 28px rgba(26, 24, 20, 0.32); }
     .dc-btn-primary .dc-btn-arrow { background: var(--accent); color: var(--ink); }
-    .dc-btn-light { background: var(--white); color: var(--ink); border: 2px solid var(--ink); }
-    .dc-btn-light:hover { background: var(--ink); color: var(--accent); }
+    .dc-btn-light {
+      background-color: var(--white);
+      background-image: linear-gradient(var(--ink), var(--ink));
+      color: var(--ink); border: 1px solid var(--ink);
+    }
+    /* Dark fill sweeps up on hover + soft glow */
+    .dc-btn-light:hover { background-size: 100% 100%; color: var(--accent); box-shadow: 0 12px 28px rgba(26, 24, 20, 0.3); }
     .dc-btn-arrow {
       width: 28px; height: 28px; border-radius: 50%;
       background: var(--accent); color: var(--ink);
       display: grid; place-items: center;
-      transition: background .2s, color .2s;
+      transition: background .2s, color .2s, transform .3s cubic-bezier(.34, 1.56, .64, 1);
     }
 
     /* ============ Hero ============ */
-    .dc-hero { position: relative; padding: 32px 0 64px; }
+    .dc-hero { position: relative; padding: 0; margin-top: 0; }
+    /* Full-bleed hero (breaks out of .dc-wrap) */
+    .dc-hero .dc-wrap { max-width: none; padding: 0; }
     .dc-hero-card {
-      background: var(--cream); border-radius: var(--radius-xl);
-      padding: 72px 60px 60px; position: relative; overflow: hidden;
-      box-shadow: var(--shadow-md);
+      background: var(--cream); border-radius: 0;
+      padding: 150px 40px 110px; position: relative; overflow: hidden;
+      min-height: calc(100vh + 170px); min-height: calc(100svh + 170px); display: flex; align-items: center; justify-content: center;
     }
-    .dc-hero-grid {
-      display: flex; gap: 40px; align-items: flex-start;
+    /* Background video filling the hero card */
+    .dc-hero-video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center top; z-index: 0;
     }
-    .dc-hero-grid > div:first-child {
-      flex: 1 1 0; min-width: 0; padding-top: 16px;
+    /* Gradient over the video for text readability */
+    .dc-hero-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(180deg,
+        rgba(20,16,12,.42) 0%,
+        rgba(20,16,12,.25) 42%,
+        rgba(20,16,12,.62) 100%);
     }
+    /* Arc transition into the cream section below (morphs on scroll) */
+    .dc-hero-wave {
+      position: absolute; left: 0; right: 0; bottom: -1px;
+      width: 100%; height: 190px; z-index: 2;
+      display: block; pointer-events: none;
+    }
+    .dc-hero-content {
+      position: relative; z-index: 3;
+      max-width: 980px; text-align: center;
+      display: flex; flex-direction: column; align-items: center;
+      transform: translateY(-95px); /* lift content above the hidden bottom buffer */
+    }
+    .dc-hero-content > div { display: flex; flex-direction: column; align-items: center; width: 100%; }
+    /* White text over the video */
+    .dc-hero-content .dc-h1,
+    .dc-hero-content .dc-hero-sub,
+    .dc-hero-content .dc-stat-num { color: #fff; }
+    .dc-hero-content .dc-stat-label { color: rgba(255,255,255,.8); }
+    .dc-hero-content .dc-h1 { font-weight: 600; text-shadow: 0 2px 18px rgba(0,0,0,.35); }
+    .dc-hero-content .dc-h1 em { box-shadow: none; text-shadow: none; }
+    .dc-hero-content .dc-hero-sub { margin-left: auto; margin-right: auto; text-shadow: 0 1px 10px rgba(0,0,0,.3); }
+    .dc-hero-content .dc-hero-ctas,
+    .dc-hero-content .dc-hero-stats { justify-content: center; }
+    /* Outline button over the video */
+    .dc-hero-content .dc-btn-light {
+      background-color: transparent;
+      background-image: linear-gradient(#fff, #fff);
+      color: #fff; border-color: #fff;
+    }
+    .dc-hero-content .dc-btn-light:hover { color: var(--ink); box-shadow: 0 12px 28px rgba(0,0,0,.28); }
+
     .dc-nowrap { white-space: nowrap; }
-    .dc-eyebrow {
-      display: inline-flex; align-items: center; gap: 10px;
-      padding: 6px 18px 6px 6px; border-radius: 999px;
-      background: var(--accent-soft); color: var(--ink);
-      font-size: 13px; font-weight: 600; margin-bottom: 22px;
-    }
-    .dc-eyebrow-dot {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: var(--accent); display: grid; place-items: center;
-      font-size: 14px;
-    }
     .dc-h1 {
       font-family: var(--display);
-      font-size: clamp(32px, 4.2vw, 54px);
-      line-height: 1.02; letter-spacing: -.035em;
+      font-size: clamp(34px, 5vw, 60px);
+      line-height: 1.04; letter-spacing: -.035em;
       font-weight: 700; margin: 0 0 22px; text-wrap: pretty;
     }
     .dc-h1 em {
@@ -196,56 +285,12 @@
       display: inline-block; margin: 4px 0;
       box-shadow: 0 0 0 6px rgba(255,210,63,.25);
     }
-    .dc-hero-sub { font-size: 17px; color: var(--ink-2); max-width: 460px; margin: 0 0 30px; text-wrap: pretty; }
+    .dc-hero-sub { font-size: 17px; color: var(--ink-2); max-width: 600px; margin: 0 0 30px; text-wrap: pretty; }
     .dc-hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 36px; }
-    .dc-hero-stats { display: flex; gap: 36px; flex-wrap: wrap; }
-    .dc-stat-num { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: -.03em; line-height: 1; }
+    .dc-hero-stats { display: flex; gap: 40px; flex-wrap: wrap; }
+    .dc-stat-num { font-family: var(--display); font-weight: 700; font-size: 30px; letter-spacing: -.03em; line-height: 1; }
     .dc-stat-label { font-size: 12.5px; color: var(--ink-3); margin-top: 4px; font-weight: 500; letter-spacing: .02em; }
 
-    .dc-hero-visual {
-      position: relative;
-      display: flex; align-items: center; justify-content: center;
-      flex: 0 0 56%; flex-shrink: 0;
-    }
-    .dc-hero-circle {
-      width: 340px; height: 340px; border-radius: 50%;
-      background: var(--accent); display: grid; place-items: center;
-      position: relative; flex-shrink: 0;
-    }
-    .dc-hero-circle-inner {
-      font-size: 120px; line-height: 1;
-      filter: drop-shadow(0 8px 24px rgba(0,0,0,.15));
-    }
-    .dc-hero-badge {
-      position: absolute;
-      background: var(--white); border-radius: 999px;
-      padding: 10px 16px; font-size: 13px; font-weight: 600;
-      display: flex; align-items: center; gap: 8px;
-      box-shadow: var(--shadow-md);
-    }
-    .dc-hero-badge-1 { top: 18%; left: -10%; }
-    .dc-hero-badge-2 { bottom: 18%; right: -10%; }
-    .dc-hero-badge-icon { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-size: 13px; }
-
-    /* ============ Marquee ============ */
-    .dc-marquee-wrap {
-      background: var(--ink); overflow: hidden; padding: 22px 0;
-      position: relative; z-index: 2; margin: -1px 0;
-    }
-    .dc-marquee-track {
-      display: flex; gap: 0; width: max-content;
-      animation: dc-marquee 50s linear infinite;
-    }
-    .dc-marquee-track:hover { animation-play-state: paused; }
-    @keyframes dc-marquee { to { transform: translateX(-50%); } }
-    .dc-marquee-item {
-      display: inline-flex; align-items: center; gap: 0;
-      padding: 0; white-space: nowrap;
-      font-family: var(--display); font-weight: 600; font-size: 30px;
-      color: var(--accent); letter-spacing: -0.02em; line-height: 1;
-    }
-    .dc-marquee-item svg { display: block; }
-    .dc-marquee-dot { display: inline-flex; align-items: center; justify-content: center; margin: 0 32px; transform: translateY(3px); opacity: 1; }
 
     /* ============ Section base ============ */
     .dc-section { padding: 100px 0; position: relative; overflow: hidden; }
@@ -272,60 +317,95 @@
     .dc-h2 em { font-style: normal; color: var(--ink-3); }
     .dc-section-sub { max-width: 380px; color: var(--ink-2); font-size: 15.5px; }
 
-    /* ============ Pricing table ============ */
+    /* ============ Pricing (redesign) ============ */
     .dc-price-tabs {
-      display: flex; gap: 8px; padding: 8px;
-      background: var(--white); border-radius: 999px;
-      box-shadow: var(--shadow-sm); width: max-content;
-      margin: 0 auto 48px; flex-wrap: wrap; justify-content: center;
+      display: flex; gap: 6px;
+      margin: 0 0 40px;
+      flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+      -webkit-overflow-scrolling: touch; padding-bottom: 2px;
     }
+    .dc-price-tabs::-webkit-scrollbar { display: none; }
     .dc-price-tab {
+      display: flex; align-items: center; gap: 7px;
       padding: 11px 22px; border-radius: 999px;
-      font-weight: 600; font-size: 14px;
-      transition: background .15s, color .15s;
+      font-weight: 600; font-size: 14px; white-space: nowrap; flex-shrink: 0;
+      border: 1.5px solid var(--line-2);
+      background: var(--white); color: var(--ink-2);
+      transition: background .15s, color .15s, border-color .15s;
     }
-    .dc-price-tab:hover { background: var(--accent-soft); }
-    .dc-price-tab.active { background: var(--ink); color: var(--accent); }
+    .dc-price-tab:hover { background: var(--accent-soft); border-color: var(--accent-deep); color: var(--ink); }
+    .dc-price-tab.active { background: var(--ink); color: var(--accent); border-color: transparent; }
+    .dc-price-tab svg { flex-shrink: 0; }
 
     .dc-price-panel { display: none; }
     .dc-price-panel.active { display: block; }
 
-    .dc-price-card {
-      background: var(--white); border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md); overflow: hidden;
+    /* Card active — без glow */
+    #послуги.dc-section { overflow: visible; }
+
+    /* Card shell */
+    .gp-card {
+      background: var(--white); border-radius: 24px;
+      border: 1.5px solid var(--line-2); overflow: hidden;
     }
-    .dc-price-card-head {
-      background: var(--accent); padding: 32px 40px;
-      display: flex; align-items: center; gap: 20px;
+    /* Card header */
+    .gp-card-head {
+      display: flex; align-items: center; gap: 18px;
+      padding: 28px 32px; border-bottom: 1.5px solid var(--line);
     }
-    .dc-price-card-icon { font-size: 40px; }
-    .dc-price-card-title { font-family: var(--display); font-weight: 700; font-size: 22px; color: var(--ink); }
-    .dc-price-card-desc { font-size: 14px; color: var(--ink-2); margin-top: 4px; }
-    .dc-price-table { width: 100%; border-collapse: collapse; }
-    .dc-price-table th {
-      padding: 14px 24px; text-align: left;
-      font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    .gp-card-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: var(--ink); color: var(--accent);
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .gp-card-title {
+      font-family: var(--display); font-weight: 700; font-size: 19px;
+      letter-spacing: -0.02em; color: var(--ink);
+    }
+    .gp-card-desc { font-size: 13.5px; color: var(--ink-3); margin-top: 4px; }
+
+    /* Includes chips */
+    .gp-includes {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 32px; border-bottom: 1.5px solid var(--line);
+      background: var(--cream); flex-wrap: wrap;
+    }
+    .gp-includes-label {
+      font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--ink-3);
-      border-bottom: 1.5px solid var(--line);
+      padding-top: 5px; white-space: nowrap; flex-shrink: 0;
     }
-    .dc-price-table td { padding: 16px 24px; font-size: 15px; border-bottom: 1px solid var(--line); vertical-align: middle; }
-    .dc-price-table tr:last-child td { border-bottom: none; }
-    .dc-price-table tr:hover td { background: var(--accent-soft); }
-    .dc-price-badge {
-      font-family: var(--display);
-      font-weight: 700;
-      font-size: 18px;
-      letter-spacing: -0.02em;
-      color: var(--ink);
-      white-space: nowrap;
+    .gp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .gp-chip {
+      font-size: 12.5px; font-weight: 500;
+      padding: 5px 13px; white-space: nowrap;
+      background: var(--white); border: 1.5px solid var(--line-2);
+      border-radius: 999px; color: var(--ink-2);
     }
-    .dc-price-note {
-      background: var(--accent-soft); border-radius: var(--radius-sm);
-      padding: 16px 24px; margin: 24px;
-      font-size: 13.5px; color: var(--ink-2);
-      display: flex; align-items: flex-start; gap: 12px;
+
+    /* Price rows */
+    .gp-rows { display: flex; flex-direction: column; padding: 6px 0; }
+    .gp-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 15px 32px;
+      transition: background .15s;
     }
-    .dc-price-note-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .gp-row:hover { background: var(--cream); }
+    .gp-row + .gp-row { border-top: 1px solid rgba(26,24,20,.06); }
+    .gp-row-name { font-size: 15px; font-weight: 600; color: var(--ink); }
+    .gp-row-price {
+      font-family: var(--display); font-weight: 700;
+      font-size: 21px; letter-spacing: -0.03em;
+      color: var(--ink); white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* Bottom note */
+    .gp-note {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 18px 32px; border-top: 1.5px solid var(--line);
+      font-size: 13px; color: var(--ink-3); line-height: 1.55;
+    }
+    .gp-note svg { flex-shrink: 0; margin-top: 2px; }
 
     /* ============ Additional services grid ============ */
     /* ── Extras groups ── */
@@ -347,7 +427,7 @@
       gap: 10px;
       margin-bottom: 6px;
     }
-    .dc-extras-group-icon { font-size: 24px; }
+    .dc-extras-group-icon { display: flex; align-items: center; color: var(--ink); }
     .dc-extras-group-title {
       font-weight: 700;
       font-size: 17px;
@@ -396,142 +476,290 @@
       transition: transform .2s, box-shadow .2s;
     }
     .dc-add-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-    .dc-add-icon { font-size: 32px; margin-bottom: 10px; }
+    .dc-add-icon { display: flex; align-items: center; justify-content: center; margin-bottom: 10px; color: var(--ink); }
     .dc-add-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
     .dc-add-price { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; color: var(--ink); white-space: nowrap; }
 
-    /* ============ Process — radial layout ============ */
-    .gp-section {
-      position: relative;
-      padding: 60px 0 0;
-      overflow: hidden;
-    }
-    .gp-inner {
-      position: relative;
-      min-height: 940px;
-      max-width: 1920px;
-      margin: 0 auto;
-      padding: 0 40px;
-    }
+    /* ============ Process — scroll journey ============ */
+    .gp-section { position: relative; padding: 100px 0 120px; overflow: hidden; }
+    .gp-inner { position: relative; max-width: 1280px; margin: 0 auto; padding: 0 40px; }
     /* Header */
-    .gp-head { text-align: center; position: relative; z-index: 5; }
+    .gp-head { text-align: center; position: relative; z-index: 5; margin-bottom: 48px; }
 
-    /* SVG arc connector */
-    .gp-arc {
-      position: absolute; left: 0; top: -20px;
-      width: 100%; height: calc(100% + 20px);
-      z-index: 1; pointer-events: none;
-    }
-
-    /* Central dog */
-    .gp-dog-wrap {
-      position: absolute;
-      left: 50%;
-      bottom: 50px;
-      transform: translateX(-50%);
-      z-index: 3;
-      width: clamp(300px, 28vw, 440px);
+    /* Journey stage — aspect-ratio matches SVG viewBox so coords map 1:1 to % */
+    .gp-journey {
+      position: relative;
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      aspect-ratio: 1200 / 820;
     }
 
-    /* Wave — inside section, covers dog feet */
-    .gp-wave {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      z-index: 5;
-      line-height: 0;
-      pointer-events: none;
-    }
-    .gp-silhouette {
-      position: absolute;
-      inset: -20% -8% 0 -8%;
-      width: 116%; height: 120%;
-      pointer-events: none; z-index: 0;
-      object-fit: contain;
-    }
-    .gp-dog {
-      width: 100%; height: auto; display: block;
-      position: relative; z-index: 1;
+    /* Route SVGs */
+    .gp-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; overflow: visible; }
+    .gp-svg-m { display: none; }
+    .gp-route-base { fill: none; stroke: rgba(26,24,20,.13); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .gp-route-draw {
+      fill: none; stroke: var(--accent); stroke-width: 3.6;
+      stroke-linecap: round; stroke-linejoin: round;
+      filter: drop-shadow(0 0 5px rgba(255,210,63,.9)) drop-shadow(0 0 13px rgba(255,210,63,.55));
     }
 
-    /* Steps */
-    .gp-step {
+    /* Dots along the route */
+    .gp-dot {
+      fill: var(--cream); stroke: rgba(26,24,20,.32); stroke-width: 2;
+      transform-box: fill-box; transform-origin: center;
+      transition: fill .4s ease, stroke .4s ease, transform .45s cubic-bezier(.34,1.56,.64,1), filter .45s ease;
+    }
+    .gp-dot.is-past { fill: var(--ink); stroke: var(--ink); }
+    .gp-dot.is-active { fill: var(--accent); stroke: var(--ink); transform: scale(1.9); filter: drop-shadow(0 0 9px rgba(255,210,63,.95)); }
+
+    /* Step cards */
+    .gp-journey .gp-card {
       position: absolute; z-index: 4;
-      display: flex; gap: 10px; align-items: flex-start;
-      max-width: 310px;
-      background: var(--accent);
-      padding: 10px 0;
+      width: clamp(280px, 26vw, 360px);
+      display: flex; gap: 16px; align-items: flex-start;
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.6);
+      -webkit-backdrop-filter: blur(16px) saturate(1.4);
+      backdrop-filter: blur(16px) saturate(1.4);
+      padding: 24px 26px 26px;
+      transform: translate(var(--ox, -50%), var(--oy, -50%)) translateY(var(--lift, 0px)) rotate(var(--rot, 0deg));
+      transition: opacity .6s ease, transform .65s cubic-bezier(.22,1,.36,1), box-shadow .6s ease, filter .6s ease;
     }
+    .gp-card-body { flex: 1; min-width: 0; }
     .gp-num {
       flex-shrink: 0;
-      min-width: 37px; height: 37px;
-      padding: 5px 14px;
-      border-radius: 18.5px;
-      background: #1d1d1d; color: var(--accent);
-      font-family: "Oswald", var(--display), sans-serif;
-      font-weight: 500; font-size: 20px; line-height: 1;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 16px rgba(26,24,20,.22);
-      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 42px; height: 42px; padding: 0 13px;
+      border-radius: 21px; background: var(--ink); color: var(--accent);
+      font-family: "Oswald", var(--display), sans-serif; font-weight: 500; font-size: 21px; line-height: 1;
     }
-    .gp-step:hover .gp-num { transform: scale(1.1); }
-    .gp-text-wrap { display: flex; flex-direction: column; gap: 6px; width: 256px; }
-    .gp-title { font-weight: 700; font-size: 15px; color: var(--ink); line-height: 1.55; }
-    .gp-body  { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; overflow-wrap: break-word; }
+    .gp-title { font-weight: 700; font-size: 17.5px; color: var(--ink); line-height: 1.4; margin: 0 0 8px; }
+    .gp-body  { font-size: 15px; color: var(--ink-2); line-height: 1.55; margin: 0; overflow-wrap: break-word; }
 
-    /* Step positions (based on Figma 1920px layout) */
-    .gp-s1 { left: 16%; top: 72%; }
-    .gp-s2 { left: 21%; top: 43%; }
-    .gp-s3 { left: 50%; top: 22%; transform: translateX(-50%); }
-    .gp-s4 { left: 65%; top: 42%; }
-    .gp-s5 { left: 70%; top: 73%; }
-    /* Fix: preserve translateX(-50%) centering through reveal animation lifecycle */
-    .gp-s3.reveal { transform: translateX(-50%) translateY(36px) scale(0.97); }
-    .gp-s3.reveal.in-view { transform: translateX(-50%); }
+    /* Anchor each card to its dot, then nudge off the line (scattered composition) */
+    .gp-c1 { left: 30%; top: 13%; --ox: -35%; --oy: -50%; --rot: -2.5deg; }
+    .gp-c2 { left: 70%; top: 32%; --ox: -65%; --oy: -50%; --rot: 2deg; }
+    .gp-c3 { left: 30%; top: 52%; --ox: -35%; --oy: -50%; --rot: -2deg; }
+    .gp-c4 { left: 70%; top: 72%; --ox: -65%; --oy: -50%; --rot: 2.5deg; }
+    .gp-c5 { left: 30%; top: 90%; --ox: -35%; --oy: -50%; --rot: -1.5deg; }
+
+    /* Scroll states (only once JS marks the stage ready — graceful no-JS fallback) */
+    .gp-journey.is-ready .gp-card { opacity: .16; filter: blur(2px); --lift: 32px; }
+    .gp-journey.is-ready .gp-card.is-past   { opacity: 1; filter: none; --lift: 0px;   box-shadow: var(--shadow-sm); }
+    .gp-journey.is-ready .gp-card.is-active { opacity: 1;  filter: none; --lift: -10px; box-shadow: var(--shadow-lg); }
 
     /* Tablet */
-    @media (min-width:861px) and (max-width:1200px) {
-      .gp-inner { min-height: 820px; }
-      .gp-step  { max-width: 220px; }
-      .gp-text-wrap { width: 170px; min-width: 0; }
-      .gp-dog-wrap { width: clamp(240px, 24vw, 360px); bottom: 50px; }
-      .gp-s1 { left: 4%; top: 74%; }
-      .gp-s2 { left: 8%; top: 42%; }
-      .gp-s3 { top: 18%; }
-      .gp-s4 { left: 63%; top: 41%; }
-      .gp-s5 { left: 67%; top: 74%; }
+    @media (min-width:861px) and (max-width:1100px) {
+      .gp-journey .gp-card { width: clamp(230px, 27vw, 300px); padding: 18px 20px 20px; }
+      .gp-title { font-size: 15.5px; }
+      .gp-body  { font-size: 13.5px; }
     }
 
-    /* Mobile */
+    /* Mobile — softer vertical/diagonal route + stacked cards */
     @media (max-width: 860px) {
-      .gp-section { padding-top: 40px; padding-bottom: 0; }
-      .gp-inner { min-height: auto; padding: 0 20px 0; display: flex; flex-direction: column; align-items: center; }
-      .gp-arc { display: none; }
-      .gp-dog-wrap { position: relative; left: auto; bottom: auto; transform: none; width: 220px; margin: 0 auto; margin-top: -30px; }
-      .gp-wave { position: absolute; bottom: -40px; left: 0; right: 0; }
-      .gp-silhouette { display: none; }
-      .gp-step { position: static !important; width: 100%; max-width: 100%; transform: none !important;
-        margin-bottom: 16px; padding: 0; }
-      .gp-s1 { margin-top: 32px; }
-      .gp-text-wrap { width: auto; flex: 1; }
-      .gp-num { flex-shrink: 0; }
+      .gp-section { padding: 64px 0 80px; }
+      .gp-inner { padding: 0 20px; }
+      .gp-head { margin-bottom: 32px; }
+      .gp-journey { aspect-ratio: auto; max-width: 540px; padding-left: 38px; }
+      .gp-svg-d { display: none; }
+      .gp-svg-m { display: block; position: absolute; left: 0; top: 0; height: 100%; width: 30px; }
+      .gp-journey .gp-card {
+        position: static; width: 100%; margin-bottom: 18px;
+        display: flex; --ox: 0px; --oy: 0px; --rot: 0deg;
+        transform: translateY(var(--lift, 0px));
+      }
+      .gp-journey.is-ready .gp-card { --lift: 24px; }
+      .gp-journey.is-ready .gp-card.is-past   { --lift: 0px; }
+      .gp-journey.is-ready .gp-card.is-active { --lift: -6px; }
     }
 
-    /* ============ Features cards ============ */
-    .dc-feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .dc-feat-card {
-      background: var(--white); border-radius: var(--radius-md);
-      padding: 32px 28px; box-shadow: var(--shadow-sm);
-      transition: transform .2s, box-shadow .2s;
+    /* ============ Before / After slider ============ */
+    .ba-wrap { max-width: 880px; margin: 44px auto 0; }
+    .ba {
+      --pos: 50%;
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      background: var(--cream);
+      user-select: none; -webkit-user-select: none;
+      touch-action: pan-y;
     }
-    .dc-feat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-    .dc-feat-ic {
-      width: 52px; height: 52px; border-radius: 16px;
+    .ba-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      pointer-events: none; -webkit-user-drag: none;
+    }
+    .ba-before {
+      position: absolute; inset: 0; z-index: 2;
+      clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+      will-change: clip-path;
+    }
+    .ba-label {
+      position: absolute; top: 16px; z-index: 3;
+      font-family: var(--display); font-weight: 700;
+      font-size: 12.5px; letter-spacing: .02em;
+      padding: 7px 15px; border-radius: 999px;
+      color: var(--ink); pointer-events: none;
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      box-shadow: var(--shadow-sm);
+    }
+    .ba-label-before { left: 16px; background: rgba(255,255,255,.85); }
+    .ba-label-after  { right: 16px; background: var(--accent); }
+    .ba-handle {
+      position: absolute; top: 0; bottom: 0; left: var(--pos);
+      transform: translateX(-50%);
+      z-index: 4; pointer-events: none;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .ba-line { flex: 1; width: 3px; background: rgba(255,255,255,.92); box-shadow: 0 0 10px rgba(26,24,20,.3); }
+    .ba-grip {
+      width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+      background: var(--white); color: var(--ink);
+      display: grid; place-items: center; margin: 10px 0;
+      box-shadow: var(--shadow-md);
+    }
+    .ba-grip svg { display: block; }
+    .ba-range {
+      position: absolute; inset: 0; z-index: 5;
+      width: 100%; height: 100%; margin: 0;
+      -webkit-appearance: none; appearance: none;
+      background: transparent; cursor: ew-resize;
+    }
+    .ba-range:focus-visible { outline: 3px solid var(--accent-deep); outline-offset: 3px; }
+    .ba-range::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 52px; height: 1000px; background: transparent; cursor: ew-resize;
+    }
+    .ba-range::-moz-range-thumb { width: 52px; height: 1000px; background: transparent; border: none; cursor: ew-resize; }
+    .ba-range::-moz-range-track { background: transparent; }
+    @media (max-width: 600px) {
+      .ba { aspect-ratio: 3 / 4; }
+      .ba-grip { width: 42px; height: 42px; }
+    }
+
+    /* ============ Bento — Чому Dog Care ============ */
+    .bento-section { position: relative; overflow: hidden; }
+    .bento-section .dc-wrap { position: relative; z-index: 1; }
+    .bento-glow { position: absolute; z-index: 0; pointer-events: none; border-radius: 50%; filter: blur(90px); }
+    .bento-glow-1 { width: 420px; height: 420px; top: -90px; left: -70px; background: radial-gradient(circle, rgba(255,210,63,.45), transparent 70%); }
+    .bento-glow-2 { width: 500px; height: 500px; bottom: -150px; right: -90px; background: radial-gradient(circle, rgba(255,210,63,.30), transparent 70%); }
+
+    .bento-pill {
+      display: inline-flex; align-items: center;
+      padding: 7px 16px; border-radius: 999px;
+      background: var(--accent-soft); color: var(--ink);
+      font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+    }
+
+    .bento {
+      display: grid; gap: 16px; margin-top: 44px;
+      grid-template-columns: 1fr 1.7fr;
+      grid-template-rows: minmax(300px, 1.3fr) minmax(250px, 1fr);
+      grid-template-areas:
+        "breeds ba"
+        "breeds combined";
+    }
+    .bento-cell { min-width: 0; }
+    .b-breeds { grid-area: breeds; } .b-ba { grid-area: ba; } .b-combined { grid-area: combined; }
+
+    .bento-card {
+      position: relative; height: 100%; overflow: hidden;
+      border-radius: 30px;
+      background: rgba(255,255,255,.55);
+      border: 1px solid rgba(255,210,63,.35);
+      box-shadow: 0 10px 30px rgba(26,24,20,.07);
+      -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 22px;
+      transition: transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease, border-color .4s ease;
+    }
+    .bento-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 24px 54px rgba(26,24,20,.16);
+      border-color: rgba(255,210,63,.85);
+    }
+    .bento-media {
+      position: absolute; inset: 0; z-index: 0;
+      background-size: cover; background-position: center;
+      transition: transform .6s cubic-bezier(.22,1,.36,1);
+    }
+    .bento-card:hover .bento-media { transform: scale(1.07); }
+    .bento-media::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(20,16,12,.05) 25%, rgba(20,16,12,.62) 100%);
+    }
+    /* Light progressive blur at the bottom (two stacked blur bands) */
+    .bento-blur { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+    .bento-blur::before, .bento-blur::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; }
+    .bento-blur::before {
+      height: 40%;
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+      -webkit-mask-image: linear-gradient(to top, #000 0%, #000 25%, transparent 100%);
+      mask-image: linear-gradient(to top, #000 0%, #000 25%, transparent 100%);
+    }
+    .bento-blur::after {
+      height: 22%;
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 100%);
+      mask-image: linear-gradient(to top, #000 0%, transparent 100%);
+    }
+    .bento-icon {
+      position: absolute; top: 18px; left: 18px; z-index: 2;
+      width: 44px; height: 44px; border-radius: 14px;
       background: var(--accent); color: var(--ink);
-      display: grid; place-items: center; font-size: 24px;
-      margin-bottom: 18px;
+      display: grid; place-items: center;
+      box-shadow: 0 6px 18px rgba(255,210,63,.55);
+      transition: transform .45s cubic-bezier(.34,1.56,.64,1);
     }
-    .dc-feat-title { font-weight: 700; font-size: 17px; margin-bottom: 8px; }
-    .dc-feat-body { font-size: 14.5px; color: var(--ink-2); }
+    .bento-card:hover .bento-icon { transform: translateY(-3px) scale(1.1); }
+    .bento-title {
+      position: relative; z-index: 2; margin: 0;
+      font-family: var(--display); font-weight: 700;
+      font-size: clamp(16px, 1.5vw, 22px); line-height: 1.15; letter-spacing: -.02em;
+      color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,.45);
+    }
+
+    /* Before/after tile */
+    .b-ba .bento-card { padding: 0; display: block; }
+    .b-ba .ba { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; box-shadow: none; background: var(--cream); }
+
+    /* Combined card (stats + checklist) */
+    .b-combined .bento-card {
+      display: flex; flex-direction: column; justify-content: center;
+      gap: 26px; padding: 34px 38px; background: rgba(255,255,255,.78);
+    }
+    .combined-stats { display: flex; gap: clamp(32px, 6vw, 80px); }
+    .bento-stat-num { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 4vw, 52px); letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+    .bento-stat-label { font-size: 14px; font-weight: 600; color: var(--ink-2); margin-top: 6px; }
+    .combined-list {
+      list-style: none; margin: 0; padding: 0;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px 36px;
+    }
+    .combined-list li { display: flex; align-items: center; gap: 12px; font-size: 15.5px; font-weight: 600; color: var(--ink); }
+    .combined-chk { width: 26px; height: 26px; flex-shrink: 0; color: var(--accent-deep); }
+
+    @media (max-width: 900px) {
+      .bento {
+        grid-template-columns: 1fr;
+        grid-template-rows: 260px 280px auto;
+        grid-template-areas: "breeds" "ba" "combined";
+      }
+    }
+    @media (max-width: 600px) {
+      .bento {
+        grid-template-rows: 220px 230px auto;
+      }
+      .combined-list { grid-template-columns: 1fr; }
+      .b-combined .bento-card { padding: 26px 22px; gap: 22px; }
+    }
 
     /* ============ FAQ ============ */
     .dc-faq-list { display: flex; flex-direction: column; gap: 16px; }
@@ -803,12 +1031,9 @@
       .dc-h1 em { white-space: normal; }
       .dc-nowrap { white-space: normal; }
       .dc-wrap { padding: 0 20px; }
-      .dc-hero-card { padding: 44px 28px 44px; }
-      .dc-hero-grid { flex-direction: column; }
-      .dc-hero-visual { flex: 0 0 auto; width: 100%; margin-top: 8px; }
-      .dc-hero-circle { width: 260px; height: 260px; }
-      .dc-hero-badge-1 { left: -4%; }
-      .dc-hero-badge-2 { right: -4%; }
+      .dc-hero-card { padding: 120px 24px 90px; min-height: calc(100svh + 110px); }
+      .dc-hero-content { transform: translateY(-60px); }
+      .dc-hero-wave { height: 130px; }
       .dc-nav-links { display: none; }
       .dc-nav-cta { display: none; }
       .dc-burger { display: flex; }
@@ -827,38 +1052,32 @@
       .dc-add-grid { grid-template-columns: 1fr 1fr; }
       /* Extras */
       .dc-extras-group { padding: 18px 16px; }
-      /* Price card */
-      .dc-price-card-head { padding: 20px 16px; gap: 12px; }
-      .dc-price-card-title { font-size: 17px; }
-      .dc-price-note { padding: 12px 14px; margin: 16px; }
+      /* New price card mobile */
+      .gp-card-head { padding: 20px 18px; gap: 14px; }
+      .gp-card-icon { width: 42px; height: 42px; border-radius: 11px; }
+      .gp-card-title { font-size: 16px; }
+      .gp-includes { padding: 14px 18px; gap: 10px; }
+      .gp-row { padding: 13px 18px; }
+      .gp-row-price { font-size: 18px; }
+      .gp-note { padding: 14px 18px; }
       /* FAQ */
       .dc-faq-q { padding: 18px 18px; font-size: 15px; gap: 14px; }
       .dc-faq-a { padding: 0 18px; }
       .dc-faq-item.open .dc-faq-a { padding-bottom: 20px; }
       .dc-price-tabs {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4px;
-        padding: 6px;
-        width: 100%;
-        border-radius: 22px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
         margin-bottom: 28px;
+        gap: 6px;
       }
       .dc-price-tab {
-        padding: 11px 10px;
+        padding: 10px 16px;
         font-size: 13px;
-        justify-content: center;
-        border-radius: 18px;
-        text-align: center;
       }
-      /* Price table horizontal scroll */
-      .dc-price-panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      .dc-price-table { min-width: 340px; }
-      .dc-price-table th, .dc-price-table td { padding: 10px 14px; font-size: 13px; }
       .dc-h2 { font-size: clamp(26px, 7vw, 34px); }
       /* Hero */
-      .dc-hero-card { padding: 32px 18px; }
-      .dc-hero-circle { width: 200px; height: 200px; }
+      .dc-hero-card { padding: 104px 16px 72px; min-height: calc(100svh + 110px); }
       .dc-hero-sub { font-size: 14.5px; text-align: center; }
       .dc-hero-stats { gap: 0; justify-content: center; flex-wrap: nowrap; }
       .dc-hero-stats > div { text-align: center; flex: 1; }
@@ -887,7 +1106,6 @@
       .dc-add-grid { grid-template-columns: 1fr; }
       .dc-nav-cta { display: none; }
       .dc-h2 { font-size: 24px; }
-      .dc-hero-circle { width: 160px; height: 160px; }
     }
 
     /* ── Каруселі фото ── */
@@ -1057,6 +1275,157 @@
       .grm-scene-title .dc-h2 { max-width: 300px; }
     }
 
+    /* ============ Groomer section ============ */
+    .gr-card {
+      background: var(--white);
+      border: 1px solid var(--line-2);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      padding: 52px;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+    .gr-grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 56px;
+      align-items: center;
+    }
+    .gr-text {
+      font-size: 16.5px; color: var(--ink-2);
+      line-height: 1.75; margin: 0 0 18px;
+    }
+    .gr-text:last-child { margin-bottom: 0; }
+    .gr-text strong { color: var(--ink); font-weight: 700; }
+    /* Line-by-line blur reveal (grouped by paragraph), persistent */
+    .gr-line { display: block; overflow: hidden; }
+    .gr-line-in {
+      display: block;
+      transform: translateY(115%);
+      opacity: 0;
+      filter: blur(8px);
+      transition: transform 1s cubic-bezier(.22,1,.36,1),
+                  opacity .9s ease, filter .9s ease;
+      transition-delay: var(--d, 0ms);
+      will-change: transform, opacity, filter;
+    }
+    .gr-line.is-in .gr-line-in { transform: none; opacity: 1; filter: blur(0); }
+    .gr-strong { color: var(--ink); font-weight: 700; }
+    .gr-photo-col { position: relative; display: flex; flex-direction: column; }
+    .gr-photo-frame {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--accent);
+      width: 100%;
+      aspect-ratio: 3 / 4;
+    }
+    .gr-photo-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 55%, rgba(26,24,20,.22) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .gr-photo-img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center top;
+      display: block;
+      transition: transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    .gr-photo-frame:hover .gr-photo-img { transform: scale(1.04); }
+    .gr-photo-deco {
+      position: absolute;
+      bottom: -28px; right: -28px;
+      width: 160px; height: 160px;
+      background: var(--accent);
+      border-radius: 50%;
+      z-index: -1; opacity: .45;
+    }
+    .gr-photo-badge {
+      position: absolute; bottom: 20px; left: 20px; z-index: 2;
+      background: var(--white); border-radius: 999px;
+      padding: 10px 18px 10px 12px;
+      font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: var(--shadow-md); color: var(--ink);
+    }
+    .gr-photo-badge svg { color: var(--ink-3); flex-shrink: 0; }
+
+    .gr-text-col { padding-top: 6px; }
+    .gr-intro {
+      font-size: 17px; color: var(--ink-2);
+      line-height: 1.65; margin: 16px 0 32px;
+    }
+    .gr-block { margin-bottom: 30px; }
+    .gr-block-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 800;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--ink-3); margin-bottom: 12px;
+    }
+    .gr-block-label svg { flex-shrink: 0; }
+    .gr-principles { list-style: none; padding: 0; margin: 0; }
+    .gr-principles li {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 15px; color: var(--ink); line-height: 1.6;
+    }
+    .gr-principles li:first-child { border-top: 1px solid var(--line); }
+    .gr-principles li::before {
+      content: '';
+      flex-shrink: 0;
+      width: 8px; height: 8px; margin-top: 8px;
+      border-radius: 50%;
+      background: var(--accent-deep);
+    }
+    .gr-body-text {
+      font-size: 15px; color: var(--ink-2);
+      line-height: 1.65; margin: 0 0 14px;
+    }
+    .gr-body-text strong { color: var(--ink); }
+    .gr-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .gr-tag {
+      font-size: 13px; font-weight: 600;
+      padding: 7px 16px;
+      background: var(--white);
+      border: 1.5px solid var(--line-2);
+      border-radius: 999px; color: var(--ink-2);
+    }
+    .gr-quote {
+      position: relative;
+      margin: 0;
+      background: var(--ink);
+      border-radius: var(--radius-md);
+      padding: 28px 28px 28px 52px;
+      font-size: 15px; font-style: italic;
+      color: rgba(255,254,247,.82); line-height: 1.7;
+    }
+    .gr-quote-mark {
+      position: absolute; top: 12px; left: 18px;
+      font-family: var(--display); font-size: 58px;
+      line-height: 1; color: var(--accent);
+      font-style: normal; font-weight: 800;
+    }
+
+    @media (max-width: 1024px) {
+      .gr-card { padding: 40px; }
+      .gr-grid { grid-template-columns: 1fr 340px; gap: 40px; }
+    }
+    @media (max-width: 860px) {
+      .gr-card { padding: 28px; }
+      .gr-grid { grid-template-columns: 1fr; gap: 28px; }
+      .gr-photo-col { order: -1; }
+      .gr-photo-frame { aspect-ratio: 4 / 3; }
+      .gr-text { font-size: 15.5px; }
+    }
+    @media (max-width: 600px) {
+      .gr-card { padding: 22px; }
+      .gr-photo-frame { aspect-ratio: 3 / 4; max-height: 440px; }
+    }
+
   </style>
   <!-- Firebase SDK (завантажується першим) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1150,11 +1519,14 @@
   <section class="dc-hero">
     <div class="dc-wrap">
       <div class="dc-hero-card">
-        <div class="dc-hero-grid">
+        <video class="dc-hero-video" src="grooming%20hero.mp4" poster="Grooming_hero.png" autoplay muted loop playsinline></video>
+        <div class="dc-hero-overlay"></div>
+        <svg class="dc-hero-wave" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden="true">
+          <path id="heroWavePath" d="M0,110 Q720,-20 1440,110 L1440,220 L0,220 Z" fill="var(--cream)"></path>
+        </svg>
+        <div class="dc-hero-content">
           <div>
-            <h1 class="dc-h1 reveal" style="--reveal-i:1">
-              DOG CARE —<br><span class="dc-nowrap">перша прозора</span><br>територія<br><em>грумінгу</em>
-            </h1>
+            <h1 class="dc-h1 reveal" style="--reveal-i:1">DOG CARE — перша прозора територія <em>грумінгу</em></h1>
             <p class="dc-hero-sub reveal" style="--reveal-i:2" id="grm-sub">
               Місце де ваш улюбленець почуває себе комфортно
             </p>
@@ -1182,92 +1554,72 @@
               </div>
             </div>
           </div>
-          <div class="dc-hero-visual reveal" style="--reveal-i:2; margin-top:-60px; position:relative;">
-            <!-- deco: sparkle top-right -->
-            <span style="position:absolute;top:8%;right:4%;z-index:2;pointer-events:none;">
-              <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <line x1="30" y1="6" x2="46" y2="2" stroke="#1A1814" stroke-width="2.8" stroke-linecap="round"/>
-                <line x1="36" y1="20" x2="52" y2="18" stroke="#1A1814" stroke-width="2.8" stroke-linecap="round"/>
-                <line x1="32" y1="34" x2="46" y2="34" stroke="#1A1814" stroke-width="2.8" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <!-- deco: curl left-middle -->
-            <span style="position:absolute;left:4%;top:42%;z-index:2;pointer-events:none;">
-              <svg width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M42 58 C18 56 8 38 20 24 C32 10 52 18 48 34 C44 50 26 50 22 38" stroke="#1A1814" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-            <img src="Grooming_hero.png" alt="Грумінг" style="width:100%;height:auto;display:block;object-fit:contain;mask-image:linear-gradient(to bottom,black 65%,transparent 100%),linear-gradient(to right,transparent 0%,black 10%,black 90%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,black 65%,transparent 100%),linear-gradient(to right,transparent 0%,black 10%,black 90%,transparent 100%);mask-composite:intersect;-webkit-mask-composite:source-in;">
-          </div>
-          </div>
         </div>
       </div>
     </div>
   </section>
-  <!-- ══ MARQUEE ══ -->
-  <div class="dc-marquee-wrap">
-    <div class="dc-marquee-track">
-      <!-- Two copies for seamless loop -->
-      <div class="dc-marquee-item"><span>Грумінг</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Стрижка</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Купання</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Чищення вух</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Стрижка кігтів</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Всі породи</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>5 років досвіду</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Прозорий простір</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Грумінг</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Стрижка</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Купання</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Чищення вух</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Стрижка кігтів</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Всі породи</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>5 років досвіду</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-      <div class="dc-marquee-item"><span>Прозорий простір</span><span class="dc-marquee-dot"><svg width="22" height="22" viewBox="0 0 429 403" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M131.837 403C128.335 401.68 123.194 401.333 119.191 400.043C103.522 395.08 90.6218 383.828 83.5813 368.975C75.5673 352.383 74.3586 331.745 80.4623 314.348C84.9491 301.913 92.3878 290.753 102.139 281.828C106.546 277.785 112.253 273.568 116.938 269.7C123.802 264.068 130.058 257.73 135.602 250.793C141.702 243.064 147.269 234.502 151.914 225.799C155.388 219.29 158.222 212.48 161.451 205.76C173.683 180.307 201.908 161.766 230.337 171.737C247.85 177.879 260.885 192.02 268.338 208.696C270.548 213.555 273.323 219.72 275.698 224.407C281.383 235.731 288.5 246.277 296.875 255.785C301.99 261.5 307.593 266.76 313.613 271.51C317.945 274.978 322.888 278.413 326.84 282.323C342.69 298.018 353.155 317.663 352.058 340.385C350.885 364.695 338.565 386.99 316.048 397.595C312.538 399.263 308.838 400.493 305.028 401.255C303.265 401.628 298.88 402.388 297.418 403H281.34C280.42 402.71 279.315 402.433 278.355 402.313C271.353 401.438 265.203 399.775 258.445 397.888C247.301 394.775 235.839 390.61 224.39 388.71C205.904 385.643 186.625 393.293 169.078 398.158C165.389 399.198 162.232 400.048 158.471 400.815C156.11 401.295 149.376 402.173 147.422 403H131.837Z"/><path d="M134.319 0H142.666C143.463 0.412578 146.68 1.11972 147.734 1.39535C149.771 1.9112 151.759 2.6073 153.673 3.47543C170.318 11.0272 182.649 31.8027 188.671 48.2255C197.174 71.4157 200.217 101.233 189.679 124.246C184.21 136.464 174.006 145.931 161.414 150.471C150.021 154.702 137.407 154.187 126.398 149.039C111.823 142.25 100.573 127.019 95.3137 112.085C86.8087 87.9348 89.9544 51.7215 100.478 28.6252C105.097 18.4894 113.001 8.1486 123.358 3.62637C127.496 1.8195 130.311 1.48024 134.107 0.080195L134.319 0Z"/><path d="M285.295 0H295.68C297.117 0.673447 301.44 1.65844 303.777 2.60672C315.9 7.52592 324.322 19.8537 329.11 31.653C339.65 57.622 341.807 91.612 330.995 117.844C325.142 132.044 314.895 143.55 300.522 149.358C288.415 154.249 277.07 154.621 264.847 149.626C251.837 144.307 242.28 132.869 237.132 119.975C227.702 96.359 232.876 64.432 242.454 41.647C248.515 27.2277 258.702 11.7343 272.98 4.43997C277.597 2.08052 280.925 1.79491 285.105 0.0800238L285.295 0Z"/><path d="M429 182.172C427.977 185.699 427.82 192.605 427.18 196.593C422.777 224.065 408.202 254.29 378.752 261.18C353.857 267.005 331.45 251.455 326.195 226.956C321.207 203.706 330.43 178.818 342.555 159.266C352.48 143.78 365.702 128.708 384.37 124.684C409.282 119.313 424.655 139.868 427.477 161.978C427.927 165.513 428.207 170.464 428.93 173.813L429 174.128V182.172Z"/><path d="M0 167.564C0.793037 165.957 1.48027 160.04 1.86923 157.889C6.4104 132.777 27.779 115.573 53.3573 127.582C75.1987 137.837 89.5668 162.028 98.0575 183.739C104.531 200.669 106.457 220.697 98.7692 237.479C94.1115 247.886 85.4358 255.96 74.7223 259.863C64.2665 263.745 50.9987 262.928 40.9272 258.17C23.9926 250.173 13.1958 235.495 6.95843 218.226C4.88353 212.347 3.30657 206.304 2.24426 200.161C1.9027 198.274 0.464348 187.912 0 186.909V167.564Z"/></svg></span></div>
-    </div>
-  </div>
 
 
-  <!-- ══ ПЕРЕВАГИ ══ -->
-  <section class="dc-section dc-section-cream">
+  <!-- ══ ЧОМУ DOG CARE (BENTO) ══ -->
+  <section class="dc-section dc-section-cream bento-section">
     <div class="dc-wrap">
       <div class="dc-section-head dc-section-head--center">
         <div>
-          <div class="dc-eyebrow-text reveal">Чому Dog Care</div>
-          <h2 class="dc-h2 reveal" style="--reveal-i:1">Догляд, якому <em>можна довіряти</em></h2>
+          <span class="bento-pill reveal">Чому нас обирають</span>
+          <h2 class="dc-h2 reveal" style="--reveal-i:1;margin-top:14px;">Чому Dog Care — <em>це більше, ніж грумінг</em></h2>
         </div>
       </div>
-      <div class="dc-feat-grid">
-        <div class="dc-feat-card reveal" style="--reveal-i:0">
-          <div class="dc-feat-ic">🔍</div>
-          <div class="dc-feat-title">Повна прозорість</div>
-          <div class="dc-feat-body">Скляні стіни дозволяють вам спостерігати за кожним кроком догляду вашого улюбленця. Жодних закритих дверей.</div>
+
+      <div class="bento">
+
+        <!-- Ліворуч: Всі породи (висока картка) -->
+        <div class="bento-cell b-breeds reveal reveal-blur" style="--reveal-i:0">
+          <article class="bento-card">
+            <div class="bento-media" style="background-image:url('бенто.png')"></div>
+            <div class="bento-blur" aria-hidden="true"></div>
+            <span class="bento-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 1.725 1.722 3.656 1 1.261-.472 1.96-1.45 2.344-2.5"/><path d="M14.267 5.172c0-1.39 1.577-2.493 3.5-2.172 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.96-1.45-2.344-2.5"/><path d="M8 14v.5"/><path d="M16 14v.5"/><path d="M11.25 16.25h1.5L12 17l-.75-.75Z"/><path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444c0-1.061-.162-2.2-.493-3.309m-9.243-6.082A8.801 8.801 0 0 1 12 5c.78 0 1.5.108 2.161.306"/></svg></span>
+            <h3 class="bento-title">Всі породи</h3>
+          </article>
         </div>
-        <div class="dc-feat-card reveal" style="--reveal-i:1">
-          <div class="dc-feat-ic">🏆</div>
-          <div class="dc-feat-title">5 років досвіду</div>
-          <div class="dc-feat-body">Наші грумери працюють з усіма породами собак і кішок. Знаємо особливості кожної породи та індивідуальний підхід.</div>
+
+        <!-- Праворуч зверху: інтерактив «до / після» -->
+        <div class="bento-cell b-ba reveal reveal-blur" style="--reveal-i:1">
+          <article class="bento-card">
+            <div class="ba" id="beforeAfter">
+              <img class="ba-img" src="dog-clean.png" alt="Чистий доглянутий пес — після грумінгу" draggable="false">
+              <span class="ba-label ba-label-after">Після</span>
+              <div class="ba-before">
+                <img class="ba-img" src="dog-dirty.png" alt="Брудний пес — до грумінгу" draggable="false">
+                <span class="ba-label ba-label-before">До</span>
+              </div>
+              <div class="ba-handle">
+                <span class="ba-line"></span>
+                <span class="ba-grip" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 4 12l5 6"/><path d="M15 6l5 6-5 6"/></svg>
+                </span>
+                <span class="ba-line"></span>
+              </div>
+              <input class="ba-range" id="baRange" type="range" min="0" max="100" value="50" step="0.1" aria-label="Повзунок «до та після»: перетягніть, щоб порівняти">
+            </div>
+          </article>
         </div>
-        <div class="dc-feat-card reveal" style="--reveal-i:2">
-          <div class="dc-feat-ic">🧴</div>
-          <div class="dc-feat-title">Професійна косметика</div>
-          <div class="dc-feat-body">Використовуємо виключно професійні шампуні, кондиціонери та засоби догляду, безпечні для здоров'я тварин.</div>
+
+        <!-- Праворуч знизу: об'єднана картка (статистика + чеклист) -->
+        <div class="bento-cell b-combined reveal reveal-blur" style="--reveal-i:2">
+          <article class="bento-card">
+            <div class="combined-stats">
+              <div class="bento-stat"><div class="bento-stat-num">5+</div><div class="bento-stat-label">років досвіду</div></div>
+              <div class="bento-stat"><div class="bento-stat-num">500+</div><div class="bento-stat-label">щасливих хвостиків</div></div>
+            </div>
+            <ul class="combined-list">
+              <li><svg class="combined-chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>Повна прозорість</li>
+              <li><svg class="combined-chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>Професійна косметика</li>
+              <li><svg class="combined-chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>Зручне розташування</li>
+              <li><svg class="combined-chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>Комфорт тварини</li>
+            </ul>
+          </article>
         </div>
-        <div class="dc-feat-card reveal" style="--reveal-i:3">
-          <div class="dc-feat-ic">🐾</div>
-          <div class="dc-feat-title">Всі породи</div>
-          <div class="dc-feat-body">Від маленьких йоркширських тер'єрів до великих вівчарок. Догляд за довго-, коротко- та жорсткошерстними породами.</div>
-        </div>
-        <div class="dc-feat-card reveal" style="--reveal-i:4">
-          <div class="dc-feat-ic">📍</div>
-          <div class="dc-feat-title">Зручне розташування</div>
-          <div class="dc-feat-body">Знаходимось на вулиці Молодіжка, 40 в Івано-Франківську. Є зручна парковка поряд.</div>
-        </div>
-        <div class="dc-feat-card reveal" style="--reveal-i:5">
-          <div class="dc-feat-ic">😌</div>
-          <div class="dc-feat-title">Комфорт тварини</div>
-          <div class="dc-feat-body">При прояві агресії просимо власника бути присутнім. При необхідності можливе використання заспокійливих за рекомендацією ветеринара.</div>
-        </div>
+
       </div>
     </div>
   </section>
@@ -1325,249 +1677,184 @@
       </div>
 
       <div class="dc-price-tabs reveal" style="--reveal-i:2">
-        <button class="dc-price-tab active" data-tab="hygiene">Гігієнічний догляд</button>
-        <button class="dc-price-tab" data-tab="full">Повний комплекс</button>
-        <button class="dc-price-tab" data-tab="hard">Жорсткошерстні</button>
-        <button class="dc-price-tab" data-tab="cats">Кішки</button>
-        <button class="dc-price-tab" data-tab="extras">Додаткові послуги</button>
+        <button class="dc-price-tab active" data-tab="hygiene">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21H5a2 2 0 0 1-2-2v-2a6 6 0 0 1 12 0v2a2 2 0 0 1-2 2h-2"/><path d="M12 13V7"/><path d="M8 9l4-4 4 4"/></svg>
+          Гігієнічний
+        </button>
+        <button class="dc-price-tab" data-tab="full">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/><path d="M15 18l1 1 4-4-1-1"/></svg>
+          Повний комплекс
+        </button>
+        <button class="dc-price-tab" data-tab="hard">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>
+          Жорсткошерстні
+        </button>
+        <button class="dc-price-tab" data-tab="cats">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.68.26 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/></svg>
+          Кішки
+        </button>
+        <button class="dc-price-tab" data-tab="extras">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Додаткові послуги
+        </button>
       </div>
 
       <!-- Гігієнічний догляд -->
       <div class="dc-price-panel active reveal" id="tab-hygiene" style="--reveal-i:3">
-        <div class="dc-price-card">
-          <div class="dc-price-card-head">
-            <div class="dc-price-card-icon">🛁</div>
+        <div class="gp-card">
+          <div class="gp-card-head">
+            <div class="gp-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21H5a2 2 0 0 1-2-2v-2a6 6 0 0 1 12 0v2a2 2 0 0 1-2 2h-2"/><path d="M12 13V7"/><path d="M8 9l4-4 4 4"/></svg>
+            </div>
             <div>
-              <div class="dc-price-card-title">Гігієнічний догляд</div>
-              <div class="dc-price-card-desc">Купання, сушка, базовий догляд — для довгошерстних порід</div>
+              <div class="gp-card-title">Гігієнічний догляд</div>
+              <div class="gp-card-desc">Купання, сушка та базовий догляд — для довгошерстних порід</div>
             </div>
           </div>
-          <table class="dc-price-table">
-            <thead>
-              <tr>
-                <th>Порода / розмір</th>
-                <th>Що входить</th>
-                <th style="text-align:right">Ціна</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Йоркширський тер'єр</strong></td>
-                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух, протирання очей</td>
-                <td style="text-align:right"><span class="dc-price-badge">800 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Мальтезе</strong></td>
-                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух, протирання очей</td>
-                <td style="text-align:right"><span class="dc-price-badge">800 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Той-пудель</strong></td>
-                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух, протирання очей</td>
-                <td style="text-align:right"><span class="dc-price-badge">800–850 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Метис до 10 кг</strong></td>
-                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух</td>
-                <td style="text-align:right"><span class="dc-price-badge">650–750 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Метис 10–25 кг</strong></td>
-                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух</td>
-                <td style="text-align:right"><span class="dc-price-badge">900–1050 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Метис 25–45 кг</strong></td>
-                <td>Купання, сушка, розчісування, стрижка кігтів, чищення вух</td>
-                <td style="text-align:right"><span class="dc-price-badge">1100–1200 ₴</span></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="dc-price-note">
-            <span class="dc-price-note-icon">ℹ️</span>
-            <span>Гігієнічний догляд включає: купання з профкосметикою та кондиціонером, сушку з розчісуванням, стрижку подушечок лап та паху, чищення вух, стрижку кігтів, протирання очей, мінімальне розколтунювання.</span>
+          <div class="gp-includes">
+            <span class="gp-includes-label">Що входить</span>
+            <div class="gp-chips">
+              <span class="gp-chip">Купання з профкосметикою</span>
+              <span class="gp-chip">Сушка</span>
+              <span class="gp-chip">Розчісування</span>
+              <span class="gp-chip">Стрижка кігтів</span>
+              <span class="gp-chip">Чищення вух</span>
+              <span class="gp-chip">Протирання очей</span>
+              <span class="gp-chip">Стрижка подушечок лап</span>
+            </div>
+          </div>
+          <div class="gp-rows">
+            <div class="gp-row"><span class="gp-row-name">Йоркширський тер'єр</span><span class="gp-row-price">800 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Мальтезе</span><span class="gp-row-price">800 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Той-пудель</span><span class="gp-row-price">800–850 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Метис до 10 кг</span><span class="gp-row-price">650–750 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Метис 10–25 кг</span><span class="gp-row-price">900–1050 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Метис 25–45 кг</span><span class="gp-row-price">1100–1200 ₴</span></div>
+          </div>
+          <div class="gp-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Ціна залежить від стану шерсті та темпераменту тварини. Сильне розколтунювання оплачується окремо.
           </div>
         </div>
       </div>
 
       <!-- Повний комплекс -->
       <div class="dc-price-panel" id="tab-full">
-        <div class="dc-price-card">
-          <div class="dc-price-card-head">
-            <div class="dc-price-card-icon">✂️</div>
+        <div class="gp-card">
+          <div class="gp-card-head">
+            <div class="gp-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/><path d="M15 18l1 1 4-4-1-1"/></svg>
+            </div>
             <div>
-              <div class="dc-price-card-title">Повний комплекс</div>
-              <div class="dc-price-card-desc">Гігієнічний догляд + модельна/породна стрижка</div>
+              <div class="gp-card-title">Повний комплекс</div>
+              <div class="gp-card-desc">Гігієнічний догляд + модельна або породна стрижка</div>
             </div>
           </div>
-          <table class="dc-price-table">
-            <thead>
-              <tr>
-                <th>Порода / розмір</th>
-                <th>Що входить</th>
-                <th style="text-align:right">Ціна</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Йоркширський тер'єр</strong></td>
-                <td>Повний гігієнічний догляд + модельна стрижка, стрижка хвостика, полірування шерсті</td>
-                <td style="text-align:right"><span class="dc-price-badge">900–1000 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Мальтезе</strong></td>
-                <td>Повний гігієнічний догляд + породна стрижка, фінішне полірування</td>
-                <td style="text-align:right"><span class="dc-price-badge">950–1050 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Мініатюрний пудель</strong></td>
-                <td>Повний гігієнічний догляд + модельна стрижка пуделя, оформлення помпонів</td>
-                <td style="text-align:right"><span class="dc-price-badge">1000–1100 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Кокер-спанієль</strong></td>
-                <td>Повний гігієнічний догляд + породна стрижка, оформлення вух</td>
-                <td style="text-align:right"><span class="dc-price-badge">1100–1250 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Золотистий ретривер</strong></td>
-                <td>Повний гігієнічний догляд + тримінг, оформлення шерсті</td>
-                <td style="text-align:right"><span class="dc-price-badge">1300–1500 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Великий пудель</strong></td>
-                <td>Повний гігієнічний догляд + складна модельна стрижка</td>
-                <td style="text-align:right"><span class="dc-price-badge">від 1500 ₴</span></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="dc-price-note">
-            <span class="dc-price-note-icon">✨</span>
-            <span>Повний комплекс включає все з гігієнічного догляду плюс: модельну або породну стрижку, повноцінну стрижку хвостика та фінішне полірування шерсті.</span>
+          <div class="gp-includes">
+            <span class="gp-includes-label">Що входить</span>
+            <div class="gp-chips">
+              <span class="gp-chip">Повний гігієнічний догляд</span>
+              <span class="gp-chip">Модельна / породна стрижка</span>
+              <span class="gp-chip">Стрижка хвостика</span>
+              <span class="gp-chip">Полірування шерсті</span>
+            </div>
+          </div>
+          <div class="gp-rows">
+            <div class="gp-row"><span class="gp-row-name">Йоркширський тер'єр</span><span class="gp-row-price">900–1000 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Мальтезе</span><span class="gp-row-price">950–1050 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Мініатюрний пудель</span><span class="gp-row-price">1000–1100 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Кокер-спанієль</span><span class="gp-row-price">1100–1250 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Золотистий ретривер</span><span class="gp-row-price">1300–1500 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Великий пудель</span><span class="gp-row-price">від 1500 ₴</span></div>
+          </div>
+          <div class="gp-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Повний комплекс включає все з гігієнічного догляду + модельну або породну стрижку, стрижку хвостика та фінішне полірування.
           </div>
         </div>
       </div>
 
       <!-- Жорсткошерстні -->
       <div class="dc-price-panel" id="tab-hard">
-        <div class="dc-price-card">
-          <div class="dc-price-card-head">
-            <div class="dc-price-card-icon">🐕</div>
+        <div class="gp-card">
+          <div class="gp-card-head">
+            <div class="gp-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>
+            </div>
             <div>
-              <div class="dc-price-card-title">Жорсткошерстні породи та короткошерстні</div>
-              <div class="dc-price-card-desc">Купання, фурмінація, тримінг, полірування</div>
+              <div class="gp-card-title">Жорсткошерстні та короткошерстні</div>
+              <div class="gp-card-desc">Купання, фурмінація, тримінг, полірування</div>
             </div>
           </div>
-          <table class="dc-price-table">
-            <thead>
-              <tr>
-                <th>Порода / розмір</th>
-                <th>Послуга</th>
-                <th style="text-align:right">Ціна</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Мопс / Французький бульдог</strong></td>
-                <td>Профшампунь, сушка, стрижка кігтів, чищення вух, складки обличчя</td>
-                <td style="text-align:right"><span class="dc-price-badge">700–800 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Такса</strong></td>
-                <td>Купання, сушка, стрижка кігтів, чищення вух</td>
-                <td style="text-align:right"><span class="dc-price-badge">700–750 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Ягдтер'єр / Фокстер'єр</strong></td>
-                <td>Купання, сушка, тримінг, стрижка кігтів, чищення вух</td>
-                <td style="text-align:right"><span class="dc-price-badge">900–1050 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Нім. вівчарка (Експрес линька)</strong></td>
-                <td>Профшампунь для прискорення линьки, ретельне вичісування, сушка</td>
-                <td style="text-align:right"><span class="dc-price-badge">900 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Хаскі / Лабрадор</strong></td>
-                <td>Купання, сушка, фурмінація, стрижка кігтів, чищення вух</td>
-                <td style="text-align:right"><span class="dc-price-badge">1200–1400 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Велика порода 35+ кг</strong></td>
-                <td>Повний комплекс догляду + стрижка кігтів, чищення вух</td>
-                <td style="text-align:right"><span class="dc-price-badge">від 1600 ₴</span></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="dc-price-note">
-            <span class="dc-price-note-icon">ℹ️</span>
-            <span>Ціна залежить від ступеня линьки, стану шерсті та поведінки тварини. При вазі, що перевищує вказану категорію, вартість збільшується на 15–20%.</span>
+          <div class="gp-includes">
+            <span class="gp-includes-label">Що входить</span>
+            <div class="gp-chips">
+              <span class="gp-chip">Купання з профшампунем</span>
+              <span class="gp-chip">Сушка та вичісування</span>
+              <span class="gp-chip">Тримінг / Фурмінація</span>
+              <span class="gp-chip">Стрижка кігтів</span>
+              <span class="gp-chip">Чищення вух</span>
+            </div>
+          </div>
+          <div class="gp-rows">
+            <div class="gp-row"><span class="gp-row-name">Мопс / Французький бульдог</span><span class="gp-row-price">700–800 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Такса</span><span class="gp-row-price">700–750 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Ягдтер'єр / Фокстер'єр</span><span class="gp-row-price">900–1050 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Нім. вівчарка (Експрес линька)</span><span class="gp-row-price">900 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Хаскі / Лабрадор</span><span class="gp-row-price">1200–1400 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Велика порода 35+ кг</span><span class="gp-row-price">від 1600 ₴</span></div>
+          </div>
+          <div class="gp-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Ціна залежить від ступеня линьки та стану шерсті. При вазі понад зазначену категорію вартість зростає на 15–20%.
           </div>
         </div>
       </div>
 
       <!-- Кішки -->
       <div class="dc-price-panel" id="tab-cats">
-        <div class="dc-price-card">
-          <div class="dc-price-card-head">
-            <div class="dc-price-card-icon">🐱</div>
+        <div class="gp-card">
+          <div class="gp-card-head">
+            <div class="gp-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.68.26 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/></svg>
+            </div>
             <div>
-              <div class="dc-price-card-title">Грумінг котів</div>
-              <div class="dc-price-card-desc">Сухе вичісування або повне купання</div>
+              <div class="gp-card-title">Грумінг котів</div>
+              <div class="gp-card-desc">Сухе вичісування або повне купання</div>
             </div>
           </div>
-          <table class="dc-price-table">
-            <thead>
-              <tr>
-                <th>Порода / тип</th>
-                <th>Послуга</th>
-                <th style="text-align:right">Ціна</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Звичайний кіт (сухе вичісування)</strong></td>
-                <td>Розчісування, вичісування підшерстку, стрижка кігтів</td>
-                <td style="text-align:right"><span class="dc-price-badge">700 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Британець (сухе вичісування)</strong></td>
-                <td>Розчісування, вичісування підшерстку, стрижка кігтів</td>
-                <td style="text-align:right"><span class="dc-price-badge">800 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Звичайний кіт (повний пакет)</strong></td>
-                <td>Купання з профкосметикою, сушка, розчісування, стрижка кігтів</td>
-                <td style="text-align:right"><span class="dc-price-badge">1000 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Британець (повний пакет)</strong></td>
-                <td>Купання з профкосметикою, сушка, розчісування, стрижка кігтів</td>
-                <td style="text-align:right"><span class="dc-price-badge">1100 ₴</span></td>
-              </tr>
-              <tr>
-                <td><strong>Мейн-кун (повний пакет)</strong></td>
-                <td>Купання з профкосметикою, сушка, ретельне розчісування, стрижка кігтів</td>
-                <td style="text-align:right"><span class="dc-price-badge">1400 ₴</span></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="dc-price-note">
-            <span class="dc-price-note-icon">🐾</span>
-            <span>Для котів рекомендуємо заздалегідь уточнити поведінку вашого улюбленця. При агресії майстер може попросити власника бути присутнім.</span>
+          <div class="gp-includes">
+            <span class="gp-includes-label">Що входить</span>
+            <div class="gp-chips">
+              <span class="gp-chip">Розчісування</span>
+              <span class="gp-chip">Вичісування підшерстку</span>
+              <span class="gp-chip">Стрижка кігтів</span>
+              <span class="gp-chip">+ Купання з профкосметикою (повний пакет)</span>
+              <span class="gp-chip">+ Сушка (повний пакет)</span>
+            </div>
+          </div>
+          <div class="gp-rows">
+            <div class="gp-row"><span class="gp-row-name">Звичайний кіт — сухе вичісування</span><span class="gp-row-price">700 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Британець — сухе вичісування</span><span class="gp-row-price">800 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Звичайний кіт — повний пакет</span><span class="gp-row-price">1000 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Британець — повний пакет</span><span class="gp-row-price">1100 ₴</span></div>
+            <div class="gp-row"><span class="gp-row-name">Мейн-кун — повний пакет</span><span class="gp-row-price">1400 ₴</span></div>
+          </div>
+          <div class="gp-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Рекомендуємо заздалегідь уточнити темперамент вашого улюбленця. При агресії майстер може попросити власника бути присутнім.
           </div>
         </div>
       </div>
 
       <!-- Додаткові послуги -->
       <div class="dc-price-panel" id="tab-extras">
-
-        <!-- Групові прайси -->
         <div class="dc-extras-groups reveal" style="--reveal-i:0">
-
           <div class="dc-extras-group">
             <div class="dc-extras-group-head">
-              <span class="dc-extras-group-icon">🛁</span>
+              <span class="dc-extras-group-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21H5a2 2 0 0 1-2-2v-2a6 6 0 0 1 12 0v2a2 2 0 0 1-2 2h-2"/><path d="M12 13V7"/><path d="M8 9l4-4 4 4"/></svg>
+              </span>
               <span class="dc-extras-group-title">Купання</span>
             </div>
             <ul class="dc-extras-rows">
@@ -1576,10 +1863,11 @@
               <li><span class="dc-extras-row-name">від 15–45 кг</span><span class="dc-extras-row-price">від 900 ₴</span></li>
             </ul>
           </div>
-
           <div class="dc-extras-group">
             <div class="dc-extras-group-head">
-              <span class="dc-extras-group-icon">✂️</span>
+              <span class="dc-extras-group-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/></svg>
+              </span>
               <span class="dc-extras-group-title">Стрижка без купання</span>
             </div>
             <p class="dc-extras-group-note">якщо песик попередньо чистий</p>
@@ -1593,33 +1881,30 @@
               <li><span class="dc-extras-row-name">Спаніель</span><span class="dc-extras-row-price">900 ₴</span></li>
             </ul>
           </div>
-
         </div>
-
-        <!-- Картки дрібних доп. послуг -->
         <div class="dc-add-grid" id="grm-add-grid" style="margin-top: 24px;">
           <div class="dc-add-card reveal" style="--reveal-i:1">
-            <div class="dc-add-icon">💅</div>
+            <div class="dc-add-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5V9a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1v2.5"/><path d="M15 11.5V9a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2.5"/><rect x="3" y="11" width="18" height="3" rx="1.5"/><path d="M5 14v5"/><path d="M9 14v5"/><path d="M15 14v5"/><path d="M19 14v5"/></svg></div>
             <div class="dc-add-name">Стрижка кігтів</div>
             <div class="dc-add-price">200 ₴</div>
           </div>
           <div class="dc-add-card reveal" style="--reveal-i:2">
-            <div class="dc-add-icon">👂</div>
+            <div class="dc-add-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c0-4.97 4.03-9 9-9s9 4.03 9 9"/><path d="M7 12c0-2.76 2.24-5 5-5s5 2.24 5 5"/><circle cx="12" cy="12" r="1"/></svg></div>
             <div class="dc-add-name">Чищення вух</div>
             <div class="dc-add-price">150 ₴</div>
           </div>
           <div class="dc-add-card reveal" style="--reveal-i:3">
-            <div class="dc-add-icon">🪢</div>
+            <div class="dc-add-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg></div>
             <div class="dc-add-name">Розколтунювання</div>
             <div class="dc-add-price">від 250 ₴</div>
           </div>
           <div class="dc-add-card reveal" style="--reveal-i:4">
-            <div class="dc-add-icon">🦷</div>
+            <div class="dc-add-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
             <div class="dc-add-name">Чищення зубів (гель)</div>
             <div class="dc-add-price">170 ₴</div>
           </div>
           <div class="dc-add-card reveal" style="--reveal-i:5">
-            <div class="dc-add-icon">✂️</div>
+            <div class="dc-add-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/></svg></div>
             <div class="dc-add-name">Стрижка мордочки</div>
             <div class="dc-add-price">+200 ₴</div>
           </div>
@@ -1652,7 +1937,7 @@
   </div>
 
   <!-- ══ ЯК ЦЕ ПРАЦЮЄ ══ -->
-  <section class="dc-section dc-section-yellow gp-section" id="процес">
+  <section class="dc-section dc-section-cream gp-section" id="процес">
     <div class="gp-inner">
 
       <!-- Header -->
@@ -1663,62 +1948,102 @@
         </h2>
       </div>
 
-      <!-- SVG arc connector (behind everything) -->
-      <svg class="gp-arc" viewBox="0 0 1920 910" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <path d="M 307,687 A 653,520 0 0,1 1613,687"
-              stroke="#1A1814" stroke-width="2.4" fill="none"
-              stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+      <!-- Scroll-driven journey -->
+      <div class="gp-journey">
 
-<!-- 5 Steps (absolutely positioned) -->
-      <div class="gp-step gp-s1 reveal" style="--reveal-i:0">
-        <div class="gp-num">01</div>
-        <div class="gp-text-wrap">
-          <div class="gp-title">Запис онлайн або по телефону</div>
-          <div class="gp-body">Обираєте зручний час, вказуєте породу та бажані послуги. Підтверджуємо запис протягом кількох хвилин.</div>
-        </div>
-      </div>
-      <div class="gp-step gp-s2 reveal" style="--reveal-i:1">
-        <div class="gp-num">02</div>
-        <div class="gp-text-wrap">
-          <div class="gp-title">Приймання та огляд</div>
-          <div class="gp-body">Майстер оглядає стан шерсті, шкіри та кігтів. Уточнює побажання щодо стрижки і фінального вигляду.</div>
-        </div>
-      </div>
-      <div class="gp-step gp-s3 reveal" style="--reveal-i:2">
-        <div class="gp-num">03</div>
-        <div class="gp-text-wrap">
-          <div class="gp-title">Купання та догляд</div>
-          <div class="gp-body">Купаємо з профшампунем і кондиціонером, сушимо, вичісуємо. Ви можете спостерігати крізь скляні стіни.</div>
-        </div>
-      </div>
-      <div class="gp-step gp-s4 reveal" style="--reveal-i:3">
-        <div class="gp-num">04</div>
-        <div class="gp-text-wrap">
-          <div class="gp-title">Стрижка та фінішний догляд</div>
-          <div class="gp-body">Виконуємо вибрану стрижку, стрижемо кігті, чистимо вуха, поліруємо шерсть для ідеального фінального вигляду.</div>
-        </div>
-      </div>
-      <div class="gp-step gp-s5 reveal" style="--reveal-i:4">
-        <div class="gp-num">05</div>
-        <div class="gp-text-wrap">
-          <div class="gp-title">Повернення щасливим</div>
-          <div class="gp-body">Отримуєте доглянутого і запашного улюбленця. Майстер розповість про стан шерсті та рекомендації по догляду вдома.</div>
-        </div>
-      </div>
-
-      <!-- Dog (inside section) -->
-      <div class="gp-dog-wrap">
-        <img src="dog-process.png" alt="Доглянутий пес" class="gp-dog">
-      </div>
-
-      <!-- Wave (inside section, вище за собаку за z-index) -->
-      <div class="gp-wave" aria-hidden="true">
-        <svg viewBox="0 0 1440 80" height="80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-          <path d="M0,0 C200,40 400,0 600,0 C800,40 1000,0 1200,0 C1320,20 1380,10 1440,0 L1440,80 L0,80 Z" fill="#ffffff"/>
+        <!-- Desktop curved route (viewBox ratio == stage ratio → 1:1 mapping) -->
+        <svg class="gp-svg gp-svg-d" viewBox="0 0 1200 820" aria-hidden="true">
+          <path class="gp-route-base" d="M 360,107 C 440,133 840,209 840,262 C 840,315 360,371 360,426 C 360,481 840,538 840,590 C 840,642 440,713 360,738"/>
+          <path class="gp-route-draw" pathLength="1" d="M 360,107 C 440,133 840,209 840,262 C 840,315 360,371 360,426 C 360,481 840,538 840,590 C 840,642 440,713 360,738"/>
+          <circle class="gp-dot" cx="360" cy="107" r="8"/>
+          <circle class="gp-dot" cx="840" cy="262" r="8"/>
+          <circle class="gp-dot" cx="360" cy="426" r="8"/>
+          <circle class="gp-dot" cx="840" cy="590" r="8"/>
+          <circle class="gp-dot" cx="360" cy="738" r="8"/>
         </svg>
+
+        <!-- Mobile soft vertical route -->
+        <svg class="gp-svg gp-svg-m" viewBox="0 0 40 1000" preserveAspectRatio="none" aria-hidden="true">
+          <path class="gp-route-base" vector-effect="non-scaling-stroke" d="M20,0 C38,140 4,300 20,460 C36,620 4,780 20,1000"/>
+          <path class="gp-route-draw" vector-effect="non-scaling-stroke" pathLength="1" d="M20,0 C38,140 4,300 20,460 C36,620 4,780 20,1000"/>
+        </svg>
+
+        <article class="gp-card gp-c1">
+          <span class="gp-num">01</span>
+          <div class="gp-card-body">
+            <h3 class="gp-title">Запис онлайн або по телефону</h3>
+            <p class="gp-body">Обираєте зручний час, вказуєте породу та бажані послуги. Підтверджуємо запис протягом кількох хвилин.</p>
+          </div>
+        </article>
+
+        <article class="gp-card gp-c2">
+          <span class="gp-num">02</span>
+          <div class="gp-card-body">
+            <h3 class="gp-title">Приймання та огляд</h3>
+            <p class="gp-body">Майстер оглядає стан шерсті, шкіри та кігтів. Уточнює побажання щодо стрижки і фінального вигляду.</p>
+          </div>
+        </article>
+
+        <article class="gp-card gp-c3">
+          <span class="gp-num">03</span>
+          <div class="gp-card-body">
+            <h3 class="gp-title">Купання та догляд</h3>
+            <p class="gp-body">Купаємо з профшампунем і кондиціонером, сушимо, вичісуємо. Ви можете спостерігати крізь скляні стіни.</p>
+          </div>
+        </article>
+
+        <article class="gp-card gp-c4">
+          <span class="gp-num">04</span>
+          <div class="gp-card-body">
+            <h3 class="gp-title">Стрижка та фінішний догляд</h3>
+            <p class="gp-body">Виконуємо вибрану стрижку, стрижемо кігті, чистимо вуха, поліруємо шерсть для ідеального фінального вигляду.</p>
+          </div>
+        </article>
+
+        <article class="gp-card gp-c5">
+          <span class="gp-num">05</span>
+          <div class="gp-card-body">
+            <h3 class="gp-title">Повернення щасливим</h3>
+            <p class="gp-body">Отримуєте доглянутого і запашного улюбленця. Майстер розповість про стан шерсті та рекомендації по догляду вдома.</p>
+          </div>
+        </article>
+
       </div>
 
+    </div>
+  </section>
+
+  <!-- ══ GROOMER ══ -->
+  <section class="dc-section dc-section-cream" id="grumer">
+    <div class="dc-wrap">
+      <div class="gr-card">
+        <div class="gr-grid">
+
+          <!-- Text column (left) -->
+          <div class="gr-text-col">
+            <div class="dc-eyebrow-text reveal">Знайомтесь з майстром</div>
+            <h2 class="dc-h2 reveal" style="--reveal-i:1">Мене звати Роксолана</h2>
+            <p class="gr-text" style="--reveal-i:2">Грумер у DOG CARE — місці, де справді люблять тварин і де я знайшла свободу для творчості та ідей.</p>
+            <p class="gr-text" style="--reveal-i:3">Комфорт і психоемоційний стан тварини — понад усе. Краще зробити не ідеально, але без стресу. Я адаптую тварин до грумінгу, щоб він став для них нормою та позитивним досвідом, а не випробуванням.</p>
+            <p class="gr-text" style="--reveal-i:4">Працюю з собаками всіх порід, котами та кроликами — зокрема з тваринами, що мають особливості чи важкий пережитий досвід. <strong>Кожен заслуговує на красиву стрижку й догляд.</strong></p>
+            <p class="gr-text" style="--reveal-i:5">Тварини — не речі, і вони не обирають приходити на стрижку. Тому ми маємо зробити все, щоб їм це проходило якомога легше.</p>
+          </div>
+
+          <!-- Photo column (right) -->
+          <div class="gr-photo-col reveal" style="--reveal-i:2">
+            <div class="gr-photo-frame">
+              <img src="roxolana.jpg" alt="Роксолана — грумер DOG CARE" class="gr-photo-img" width="400" height="533" loading="lazy">
+              <div class="gr-photo-badge" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                Грумер DOG CARE
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   </section>
 
@@ -2019,6 +2344,253 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); observer.unobserve(e.target); } });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  /* ── Hero heading: Damas-style masked line reveal on load ── */
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.dc-hero-reveal').forEach(el => el.classList.add('is-in'));
+    });
+  });
+
+  /* ── Hero video: slowed playback ── */
+  (function () {
+    const v = document.querySelector('.dc-hero-video');
+    if (!v) return;
+    const RATE = 0.5;
+    const setRate = () => {
+      v.defaultPlaybackRate = RATE;                 // rate used when playback (re)starts
+      if (Math.abs(v.playbackRate - RATE) > 0.001) v.playbackRate = RATE;
+    };
+    setRate();
+    ['loadedmetadata', 'loadeddata', 'canplay', 'play', 'playing'].forEach(ev =>
+      v.addEventListener(ev, setRate)
+    );
+    // Browsers sometimes reset the rate right after autoplay kicks in — reassert.
+    setTimeout(setRate, 300);
+    setTimeout(setRate, 1200);
+  })();
+
+  /* ── Before / After slider ── */
+  (function () {
+    const ba = document.getElementById('beforeAfter');
+    const range = document.getElementById('baRange');
+    if (!ba || !range) return;
+    const apply = () => ba.style.setProperty('--pos', range.value + '%');
+    range.addEventListener('input', apply);
+    apply();
+  })();
+
+  /* ── Hero divider: a single arc that bends (up → down) on scroll ── */
+  (function () {
+    const path = document.getElementById('heroWavePath');
+    if (!path) return;
+    const svg = path.closest('svg');
+    const Y0 = 110, AMP = 130, W = 1440, H = 220;
+    let ticking = false;
+    function update() {
+      ticking = false;
+      const rect = svg.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      // 0 when the arc sits near the bottom of the viewport, 1 once it reaches the top
+      let p = (vh - rect.top) / vh;
+      p = Math.max(0, Math.min(1, p));
+      const cy = (Y0 - AMP) + (2 * AMP) * p; // control point: above → below baseline
+      path.setAttribute('d',
+        'M0,' + Y0 + ' Q' + (W / 2) + ',' + cy.toFixed(1) + ' ' + W + ',' + Y0 +
+        ' L' + W + ',' + H + ' L0,' + H + ' Z');
+    }
+    function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  })();
+
+  /* ── Process journey: scroll-driven route draw + active step ── */
+  (function () {
+    const journey = document.querySelector('.gp-journey');
+    if (!journey) return;
+
+    const draws = journey.querySelectorAll('.gp-route-draw');
+    const cards = Array.from(journey.querySelectorAll('.gp-card'));
+    const dots  = Array.from(journey.querySelectorAll('.gp-dot'));
+    const N = cards.length;
+
+    // Normalize stroke (paths use pathLength="1" → dash units are 0..1)
+    draws.forEach(p => { p.style.strokeDasharray = '1'; p.style.strokeDashoffset = '1'; });
+
+    // Where each dot actually sits along the drawn line (0..1), so the active
+    // step lights up exactly when the line reaches it. Falls back to even spacing.
+    const dpath = journey.querySelector('.gp-svg-d .gp-route-draw');
+    const dotEls = Array.from(journey.querySelectorAll('.gp-svg-d .gp-dot'));
+    let thresholds = cards.map((_, i) => i / (N - 1));
+    if (dpath && dpath.getTotalLength && dotEls.length === N) {
+      const total = dpath.getTotalLength();
+      const step = total / 500;
+      thresholds = dotEls.map(dot => {
+        const cx = +dot.getAttribute('cx'), cy = +dot.getAttribute('cy');
+        let best = 0, bestD = Infinity;
+        for (let l = 0; l <= total; l += step) {
+          const pt = dpath.getPointAtLength(l);
+          const d = (pt.x - cx) ** 2 + (pt.y - cy) ** 2;
+          if (d < bestD) { bestD = d; best = l; }
+        }
+        return (best / total) * 0.9; // slight lead so the last step still activates
+      });
+    }
+
+    function setActive(p) {
+      let active = -1;
+      for (let i = 0; i < N; i++) { if (p >= thresholds[i]) active = i; }
+      cards.forEach((c, i) => {
+        c.classList.toggle('is-active', i === active);
+        c.classList.toggle('is-past', i < active);
+      });
+      dots.forEach((d, i) => {
+        d.classList.toggle('is-active', i === active);
+        d.classList.toggle('is-past', i < active);
+      });
+    }
+
+    function render(p) {
+      p = Math.max(0, Math.min(1, p));
+      draws.forEach(pa => { pa.style.strokeDashoffset = String(1 - p); });
+      setActive(p);
+    }
+
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+      journey.classList.add('is-ready');
+      ScrollTrigger.create({
+        trigger: journey,
+        start: 'top 72%',
+        end: 'bottom 80%',
+        scrub: 0.6,
+        onUpdate: self => render(self.progress)
+      });
+      render(0);
+    } else {
+      // No GSAP: reveal everything statically
+      draws.forEach(pa => { pa.style.strokeDashoffset = '0'; });
+      cards.forEach(c => c.classList.add('is-past'));
+    }
+  })();
+
+  /* ── Groomer text: line-by-line reveal (grouped by paragraph), persistent ── */
+  (function () {
+    const col = document.querySelector('#grumer .gr-text-col');
+    if (!col) return;
+    const paras = Array.from(col.querySelectorAll('.gr-text'));
+    if (!paras.length) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let revealed = false;
+
+    // Tokenize once, preserving <strong>, so we can re-split on resize
+    function tokenize(p) {
+      const tokens = [];
+      (function walk(node, strong) {
+        node.childNodes.forEach(ch => {
+          if (ch.nodeType === 3) {
+            ch.textContent.split(/(\s+)/).forEach(part => {
+              if (part === '') return;
+              tokens.push({ text: part, space: /^\s+$/.test(part), strong });
+            });
+          } else if (ch.nodeType === 1) {
+            walk(ch, strong || ch.tagName === 'STRONG');
+          }
+        });
+      })(p, false);
+      return tokens;
+    }
+    paras.forEach(p => { p._tokens = tokenize(p); });
+
+    function buildLines() {
+      paras.forEach(p => {
+        // 1) lay words out to measure wrapping
+        p.textContent = '';
+        const wordEls = [];
+        p._tokens.forEach(t => {
+          if (t.space) { p.appendChild(document.createTextNode(' ')); return; }
+          const s = document.createElement('span');
+          s.textContent = t.text;
+          if (t.strong) s.className = 'gr-strong';
+          p.appendChild(s);
+          wordEls.push(s);
+        });
+        // 2) group words into visual lines by vertical position
+        const groups = [];
+        let last = null;
+        wordEls.forEach(w => {
+          const top = w.offsetTop;
+          if (last === null || Math.abs(top - last) > 3) { groups.push([]); last = top; }
+          groups[groups.length - 1].push(w);
+        });
+        // 3) rebuild with masked line wrappers
+        p.textContent = '';
+        groups.forEach(group => {
+          const line = document.createElement('span');
+          line.className = 'gr-line';
+          const inner = document.createElement('span');
+          inner.className = 'gr-line-in';
+          group.forEach((w, i) => {
+            if (i > 0) inner.appendChild(document.createTextNode(' '));
+            inner.appendChild(w);
+          });
+          line.appendChild(inner);
+          p.appendChild(line);
+        });
+      });
+
+      // stagger: continuous across lines + a little extra gap per paragraph
+      let li = 0;
+      paras.forEach((p, pi) => {
+        p.querySelectorAll('.gr-line').forEach(line => {
+          line.style.setProperty('--d', (li * 85 + pi * 90) + 'ms');
+          li++;
+        });
+      });
+
+      // if already revealed (or reduced motion), show instantly without re-animating
+      if (revealed || reduce) {
+        const inners = col.querySelectorAll('.gr-line-in');
+        inners.forEach(el => { el.style.transition = 'none'; });
+        col.querySelectorAll('.gr-line').forEach(l => l.classList.add('is-in'));
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          inners.forEach(el => { el.style.transition = ''; });
+        }));
+      }
+    }
+
+    function reveal() {
+      if (revealed) return;
+      revealed = true;
+      col.querySelectorAll('.gr-line').forEach(l => l.classList.add('is-in'));
+    }
+
+    function init() {
+      buildLines();
+      if (reduce) { reveal(); return; }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { reveal(); io.disconnect(); } });
+      }, { threshold: 0.15 });
+      io.observe(col);
+    }
+
+    // Build with the correct font metrics
+    if (document.fonts && document.fonts.ready) {
+      buildLines();                       // immediate (avoid flash of unstyled text)
+      document.fonts.ready.then(init);    // re-measure once the display font is ready
+    } else {
+      init();
+    }
+
+    // Re-split on resize (preserves revealed state, no re-animation)
+    let rt;
+    window.addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = setTimeout(buildLines, 200);
+    });
+  })();
 </script>
 
 <script>
@@ -2027,8 +2599,9 @@
   const EXTRA_ICONS = ['💅','👂','🪢','🦷','✂️','✨','🐾','🧴','💆','🌟'];
 
   const DEFAULT_GROOMING = [
-    { id:'hygiene', icon:'🛁', label:'Гігієнічний догляд', desc:'Купання, сушка, базовий догляд — для довгошерстних порід',
-      note:'Включає: купання з профкосметикою та кондиціонером, сушку з розчісуванням, стрижку подушечок лап та паху, чищення вух, стрижку кігтів, протирання очей, мінімальне розколтунювання.',
+    { id:'hygiene', label:'Гігієнічний догляд', desc:'Купання, сушка та базовий догляд — для довгошерстних порід',
+      note:'Ціна залежить від стану шерсті та темпераменту тварини. Сильне розколтунювання оплачується окремо.',
+      includes:['Купання з профкосметикою','Сушка','Розчісування','Стрижка кігтів','Чищення вух','Протирання очей','Стрижка подушечок лап'],
       rows:[
         {name:"Йоркширський тер'єр", price:'800 ₴'},
         {name:'Мальтезе', price:'800 ₴'},
@@ -2037,8 +2610,9 @@
         {name:'Метис 10–25 кг', price:'900–1050 ₴'},
         {name:'Метис 25–45 кг', price:'1100–1200 ₴'}
       ]},
-    { id:'full', icon:'✂️', label:'Повний комплекс', desc:'Гігієнічний догляд + модельна/породна стрижка',
-      note:'Повний комплекс включає все з гігієнічного догляду плюс: модельну або породну стрижку, повноцінну стрижку хвостика та фінішне полірування шерсті.',
+    { id:'full', label:'Повний комплекс', desc:'Гігієнічний догляд + модельна або породна стрижка',
+      note:'Повний комплекс включає всі процедури гігієнічного догляду + модельну або породну стрижку, стрижку хвостика та фінішне полірування.',
+      includes:['Повний гігієнічний догляд','Модельна / породна стрижка','Стрижка хвостика','Полірування шерсті'],
       rows:[
         {name:"Йоркширський тер'єр", price:'900–1000 ₴'},
         {name:'Мальтезе', price:'950–1050 ₴'},
@@ -2047,8 +2621,9 @@
         {name:'Золотистий ретривер', price:'1300–1500 ₴'},
         {name:'Великий пудель', price:'від 1500 ₴'}
       ]},
-    { id:'hard', icon:'🐕', label:'Жорсткошерстні та короткошерстні', desc:'Купання, фурмінація, тримінг, полірування',
-      note:'Ціна залежить від ступеня линьки, стану шерсті та поведінки тварини. При перевищенні вагової категорії — +15–20% до ціни.',
+    { id:'hard', label:'Жорсткошерстні та короткошерстні', desc:'Купання, фурмінація, тримінг, полірування',
+      note:'Ціна залежить від ступеня линьки та стану шерсті. При перевищенні вагової категорії — +15–20% до ціни.',
+      includes:['Купання з профшампунем','Сушка та вичісування','Тримінг / Фурмінація','Стрижка кігтів','Чищення вух'],
       rows:[
         {name:'Мопс / Французький бульдог', price:'700–800 ₴'},
         {name:'Такса', price:'700–750 ₴'},
@@ -2057,14 +2632,15 @@
         {name:'Хаскі / Лабрадор', price:'1200–1400 ₴'},
         {name:'Велика порода 35+ кг', price:'від 1600 ₴'}
       ]},
-    { id:'cats', icon:'🐱', label:'Кішки', desc:'Сухе вичісування або повне купання',
-      note:'Для котів рекомендуємо заздалегідь уточнити поведінку. При агресії майстер може попросити власника бути присутнім.',
+    { id:'cats', label:'Кішки', desc:'Сухе вичісування або повне купання',
+      note:'Рекомендуємо заздалегідь уточнити темперамент улюбленця. При агресії майстер може попросити власника бути присутнім.',
+      includes:['Розчісування','Вичісування підшерстку','Стрижка кігтів','+ Купання (повний пакет)','+ Сушка (повний пакет)'],
       rows:[
-        {name:'Звичайний кіт (сухе вичісування)', price:'700 ₴'},
-        {name:'Британець (сухе вичісування)', price:'800 ₴'},
-        {name:'Звичайний кіт (повний пакет)', price:'1000 ₴'},
-        {name:'Британець (повний пакет)', price:'1100 ₴'},
-        {name:'Мейн-кун (повний пакет)', price:'1400 ₴'}
+        {name:'Звичайний кіт — сухе вичісування', price:'700 ₴'},
+        {name:'Британець — сухе вичісування', price:'800 ₴'},
+        {name:'Звичайний кіт — повний пакет', price:'1000 ₴'},
+        {name:'Британець — повний пакет', price:'1100 ₴'},
+        {name:'Мейн-кун — повний пакет', price:'1400 ₴'}
       ]},
     { id:'extra', icon:'➕', label:'Додаткові послуги', desc:'Послуги à la carte', note:'',
       groups:[
@@ -2103,51 +2679,92 @@
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  function renderPanel(cat, active) {
-    const rows = (cat.rows||[]).map(r =>
-      `<tr><td><strong>${esc(r.name)}</strong></td><td style="text-align:right"><span class="dc-price-badge">${esc(r.price)}</span></td></tr>`
-    ).join('');
+  /* Count-up animation for hero stats (5+, 500+, 100%) */
+  function animateStats(container) {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const nums = container.querySelectorAll('.dc-stat-num');
+    nums.forEach(el => {
+      const raw = el.textContent.trim();
+      const m = raw.match(/^(\d+)(.*)$/);
+      if (!m) return;
+      const target = parseInt(m[1], 10);
+      const suffix = m[2] || '';
+      const duration = 1400;
+      const start = performance.now();
+      el.textContent = '0' + suffix;
+      function tick(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(eased * target) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  }
 
-    /* Спеціальний рендер для вкладки "Додаткові послуги" */
+  const TAB_ICONS = {
+    hygiene: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21H5a2 2 0 0 1-2-2v-2a6 6 0 0 1 12 0v2a2 2 0 0 1-2 2h-2"/><path d="M12 13V7"/><path d="M8 9l4-4 4 4"/></svg>`,
+    full:    `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/><path d="M15 18l1 1 4-4-1-1"/></svg>`,
+    hard:    `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>`,
+    cats:    `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.68.26 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/></svg>`,
+    extra:   `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+  };
+
+  const PANEL_ICONS = {
+    hygiene: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21H5a2 2 0 0 1-2-2v-2a6 6 0 0 1 12 0v2a2 2 0 0 1-2 2h-2"/><path d="M12 13V7"/><path d="M8 9l4-4 4 4"/></svg>`,
+    full:    `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/><path d="M15 18l1 1 4-4-1-1"/></svg>`,
+    hard:    `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>`,
+    cats:    `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.68.26 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/></svg>`,
+    extra:   `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+  };
+
+  const INFO_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+
+  function renderPanel(cat, active) {
+    /* Додаткові послуги */
     if (cat.id === 'extra') {
-      const groupsHtml = (cat.groups||[]).map(g => `
-        <div class="dc-extras-group">
+      const groupsHtml = (cat.groups||[]).map(g => {
+        const gIconSvg = g.icon === '🛁' ? PANEL_ICONS.hygiene : PANEL_ICONS.full;
+        return `<div class="dc-extras-group">
           <div class="dc-extras-group-head">
-            <span class="dc-extras-group-icon">${esc(g.icon)}</span>
+            <span class="dc-extras-group-icon">${gIconSvg}</span>
             <span class="dc-extras-group-title">${esc(g.title)}</span>
           </div>
           ${g.note ? `<p class="dc-extras-group-note">${esc(g.note)}</p>` : ''}
           <ul class="dc-extras-rows">
             ${(g.rows||[]).map(r => `<li><span class="dc-extras-row-name">${esc(r.name)}</span><span class="dc-extras-row-price">${esc(r.price)}</span></li>`).join('')}
           </ul>
-        </div>`).join('');
-
+        </div>`;
+      }).join('');
+      const addRows = (cat.rows||[]).map(r =>
+        `<div class="dc-add-card"><div class="dc-add-icon">${PANEL_ICONS.full}</div><div class="dc-add-name">${esc(r.name)}</div><div class="dc-add-price">${esc(r.price)}</div></div>`
+      ).join('');
       return `<div class="dc-price-panel${active?' active':''}">
         ${groupsHtml ? `<div class="dc-extras-groups">${groupsHtml}</div>` : ''}
-        ${rows ? `<div class="dc-add-grid" style="margin-top:24px">${
-          (cat.rows||[]).map((r,i) => `
-            <div class="dc-add-card">
-              <div class="dc-add-name">${esc(r.name)}</div>
-              <div class="dc-add-price">${esc(r.price)}</div>
-            </div>`).join('')
-        }</div>` : ''}
+        ${addRows ? `<div class="dc-add-grid" style="margin-top:24px">${addRows}</div>` : ''}
       </div>`;
     }
 
+    /* Основні категорії */
+    const rowsHtml = (cat.rows||[]).map(r =>
+      `<div class="gp-row"><span class="gp-row-name">${esc(r.name)}</span><span class="gp-row-price">${esc(r.price)}</span></div>`
+    ).join('');
+    const chipsHtml = (cat.includes||[]).map(inc =>
+      `<span class="gp-chip">${esc(inc)}</span>`
+    ).join('');
+
     return `<div class="dc-price-panel${active?' active':''}">
-      <div class="dc-price-card">
-        <div class="dc-price-card-head">
-          <div class="dc-price-card-icon">${esc(cat.icon||'✂️')}</div>
+      <div class="gp-card">
+        <div class="gp-card-head">
+          <div class="gp-card-icon">${PANEL_ICONS[cat.id]||PANEL_ICONS.full}</div>
           <div>
-            <div class="dc-price-card-title">${esc(cat.label)}</div>
-            <div class="dc-price-card-desc">${esc(cat.desc||'')}</div>
+            <div class="gp-card-title">${esc(cat.label)}</div>
+            <div class="gp-card-desc">${esc(cat.desc||'')}</div>
           </div>
         </div>
-        <table class="dc-price-table">
-          <thead><tr><th>Порода / послуга</th><th style="text-align:right">Ціна</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-        ${cat.note ? `<div class="dc-price-note"><span class="dc-price-note-icon">ℹ️</span><span>${esc(cat.note)}</span></div>` : ''}
+        ${chipsHtml ? `<div class="gp-includes"><span class="gp-includes-label">Що входить</span><div class="gp-chips">${chipsHtml}</div></div>` : ''}
+        <div class="gp-rows">${rowsHtml}</div>
+        ${cat.note ? `<div class="gp-note">${INFO_SVG}${esc(cat.note)}</div>` : ''}
       </div>
     </div>`;
   }
@@ -2185,6 +2802,7 @@
       statsEl.innerHTML = meta.stats.map(s =>
         `<div><div class="dc-stat-num">${esc(s.num)}</div><div class="dc-stat-label">${esc(s.label)}</div></div>`
       ).join('');
+      animateStats(statsEl);
     }
 
     /* Pricing tabs + panels — завжди рендеримо */
@@ -2202,7 +2820,7 @@
 
       if (tabsBar) {
         tabsBar.innerHTML = mainCats.map((cat, i) =>
-          `<button class="dc-price-tab${i===activeIdx?' active':''}" data-idx="${i}">${esc(cat.label)}</button>`
+          `<button class="dc-price-tab${i===activeIdx?' active':''}" data-idx="${i}">${TAB_ICONS[cat.id]||''}${esc(cat.label)}</button>`
         ).join('');
       }
       wrap.querySelectorAll('.dc-price-panel').forEach(p => p.remove());

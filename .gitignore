@@ -4,3 +4,7 @@ node_modules
 .env
 build
 .vite
+
+# Large source video (exceeds GitHub 100MB limit, not used on site)
+dog header.mov
+*.mov

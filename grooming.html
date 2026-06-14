@@ -5874,14 +5874,28 @@
           });
         }
 
-        function initGroomingPage() {
-          /* Читаємо з localStorage, або беремо дефолтні дані */
+        async function loadSiteContent(key) {
+          try {
+            const snap = await firebase.firestore().collection("site_content").doc(key).get();
+            if (snap.exists) {
+              const d = snap.data();
+              if (d && typeof d.json === "string") return JSON.parse(d.json);
+            }
+          } catch (e) {}
+          return null;
+        }
+
+        async function initGroomingPage() {
+          /* Читаємо з Firestore (спільне для всіх відвідувачів); фолбек — localStorage / дефолт */
           let grm = DEFAULT_GROOMING;
           let meta = Object.assign({}, DEFAULT_META);
+          const lsParse = (k) => {
+            try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; }
+          };
           try {
-            const raw = localStorage.getItem("dc_grooming");
+            const raw = (await loadSiteContent("grooming")) || lsParse("dc_grooming");
             if (raw) {
-              grm = JSON.parse(raw)
+              grm = raw
                 .filter((c) => c.id !== "bathing" && c.id !== "haircut_only")
                 .map((c) => {
                   const def = DEFAULT_GROOMING.find((d) => d.id === c.id);
@@ -5892,9 +5906,9 @@
             }
           } catch (e) {}
           try {
-            const rawMeta = localStorage.getItem("dc_grooming_meta");
+            const rawMeta = (await loadSiteContent("grooming_meta")) || lsParse("dc_grooming_meta");
             if (rawMeta)
-              meta = Object.assign({}, DEFAULT_META, JSON.parse(rawMeta));
+              meta = Object.assign({}, DEFAULT_META, rawMeta);
           } catch (e) {}
 
           /* Hero subtitle */

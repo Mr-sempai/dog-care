@@ -4136,6 +4136,21 @@
       if (!customElements.get("image-slot"))
         customElements.define("image-slot", ImageSlot);
     </script>
+    <!-- Firebase (для соцмереж з адмінки) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+      try {
+        firebase.initializeApp({
+          apiKey: "AIzaSyDFtRAWaJ5Rg67FS6VRb9Z9wL675BO5H0w",
+          authDomain: "dog-care-9aef2.firebaseapp.com",
+          projectId: "dog-care-9aef2",
+          storageBucket: "dog-care-9aef2.firebasestorage.app",
+          messagingSenderId: "527199586701",
+          appId: "1:527199586701:web:2afe10b198c127377b15c4",
+        });
+      } catch (e) {}
+    </script>
     <script
       src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"
       crossorigin="anonymous"
@@ -6722,9 +6737,30 @@
       function Footer() {
         const [socials, setSocials] = React.useState({});
         React.useEffect(() => {
+          // local cache first (instant), then Firestore (shared, authoritative)
           try {
             const s = localStorage.getItem("dc_socials");
             if (s) setSocials(JSON.parse(s));
+          } catch (e) {}
+          try {
+            if (window.firebase && firebase.firestore) {
+              firebase
+                .firestore()
+                .collection("site_content")
+                .doc("socials")
+                .get()
+                .then((snap) => {
+                  if (snap.exists) {
+                    const d = snap.data();
+                    if (d && typeof d.json === "string") {
+                      const val = JSON.parse(d.json);
+                      setSocials(val);
+                      try { localStorage.setItem("dc_socials", d.json); } catch (e) {}
+                    }
+                  }
+                })
+                .catch(() => {});
+            }
           } catch (e) {}
         }, []);
 

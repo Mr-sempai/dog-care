@@ -49,6 +49,31 @@
     a { color: inherit; text-decoration: none; }
     img { display: block; max-width: 100%; }
 
+    /* Custom cursor — solid yellow dot inside a slightly larger frosted (blurred) ring */
+    .dc-cursor {
+      position: fixed; top: 0; left: 0;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      border: 1.5px solid rgba(255,255,255,.4);
+      -webkit-backdrop-filter: blur(5px) saturate(140%); backdrop-filter: blur(5px) saturate(140%);
+      transform: translate(-50%, -50%);
+      display: grid; place-items: center;
+      pointer-events: none; z-index: 100000;
+      opacity: 0;
+      transition: opacity .25s ease, width .22s cubic-bezier(.22,1,.36,1), height .22s cubic-bezier(.22,1,.36,1), border-color .22s ease;
+    }
+    .dc-cursor::after {
+      content: ''; width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent);   /* solid yellow dot */
+    }
+    .dc-cursor.is-on { opacity: 1; }
+    /* enlarge the ring over interactive elements */
+    .dc-cursor.is-active { width: 50px; height: 50px; border-color: rgba(255,255,255,.7); }
+    @media (hover: hover) and (pointer: fine) {
+      *, html, a, button, .dc-faq-q, [onclick], input, select, textarea, label { cursor: none !important; }
+    }
+    @media (hover: none), (pointer: coarse) { .dc-cursor { display: none; } }
+
     /* ============ Layout ============ */
     .dc-app { min-height: 100vh; background: var(--accent); overflow-x: clip; position: relative; }
     .dc-wrap { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
@@ -219,6 +244,10 @@
     .dc-btn-primary { background: var(--ink); color: #fff; }
     .dc-btn-primary:hover { background: #333; box-shadow: 0 12px 28px rgba(26, 24, 20, 0.32); }
     .dc-btn-primary .dc-btn-arrow { background: var(--accent); color: var(--ink); }
+    /* Hero «Записатись» — yellow */
+    .dc-hero-ctas .dc-btn-primary { background: var(--accent); color: var(--ink); }
+    .dc-hero-ctas .dc-btn-primary:hover { background: var(--accent-deep); box-shadow: 0 12px 28px rgba(255,210,63,.45); }
+    .dc-hero-ctas .dc-btn-primary .dc-btn-arrow { background: var(--ink); color: #fff; }
     .dc-btn-light {
       background-color: var(--white);
       background-image: linear-gradient(var(--ink), var(--ink));
@@ -297,8 +326,16 @@
     .dc-h1 em {
       font-style: normal; background: var(--accent); color: var(--ink);
       padding: 0 18px; border-radius: 18px;
-      display: inline-block; margin: 4px 0;
+      display: inline-block; margin: 4px 0; position: relative;
       box-shadow: 0 0 0 6px rgba(255,210,63,.25);
+    }
+    /* small frosted-glass frame around the badge */
+    .dc-h1 em::before {
+      content: ''; position: absolute; inset: -5px; border-radius: 22px;
+      border: 1.5px solid rgba(255,255,255,.55);
+      background: rgba(255,255,255,.06);
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      z-index: -1; pointer-events: none;
     }
     .dc-hero-sub { font-size: 17px; color: var(--ink-2); max-width: 600px; margin: 0 0 30px; text-wrap: pretty; }
     .dc-hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 36px; }
@@ -798,9 +835,9 @@
       transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease;
     }
     .pkg-card:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 42px 90px rgba(26,24,20,.16); }
-    .pkg-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .pkg-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
     .pkg-icon { width: 52px; height: 52px; border-radius: 16px; background: var(--accent); color: var(--ink); display: grid; place-items: center; flex-shrink: 0; }
-    .pkg-name { font-family: var(--display); font-weight: 800; font-size: clamp(21px, 2.3vw, 28px); letter-spacing: -.02em; color: var(--ink); margin: 6px 0 6px; }
+    .pkg-name { font-family: var(--display); font-weight: 800; font-size: clamp(21px, 2.3vw, 28px); letter-spacing: -.02em; color: var(--ink); margin: 0; }
     .pkg-cat-desc { font-size: 14.5px; color: var(--ink-2); line-height: 1.5; margin: 0 0 18px; }
     .pkg-incl { list-style: none; margin: 0 0 16px; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 9px 20px; }
     .pkg-incl li { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--ink); font-weight: 600; }
@@ -932,12 +969,12 @@
       break-inside: avoid; -webkit-column-break-inside: avoid;
       display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start;
       padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.10);
-      font-size: 14px; color: rgba(255,255,255,.85); line-height: 1.5;
+      font-size: 15.5px; color: rgba(255,255,255,.85); line-height: 1.55;
     }
     .rules-list > li::before {
-      content: counter(rules);
-      font-family: var(--display); font-weight: 700; font-size: 18px;
-      color: var(--accent); line-height: 1.25;
+      content: '•';
+      font-weight: 700; font-size: 22px;
+      color: var(--accent); line-height: 1.1; text-align: center;
     }
 
     /* Cancellation card */
@@ -950,9 +987,9 @@
       text-align: center; padding: 18px 14px; border-radius: 18px;
       border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04);
     }
-    .rules-cancel-item b { display: block; font-family: var(--display); font-size: 17px; color: var(--accent); margin-bottom: 6px; }
-    .rules-cancel-item span { font-size: 13.5px; color: rgba(255,255,255,.75); line-height: 1.45; }
-    .rules-warning { margin: 22px 0 0; text-align: center; font-size: 13.5px; color: rgba(255,255,255,.55); font-style: italic; }
+    .rules-cancel-item b { display: block; font-family: var(--display); font-size: 18px; color: var(--accent); margin-bottom: 6px; }
+    .rules-cancel-item span { font-size: 15px; color: rgba(255,255,255,.75); line-height: 1.5; }
+    .rules-warning { margin: 22px 0 0; text-align: center; font-size: 14.5px; color: rgba(255,255,255,.55); font-style: italic; }
     .rules-footer { margin: 30px 0 0; text-align: center; font-size: 14px; color: rgba(255,255,255,.6); }
 
     @media (max-width: 760px) {
@@ -978,30 +1015,36 @@
     /* ============ Booking modal ============ */
     .bk-overlay {
       position: fixed; inset: 0; z-index: 1000;
-      background: rgba(26,24,20,.72); backdrop-filter: blur(6px);
+      background: rgba(26,24,20,.5);
+      -webkit-backdrop-filter: blur(14px) saturate(120%); backdrop-filter: blur(14px) saturate(120%);
       display: flex; align-items: center; justify-content: center;
       padding: 20px;
       opacity: 0; pointer-events: none; transition: opacity .25s;
     }
     .bk-overlay.open { opacity: 1; pointer-events: auto; }
     .bk-modal {
-      background: var(--cream); border-radius: var(--radius-lg);
-      padding: 48px; max-width: 600px; width: 100%;
+      background: rgba(255,253,240,.78);
+      -webkit-backdrop-filter: blur(28px) saturate(160%); backdrop-filter: blur(28px) saturate(160%);
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 26px;
+      box-shadow: 0 30px 90px rgba(26,24,20,.4), inset 0 1px 0 rgba(255,255,255,.7);
+      padding: 40px; max-width: 600px; width: 100%;
       position: relative;
-      transform: translateY(24px); transition: transform .28s;
-      max-height: 90vh; overflow-y: auto;
+      transform: translateY(24px) scale(.985); transition: transform .32s cubic-bezier(.22,1,.36,1);
+      max-height: 92vh; overflow: hidden;
     }
-    .bk-overlay.open .bk-modal { transform: translateY(0); }
+    .bk-overlay.open .bk-modal { transform: translateY(0) scale(1); }
     .bk-close {
       position: absolute; top: 16px; right: 16px;
       width: 36px; height: 36px; border-radius: 50%;
-      background: var(--line); border: none; cursor: pointer;
+      background: rgba(26,24,20,.06); border: 1px solid rgba(26,24,20,.08); cursor: pointer;
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
       display: grid; place-items: center; transition: background .15s; color: var(--ink);
     }
-    .bk-close:hover { background: var(--line-2); }
+    .bk-close:hover { background: rgba(26,24,20,.12); }
     .bk-title { font-family: var(--display); font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 6px; }
-    .bk-subtitle { font-size: 14px; color: var(--ink-2); margin: 0 0 28px; }
-    .bk-form { display: flex; flex-direction: column; gap: 16px; }
+    .bk-subtitle { font-size: 14px; color: var(--ink-2); margin: 0 0 20px; }
+    .bk-form { display: flex; flex-direction: column; gap: 14px; }
     .bk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .bk-field { display: flex; flex-direction: column; gap: 6px; }
     .bk-field label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
@@ -1012,7 +1055,7 @@
       transition: border-color .15s; width: 100%;
     }
     .bk-field input:focus, .bk-field select:focus, .bk-field textarea:focus { border-color: var(--accent-deep); }
-    .bk-field textarea { resize: vertical; min-height: 80px; }
+    .bk-field textarea { resize: vertical; min-height: 60px; }
     .bk-field.bk-has-error input,
     .bk-field.bk-has-error select,
     .bk-field.bk-has-error textarea { border-color: #e53e3e; background: #fff5f5; }
@@ -1029,7 +1072,7 @@
     .bk-send-error { display: none; background: #fff5f5; border: 1.5px solid #e53e3e; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #c53030; margin-top: 4px; }
     .bk-hidden { display: none !important; }
     @media (max-width: 600px) {
-      .bk-modal { padding: 32px 20px; }
+      .bk-modal { padding: 24px; overflow-y: auto; }   /* equal padding + scroll allowed on small screens */
       .bk-row { grid-template-columns: 1fr; }
     }
 
@@ -1203,7 +1246,7 @@
       /* CTA band */
       .dc-cta-band { padding: 36px 18px; }
       /* Booking modal */
-      .bk-modal { padding: 24px 16px; border-radius: 20px; }
+      .bk-modal { padding: 20px; border-radius: 20px; }
       /* Lightbox nav buttons smaller on mobile */
       .grm-lb-prev, .grm-lb-next { width: 40px; height: 40px; font-size: 24px; }
       .grm-lb-prev { left: 8px; }
@@ -1278,7 +1321,8 @@
     .grm-lightbox {
       display: none;
       position: fixed; inset: 0;
-      background: rgba(0,0,0,.88);
+      background: rgba(10,8,6,.62);
+      -webkit-backdrop-filter: blur(18px) saturate(120%); backdrop-filter: blur(18px) saturate(120%);
       z-index: 9999;
       align-items: center;
       justify-content: center;
@@ -1288,9 +1332,10 @@
     .grm-lb-img {
       max-width: min(90vw, 900px);
       max-height: 85vh;
-      border-radius: 16px;
+      border-radius: 18px;
       object-fit: contain;
-      box-shadow: 0 32px 80px rgba(0,0,0,.6);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 32px 90px rgba(0,0,0,.6);
     }
     .grm-lb-close {
       position: absolute; top: 20px; right: 24px;
@@ -1410,6 +1455,7 @@
       line-height: 1.75; margin: 0 0 18px;
     }
     .gr-text:last-child { margin-bottom: 0; }
+    .gr-text-body { margin-top: 22px; }
     .gr-text strong { color: var(--ink); font-weight: 700; }
     /* Line-by-line blur reveal (grouped by paragraph), persistent */
     .gr-line { display: block; overflow: hidden; }
@@ -1584,7 +1630,7 @@
           <a href="grooming.html" class="dc-nav-link active">Грумінг</a>
           <a href="#контакти" class="dc-nav-link">Контакти</a>
         </div>
-        <a href="index.html#contact" class="dc-btn dc-btn-light dc-nav-cta">Записатися <span class="dc-btn-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <a href="#" onclick="bkOpen();return false;" class="dc-btn dc-btn-light dc-nav-cta">Записатися <span class="dc-btn-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
         <button class="dc-burger" id="burger" aria-label="Меню">
           <span></span><span></span><span></span>
         </button>
@@ -1645,7 +1691,7 @@
               Місце де ваш улюбленець почуває себе комфортно
             </p>
             <div class="dc-hero-ctas reveal" style="--reveal-i:3">
-              <a href="tel:+380667235102" class="dc-btn dc-btn-primary">
+              <a href="#" onclick="bkOpen();return false;" class="dc-btn dc-btn-primary">
                 Записатись
                 <span class="dc-btn-arrow">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1898,10 +1944,12 @@
           <div class="gr-text-col">
             <div class="dc-eyebrow-text reveal">Знайомтесь з майстром</div>
             <h2 class="dc-h2 scrub-rise" style="--reveal-i:1">Мене звати Роксолана</h2>
-            <p class="gr-text scrub-rise" style="--reveal-i:2">Грумер у DOG CARE — місці, де справді люблять тварин і де я знайшла свободу для творчості та ідей.</p>
-            <p class="gr-text scrub-rise" style="--reveal-i:3">Комфорт і психоемоційний стан тварини — понад усе. Краще зробити не ідеально, але без стресу. Я адаптую тварин до грумінгу, щоб він став для них нормою та позитивним досвідом, а не випробуванням.</p>
-            <p class="gr-text scrub-rise" style="--reveal-i:4">Працюю з собаками всіх порід, котами та кроликами — зокрема з тваринами, що мають особливості чи важкий пережитий досвід. <strong>Кожен заслуговує на красиву стрижку й догляд.</strong></p>
-            <p class="gr-text scrub-rise" style="--reveal-i:5">Тварини — не речі, і вони не обирають приходити на стрижку. Тому ми маємо зробити все, щоб їм це проходило якомога легше.</p>
+            <div class="gr-text-body scrub-rise">
+              <p class="gr-text">Грумер у DOG CARE — місці, де справді люблять тварин і де я знайшла свободу для творчості та ідей.</p>
+              <p class="gr-text">Комфорт і психоемоційний стан тварини — понад усе. Краще зробити не ідеально, але без стресу. Я адаптую тварин до грумінгу, щоб він став для них нормою та позитивним досвідом, а не випробуванням.</p>
+              <p class="gr-text">Працюю з собаками всіх порід, котами та кроликами — зокрема з тваринами, що мають особливості чи важкий пережитий досвід. <strong>Кожен заслуговує на красиву стрижку й догляд.</strong></p>
+              <p class="gr-text">Тварини — не речі, і вони не обирають приходити на стрижку. Тому ми маємо зробити все, щоб їм це проходило якомога легше.</p>
+            </div>
           </div>
 
           <!-- Photo column (right) -->
@@ -2641,11 +2689,11 @@
   };
 
   const PANEL_ICONS = {
-    hygiene: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21H5a2 2 0 0 1-2-2v-2a6 6 0 0 1 12 0v2a2 2 0 0 1-2 2h-2"/><path d="M12 13V7"/><path d="M8 9l4-4 4 4"/></svg>`,
-    full:    `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/><path d="M15 18l1 1 4-4-1-1"/></svg>`,
-    hard:    `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>`,
-    cats:    `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.68.26 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/></svg>`,
-    extra:   `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+    hygiene: `<img src="Гігієнічний%20догляд1.svg" alt="" width="34" height="34" style="display:block">`,
+    full:    `<img src="Повний%20комплекс1.svg" alt="" width="34" height="34" style="display:block">`,
+    hard:    `<img src="Жорсткошерстні%20та%20короткошерстні1.svg" alt="" width="34" height="34" style="display:block">`,
+    cats:    `<img src="Кішки1.svg" alt="" width="34" height="34" style="display:block">`,
+    extra:   `<img src="Додаткові%20послуги1.svg" alt="" width="34" height="34" style="display:block">`,
   };
 
   const INFO_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
@@ -2667,8 +2715,7 @@
     }
 
     return '<div class="pkg-cell"><article class="pkg-card">' +
-      '<div class="pkg-card-top"><span class="pkg-icon">'+icon+'</span></div>' +
-      '<h3 class="pkg-name">'+esc(cat.label)+'</h3>' +
+      '<div class="pkg-card-top"><span class="pkg-icon">'+icon+'</span><h3 class="pkg-name">'+esc(cat.label)+'</h3></div>' +
       (cat.desc ? '<p class="pkg-cat-desc">'+esc(cat.desc)+'</p>' : '') +
       (incl ? '<ul class="pkg-incl">'+incl+'</ul>' : '') +
       listHtml +
@@ -3280,6 +3327,40 @@
       if (e.target.closest('a, button')) canvas.classList.remove('is-on');
       else if (active) canvas.classList.add('is-on');
     });
+  })();
+
+  /* ── Custom cursor: yellow circle with frosted frame, smooth follow ── */
+  (function () {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    var cur = document.createElement('div');
+    cur.className = 'dc-cursor';
+    cur.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(cur);
+
+    var tx = window.innerWidth / 2, ty = window.innerHeight / 2;
+    var x = tx, y = ty, shown = false;
+
+    window.addEventListener('mousemove', function (e) {
+      tx = e.clientX; ty = e.clientY;
+      if (!shown) { shown = true; x = tx; y = ty; cur.classList.add('is-on'); }
+      var t = e.target;
+      if (t && t.closest && t.closest('a, button, [onclick], .dc-faq-q, input, select, label, .pkg-card, .grm-photo-card')) {
+        cur.classList.add('is-active');
+      } else {
+        cur.classList.remove('is-active');
+      }
+    }, { passive: true });
+
+    document.addEventListener('mouseleave', function () { cur.classList.remove('is-on'); });
+    document.addEventListener('mouseenter', function () { cur.classList.add('is-on'); });
+
+    (function loop() {
+      x += (tx - x) * 0.22;
+      y += (ty - y) * 0.22;
+      cur.style.left = x + 'px';
+      cur.style.top = y + 'px';
+      requestAnimationFrame(loop);
+    })();
   })();
 
 </script>

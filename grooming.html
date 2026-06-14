@@ -71,6 +71,21 @@
       transition-delay: calc(var(--reveal-i,0) * 100ms);
     }
     .reveal.reveal-blur.in-view { filter: blur(0); transform: none; }
+    /* Directional reveal — cards glide in from different sides, very smoothly */
+    .reveal.from-left, .reveal.from-right, .reveal.from-bottom {
+      filter: blur(10px);
+      transition: opacity 1.3s cubic-bezier(.16,1,.3,1),
+                  transform 1.3s cubic-bezier(.16,1,.3,1),
+                  filter 1.3s cubic-bezier(.16,1,.3,1);
+      transition-delay: calc(var(--reveal-i,0) * 140ms);
+      will-change: transform, opacity, filter;
+    }
+    .reveal.from-left   { transform: translateX(-115%) scale(.92); }
+    .reveal.from-right  { transform: translateX(115%)  scale(.92); }
+    .reveal.from-bottom { transform: translateY(120%)  scale(.92); }
+    .reveal.from-left.in-view,
+    .reveal.from-right.in-view,
+    .reveal.from-bottom.in-view { transform: none; filter: blur(0); }
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity:1!important; transform:none!important; filter:none!important; transition:none!important; }
       .dc-hero-reveal .line-in { transform:none!important; opacity:1!important; filter:none!important; transition:none!important; }
@@ -564,7 +579,7 @@
       .gp-section { padding: 64px 0 80px; }
       .gp-inner { padding: 0 20px; }
       .gp-head { margin-bottom: 32px; }
-      .gp-journey { aspect-ratio: auto; max-width: 540px; padding-left: 38px; }
+      .gp-journey { aspect-ratio: auto; max-width: 540px; margin: 0 auto; padding-left: 38px; }
       .gp-svg-d { display: none; }
       .gp-svg-m { display: block; position: absolute; left: 0; top: 0; height: 100%; width: 30px; }
       .gp-journey .gp-card {
@@ -761,6 +776,63 @@
       .b-combined .bento-card { padding: 26px 22px; gap: 22px; }
     }
 
+    /* ============ Pricing — premium package cards ============ */
+    .pkg-section { background: var(--cream); position: relative; overflow: hidden; }
+    .pkg-grid { display: grid; grid-template-columns: minmax(280px, 360px) 1fr; gap: 56px; align-items: start; }
+    .pkg-left { align-self: start; position: sticky; top: 100px; }
+    .pkg-badge { display: inline-flex; padding: 7px 16px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .pkg-title { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 3.4vw, 46px); line-height: 1.1; letter-spacing: -.02em; color: var(--ink); margin: 18px 0 16px; }
+    .pkg-title em { font-style: normal; color: var(--accent-deep); }
+    .pkg-desc { font-size: 16px; color: var(--ink-2); line-height: 1.6; max-width: 340px; margin: 0 0 30px; }
+    .pkg-dots { display: none; }
+
+    .pkg-stage { display: flex; flex-direction: column; gap: 22px; }
+    /* reveal wrapper — GSAP scrubs this; hover lives on the card inside */
+    .pkg-cell { opacity: 0; filter: blur(12px); transform: translateY(60px) scale(.97); will-change: transform, opacity, filter; }
+    .pkg-cell.is-in { opacity: 1; filter: blur(0); transform: none; }
+    .pkg-card {
+      background: #fff; border-radius: 36px;
+      border: 1px solid rgba(26,24,20,.05);
+      box-shadow: 0 30px 70px rgba(26,24,20,.10);
+      padding: 34px 36px; display: flex; flex-direction: column;
+      transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease;
+    }
+    .pkg-card:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 42px 90px rgba(26,24,20,.16); }
+    .pkg-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .pkg-icon { width: 52px; height: 52px; border-radius: 16px; background: var(--accent); color: var(--ink); display: grid; place-items: center; flex-shrink: 0; }
+    .pkg-name { font-family: var(--display); font-weight: 800; font-size: clamp(21px, 2.3vw, 28px); letter-spacing: -.02em; color: var(--ink); margin: 6px 0 6px; }
+    .pkg-cat-desc { font-size: 14.5px; color: var(--ink-2); line-height: 1.5; margin: 0 0 18px; }
+    .pkg-incl { list-style: none; margin: 0 0 16px; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 9px 20px; }
+    .pkg-incl li { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--ink); font-weight: 600; }
+    .pkg-chk { width: 19px; height: 19px; flex-shrink: 0; color: var(--accent-deep); }
+    .pkg-rows { list-style: none; margin: 0; padding: 14px 0 0; border-top: 1px solid rgba(26,24,20,.08); }
+    .pkg-rows li { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px solid rgba(26,24,20,.06); font-size: 13.5px; }
+    .pkg-rows li.pkg-rows-head { display: block; border: none; padding: 12px 0 4px; font-weight: 800; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+    /* Mini-blocks (e.g. additional services) */
+    .pkg-subblocks { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
+    .pkg-subblock { background: var(--cream); border: 1px solid rgba(26,24,20,.06); border-radius: 18px; padding: 14px 18px; }
+    .pkg-subblock-title { font-family: var(--display); font-weight: 800; font-size: 12.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink); margin: 0 0 6px; }
+    .pkg-subblock .pkg-rows { padding-top: 0; border-top: none; }
+    .pkg-subblock .pkg-rows li:last-child { border-bottom: none; }
+    .pkg-rows .nm { color: var(--ink-2); }
+    .pkg-rows .pr { font-family: var(--display); font-weight: 700; color: var(--ink); white-space: nowrap; }
+    .pkg-note { display: flex; gap: 8px; font-size: 12.5px; color: var(--ink-3); margin-top: 14px; line-height: 1.5; }
+    .pkg-note svg { flex-shrink: 0; margin-top: 2px; }
+    .pkg-bookbtn { display: inline-flex; align-items: center; gap: 10px; align-self: flex-start; margin-top: 22px; background: var(--ink); color: #fff; border: none; cursor: pointer; padding: 13px 24px; border-radius: 999px; font-weight: 700; font-size: 15px; transition: background .25s ease, color .25s ease; }
+    .pkg-bookbtn:hover { background: var(--accent); color: var(--ink); }
+    .pkg-bookbtn .arr { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--ink); display: grid; place-items: center; transition: background .25s ease, color .25s ease; }
+    .pkg-bookbtn:hover .arr { background: var(--ink); color: #fff; }
+
+    /* Fallback: show all cards if JS can't reveal them */
+    @media (prefers-reduced-motion: reduce) { .pkg-cell { opacity: 1; filter: none; transform: none; } }
+
+    @media (max-width: 900px) {
+      .pkg-grid { grid-template-columns: 1fr; gap: 26px; }
+      .pkg-left { position: static; }
+      .pkg-incl { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) { .pkg-incl { grid-template-columns: 1fr; } .pkg-card { padding: 26px 22px; } }
+
     /* ============ FAQ ============ */
     .dc-faq-list { display: flex; flex-direction: column; gap: 16px; }
     .dc-faq-item {
@@ -818,113 +890,76 @@
 
     /* ============ Rules section ============ */
     /* ══ RULES SECTION ══ */
-    .dc-rules-section {
-      background: #1A1814;
-      padding: 44px 0;
-      position: relative;
-    }
-    .dc-rules-paper {
-      background: #FFFDF0;
-      position: relative;
-      padding: 56px 0 52px;
-    }
-    .dc-rules-paper::before,
-    .dc-rules-paper::after {
-      content: '';
-      position: absolute;
-      left: 0; right: 0;
-      height: 22px;
-      background-size: 28px 22px;
-      background-repeat: repeat-x;
-    }
-    .dc-rules-paper::before {
-      top: -21px;
-      background-image: radial-gradient(circle at 50% 100%, #FFFDF0 12px, #1A1814 12.5px);
-      background-position: 0 0;
-    }
-    .dc-rules-paper::after {
-      bottom: -21px;
-      background-image: radial-gradient(circle at 50% 0, #FFFDF0 12px, #1A1814 12.5px);
-      background-position: 0 100%;
-    }
+    /* ============ Rules — dark glass ============ */
+    .dc-rules-section { background: #14110D; padding: 96px 0; position: relative; overflow: hidden; }
+    .dc-rules-glow { position: absolute; z-index: 0; pointer-events: none; border-radius: 50%; filter: blur(100px); }
+    .dc-rules-glow-1 { width: 460px; height: 460px; top: -120px; left: -80px; background: radial-gradient(circle, rgba(255,210,63,.22), transparent 70%); }
+    .dc-rules-glow-2 { width: 520px; height: 520px; bottom: -160px; right: -100px; background: radial-gradient(circle, rgba(255,210,63,.15), transparent 70%); }
+    .dc-rules-inner { position: relative; z-index: 1; max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+
     .dc-rules-title {
-      font-family: var(--display); font-size: clamp(26px, 4vw, 38px);
-      font-weight: 800; color: var(--ink); margin: 0 0 36px;
+      font-family: var(--display); font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800; color: #fff; margin: 0 0 12px;
       letter-spacing: -.02em; line-height: 1.15; text-align: center;
     }
-    .dc-rules-body { max-width: 580px; margin: 0 auto; position: relative; }
-    /* Numbered list */
-    .dc-rules-list {
+    .dc-rules-sub { text-align: center; color: rgba(255,255,255,.55); font-size: 15px; margin: 0 auto 44px; max-width: 520px; }
+
+    /* Glass card: white border + soft blurred border ring */
+    .rules-card {
+      position: relative;
+      background: rgba(255,255,255,.05);
+      -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+      border: 1.5px solid rgba(255,255,255,.55);
+      border-radius: 28px;
+      box-shadow: 0 30px 70px rgba(0,0,0,.45);
+      padding: 40px 44px;
+    }
+    .rules-card::before {
+      content: ''; position: absolute; inset: -7px;
+      border-radius: 34px; border: 2px solid rgba(255,255,255,.28);
+      filter: blur(6px); pointer-events: none;
+    }
+    .rules-card + .rules-card { margin-top: 22px; }
+
+    /* Main rules — two columns */
+    .rules-list {
       list-style: none; margin: 0; padding: 0;
       counter-reset: rules;
+      columns: 2; column-gap: 48px;
     }
-    .dc-rules-list > li {
+    .rules-list > li {
       counter-increment: rules;
-      display: grid; grid-template-columns: 28px 1fr; gap: 8px;
-      align-items: baseline;
-      padding: 13px 0;
-      border-bottom: 1px solid rgba(26,24,20,.12);
-      font-size: 13.5px; font-weight: 700; letter-spacing: .04em;
-      text-transform: uppercase; color: var(--ink); line-height: 1.5;
+      break-inside: avoid; -webkit-column-break-inside: avoid;
+      display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start;
+      padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.10);
+      font-size: 14px; color: rgba(255,255,255,.85); line-height: 1.5;
     }
-    .dc-rules-list > li::before {
-      content: counter(rules) '.';
-      font-weight: 900; font-size: 14px; color: var(--ink);
+    .rules-list > li::before {
+      content: counter(rules);
+      font-family: var(--display); font-weight: 700; font-size: 18px;
+      color: var(--accent); line-height: 1.25;
     }
-    .dc-rules-list > li:first-child { border-top: 1px solid rgba(26,24,20,.12); }
-    .dc-rules-list > li.dc-rules-footer {
-      display: flex; justify-content: center; gap: 6px;
-      counter-increment: none; text-transform: none; font-weight: 400;
-      font-size: 14px; font-style: italic; color: rgba(26,24,20,.55);
-      border-bottom: none; padding: 20px 0 0;
+
+    /* Cancellation card */
+    .rules-cancel-title {
+      font-family: var(--display); font-weight: 800; font-size: clamp(18px, 2.4vw, 24px);
+      color: #fff; margin: 0 0 18px; letter-spacing: -.02em; text-align: center;
     }
-    .dc-rules-list > li.dc-rules-footer::before { content: none; }
-    /* Cancel subsection within rules paper */
-    .dc-rules-divider {
-      border: none; border-top: 2px dashed rgba(26,24,20,.15);
-      margin: 36px 0 32px;
+    .rules-cancel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .rules-cancel-item {
+      text-align: center; padding: 18px 14px; border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04);
     }
-    .dc-rules-subtitle {
-      font-family: var(--display); font-size: clamp(20px, 3vw, 28px);
-      font-weight: 800; color: var(--ink); margin: 0 0 24px;
-      letter-spacing: -.02em; line-height: 1.2; text-align: center;
-    }
-    .dc-cancel-warning {
-      margin-top: 16px;
-      font-size: 13px; color: rgba(26,24,20,.55); font-style: italic; text-align: center;
-    }
-    /* Stamp — overlaps last line of text body */
-    .dc-rules-stamp {
-      position: absolute;
-      bottom: -10px;
-      right: -10px;
-      z-index: 3;
-      pointer-events: none;
-    }
-    .dc-rules-stamp img {
-      width: 120px; height: 120px; display: block;
-      transform: rotate(-8deg) translateY(-60px);
-      opacity: 0;
-      filter: url(#stamp-red);
-      transition: none;
-    }
-    .dc-rules-stamp img.stamp-hit {
-      animation: stamp-drop .55s cubic-bezier(.22,.68,0,1.4) .6s forwards;
-    }
-    @keyframes stamp-drop {
-      0%   { transform: rotate(-8deg) translateY(-60px) scale(1.15); opacity: 0; }
-      60%  { transform: rotate(-8deg) translateY(8px)   scale(.96);  opacity: 1; }
-      80%  { transform: rotate(-8deg) translateY(-4px)  scale(1.02); opacity: 1; }
-      100% { transform: rotate(-8deg) translateY(0)     scale(1);    opacity: 1; }
-    }
-    @media (max-width: 600px) {
-      .dc-rules-stamp {
-        position: static;
-        display: flex;
-        justify-content: center;
-        margin-top: 24px;
-      }
-      .dc-rules-stamp img { width: 88px; height: 88px; }
+    .rules-cancel-item b { display: block; font-family: var(--display); font-size: 17px; color: var(--accent); margin-bottom: 6px; }
+    .rules-cancel-item span { font-size: 13.5px; color: rgba(255,255,255,.75); line-height: 1.45; }
+    .rules-warning { margin: 22px 0 0; text-align: center; font-size: 13.5px; color: rgba(255,255,255,.55); font-style: italic; }
+    .rules-footer { margin: 30px 0 0; text-align: center; font-size: 14px; color: rgba(255,255,255,.6); }
+
+    @media (max-width: 760px) {
+      .dc-rules-section { padding: 64px 0; }
+      .rules-card { padding: 28px 22px; }
+      .rules-list { columns: 1; }
+      .rules-cancel-grid { grid-template-columns: 1fr; }
     }
 
     /* ============ CTA banner ============ */
@@ -998,30 +1033,108 @@
       .bk-row { grid-template-columns: 1fr; }
     }
 
-    /* ============ Footer ============ */
-    .dc-footer { background: var(--ink); color: var(--cream); padding: 80px 0 32px; position: relative; overflow: hidden; }
-    .dc-footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 56px; }
-    .dc-footer h4 { font-family: var(--display); font-weight: 600; font-size: 14px; margin: 0 0 18px; color: var(--accent); letter-spacing: .04em; text-transform: uppercase; }
-    .dc-footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-    .dc-footer ul a { font-size: 14px; opacity: .7; transition: opacity .15s; }
-    .dc-footer ul a:hover { opacity: 1; }
-    .dc-footer-logo { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: -.03em; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
-    .dc-footer-desc { font-size: 14px; opacity: .65; max-width: 280px; margin-bottom: 24px; }
-    .dc-socials { display: flex; gap: 8px; }
-    .dc-social { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,254,247,.15); display: grid; place-items: center; transition: background .15s, color .15s; }
-    .dc-social:hover { background: var(--accent); color: var(--ink); border-color: var(--accent); }
-    .dc-footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 28px; border-top: 1px solid rgba(255,254,247,.1); font-size: 13px; opacity: .5; flex-wrap: wrap; gap: 12px; }
-    .dc-footer-bottom a { color: inherit; }
-    @media (max-width: 900px) {
-      .dc-footer { padding: 48px 0 22px; }
-      .dc-footer-grid { grid-template-columns: 1fr 1fr 1fr; gap: 22px 14px; margin-bottom: 24px; }
-      .dc-footer-grid > div:first-child { grid-column: 1 / -1; margin-bottom: 4px; }
-      .dc-footer-logo { font-size: 22px; margin-bottom: 10px; }
-      .dc-footer-desc { font-size: 13px; margin-bottom: 16px; max-width: none; }
+    /* ============ Footer (full-width photo → dark) ============ */
+    .dc-footer { position: relative; background: #14110D; }
+
+    /* Mouse-follow trail (footer zone only) — crisp circle + solid comet trail (canvas) */
+    .footer-interactive-zone { position: relative; overflow: hidden; }
+    .footer-trail-canvas {
+      position: absolute; inset: 0; pointer-events: none; z-index: 4;
+      opacity: 0; transition: opacity .35s ease;
     }
-    @media (max-width: 600px) {
-      .dc-footer-grid { grid-template-columns: 1fr 1fr; }
-      .dc-footer-bottom { flex-direction: column; align-items: flex-start; }
+    .footer-trail-canvas.is-on { opacity: 1; }
+    @media (hover: none) { .footer-trail-canvas { display: none; } }
+
+    /* Full-width photo banner — image dissolves into the dark footer via a mask (no colour edges) */
+    .foot-photo {
+      position: relative; width: 100%;
+      height: clamp(560px, 66vw, 860px);
+      background: #14110D;   /* what the photo fades into */
+    }
+    .foot-photo-img {
+      position: absolute; inset: 0; z-index: 0;
+      background-image: url('footer pictures.png');
+      background-size: cover; background-position: center 35%;
+      -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 26%, rgba(0,0,0,.78) 50%, rgba(0,0,0,.42) 72%, rgba(0,0,0,.14) 88%, rgba(0,0,0,0) 100%);
+      mask-image: linear-gradient(to bottom, #000 0%, #000 26%, rgba(0,0,0,.78) 50%, rgba(0,0,0,.42) 72%, rgba(0,0,0,.14) 88%, rgba(0,0,0,0) 100%);
+    }
+    /* Curved top edge of the photo — cream, blends with the section above; morphs on scroll */
+    .foot-arc { position: absolute; top: -1px; left: 0; right: 0; width: 100%; height: 260px; z-index: 5; display: block; pointer-events: none; }
+    .foot-arc path { fill: #ffffff; }   /* blends with the white section above */
+    /* Soft even tint for readability on the upper photo */
+    .foot-photo-tint { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(180deg, rgba(20,16,13,.10) 0%, rgba(20,16,13,.04) 32%, rgba(20,16,13,0) 60%); }
+    /* Desktop CTA overlaid on the photo */
+    .foot-photo-cta { position: absolute; z-index: 3; left: 0; right: 0; bottom: clamp(90px, 15vh, 180px); display: flex; align-items: center; justify-content: space-between; gap: clamp(24px, 4vw, 56px); flex-wrap: wrap; padding: 0 clamp(24px, 5vw, 80px); }
+    /* CTA in the dark zone — adaptive (mobile) only; hidden on desktop */
+    .foot-cta-dark { display: none; align-items: center; justify-content: space-between; gap: clamp(28px, 4vw, 64px); flex-wrap: wrap; padding: 26px 0 0; }
+    /* Desktop divider — inside the photo CTA, spans heading → buttons, 40px below the CTA row */
+    .foot-cta-line { flex: 0 0 100%; width: 100%; height: 1px; background: rgba(255,255,255,.2); margin-top: 40px; }
+    /* Dark-zone divider — adaptive (mobile) only */
+    .foot-divider { display: none; height: 1px; background: rgba(255,255,255,.14); }
+    .foot-cta-dark .foot-cta-contact { flex: 0 0 auto; width: 100%; }
+    .foot-cta-dark .foot-cta-btn, .foot-cta-dark .foot-cta-btn2 { height: 58px; padding-top: 0; padding-bottom: 0; box-sizing: border-box; }
+    .foot-cta-dark .foot-cta-btn { position: relative; justify-content: center; padding-left: 28px; padding-right: 28px; }
+    .foot-cta-dark .foot-cta-arr { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; }
+    .foot-cta-h { font-family: var(--display); font-weight: 800; color: #fff; margin: 0; font-size: clamp(26px, 3.3vw, 46px); line-height: 1.12; letter-spacing: -.02em; text-shadow: 0 2px 22px rgba(0,0,0,.4); }
+    .foot-cta-btn { display: inline-flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--accent); color: var(--ink); border: none; cursor: pointer; padding: 12px 12px 12px 28px; border-radius: 999px; font-weight: 800; font-size: clamp(14px, 1.05vw, 16px); box-shadow: 0 16px 44px rgba(255,210,63,.45); transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease; white-space: nowrap; }
+    .foot-cta-btn:hover { transform: translateY(-3px); box-shadow: 0 22px 54px rgba(255,210,63,.6); }
+    .foot-cta-arr { width: 46px; height: 46px; border-radius: 50%; background: #fff; color: var(--ink); display: grid; place-items: center; flex-shrink: 0; }
+    /* Contacts block (moved from #контакти) — right of the heading */
+    .foot-cta-contact { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+    .foot-phones { display: flex; flex-direction: column; gap: 2px; margin-bottom: 4px; }
+    .foot-phone { font-family: var(--display); font-weight: 800; letter-spacing: -.01em; font-size: clamp(20px, 2vw, 30px); color: var(--accent); line-height: 1.18; }
+    .foot-cmeta { font-size: 14.5px; color: rgba(255,255,255,.74); text-shadow: 0 1px 8px rgba(0,0,0,.4); }
+    .foot-cbtns { display: flex; flex-direction: column; gap: 12px; align-items: stretch; flex-shrink: 0; }
+    .foot-cta-btn2 { display: inline-flex; align-items: center; justify-content: center; background: #fff; color: var(--ink); border: none; cursor: pointer; padding: 12px 28px; border-radius: 999px; font-weight: 800; font-size: clamp(14px, 1.05vw, 16px); transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease; white-space: nowrap; }
+    .foot-cta-btn2:hover { transform: translateY(-3px); box-shadow: 0 16px 38px rgba(0,0,0,.3); }
+
+    /* Dark body */
+    .foot-dark { background: #14110D; color: rgba(255,255,255,.78); padding: 6px 0 30px; position: relative; z-index: 3; }
+    .foot-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 40px; padding: 44px 0; }
+    .foot-logo svg { height: 30px; display: block; }
+    .foot-logo { display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px; }
+    .foot-logo-name { font-family: var(--display); font-weight: 800; font-size: 26px; letter-spacing: -.03em; color: #fff; line-height: 1; }
+    .foot-logo-sub { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+    .foot-desc { font-size: 14px; color: rgba(255,255,255,.6); line-height: 1.6; max-width: 280px; margin: 0 0 20px; }
+    .foot-socials { display: flex; gap: 10px; }
+    .foot-social { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); color: #fff; display: grid; place-items: center; transition: transform .25s, background .25s, color .25s, box-shadow .25s; }
+    .foot-social:hover { transform: translateY(-3px); background: var(--accent); color: var(--ink); box-shadow: 0 10px 24px rgba(255,210,63,.4); }
+    .foot-h { font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 16px; }
+    .foot-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+    .foot-links a { font-size: 14.5px; color: rgba(255,255,255,.65); transition: color .2s ease, padding-left .2s ease; }
+    .foot-links a:hover { color: #fff; padding-left: 4px; }
+    .foot-note { font-size: 14px; color: rgba(255,255,255,.65); line-height: 1.5; margin: 0 0 8px; }
+    .foot-note strong { color: #fff; font-weight: 700; }
+    .foot-btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; cursor: pointer; border: none; background: var(--accent); color: var(--ink); transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease; margin-top: 4px; }
+    .foot-btn:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(255,210,63,.5); }
+    .foot-btn .arr { width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; }
+    .foot-bottom { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.1); font-size: 13px; color: rgba(255,255,255,.45); }
+    .foot-bottom-links { display: flex; gap: 22px; align-items: center; }
+    .foot-bottom-links a { color: rgba(255,255,255,.45); transition: color .2s ease; }
+    .foot-bottom-links a:hover { color: #fff; }
+    .foot-admin { opacity: .6; font-size: 11px; letter-spacing: .03em; }
+
+    /* ===== Adaptive footer (≤900px): clean photo banner, CTA + columns in the dark zone ===== */
+    @media (max-width: 900px) {
+      .foot-photo { height: clamp(300px, 56vw, 420px); }
+      .foot-photo-cta { display: none; }     /* desktop CTA off the photo */
+      .foot-arc path { fill: #fff; }          /* banner blends with white above */
+      .foot-divider { display: block; width: 100%; max-width: 340px; margin: 16px auto 0; }   /* match the centered CTA width on mobile */
+      .foot-cta-dark { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; }
+      .foot-cta-dark .foot-cta-contact { align-items: center; }
+      .foot-cta-dark .foot-cbtns { width: 100%; max-width: 320px; margin-top: 2px; }
+      .foot-cta-h { font-size: clamp(24px, 6.5vw, 34px); }
+      .foot-grid { grid-template-columns: 1fr 1fr; gap: 30px 32px; }
+      .foot-grid > div:nth-child(1), .foot-grid > div:nth-child(4) { grid-column: 1 / -1; }
+    }
+    @media (max-width: 760px) {
+      .foot-arc { height: 70px; }
+      .foot-photo { height: clamp(220px, 52vw, 300px); }
+      .foot-grid { padding: 28px 0 8px; gap: 28px; }
+    }
+    @media (max-width: 560px) {
+      .foot-bottom { flex-direction: column; align-items: flex-start; }
     }
 
     /* ============ Wave separators ============ */
@@ -1231,6 +1344,7 @@
       height: 100%;
       will-change: transform;
       z-index: 1; /* keeps all cards below the headline (z-index: 20) */
+      visibility: hidden; /* revealed by JS once GSAP sets the off-screen start position (prevents flash/jump) */
     }
 
     /* Cards sit inside the track at fixed positions */
@@ -1565,15 +1679,15 @@
     <div class="dc-wrap">
       <div class="dc-section-head dc-section-head--center">
         <div>
-          <span class="bento-pill reveal">Чому нас обирають</span>
-          <h2 class="dc-h2 reveal" style="--reveal-i:1;margin-top:14px;">Чому Dog Care — <em>це більше, ніж грумінг</em></h2>
+          <span class="bento-pill scrub-rise">Чому нас обирають</span>
+          <h2 class="dc-h2 scrub-rise" style="margin-top:14px;">Чому Dog Care — <em>це більше, ніж грумінг</em></h2>
         </div>
       </div>
 
       <div class="bento">
 
         <!-- Ліворуч: Всі породи (висока картка) -->
-        <div class="bento-cell b-breeds reveal reveal-blur" style="--reveal-i:0">
+        <div class="bento-cell b-breeds" data-dir="left">
           <article class="bento-card">
             <div class="bento-media" style="background-image:url('бенто.png')"></div>
             <div class="bento-blur" aria-hidden="true"></div>
@@ -1583,7 +1697,7 @@
         </div>
 
         <!-- Праворуч зверху: інтерактив «до / після» -->
-        <div class="bento-cell b-ba reveal reveal-blur" style="--reveal-i:1">
+        <div class="bento-cell b-ba" data-dir="right">
           <article class="bento-card">
             <div class="ba" id="beforeAfter">
               <img class="ba-img" src="dog-clean.png" alt="Чистий доглянутий пес — після грумінгу" draggable="false">
@@ -1605,7 +1719,7 @@
         </div>
 
         <!-- Праворуч знизу: об'єднана картка (статистика + чеклист) -->
-        <div class="bento-cell b-combined reveal reveal-blur" style="--reveal-i:2">
+        <div class="bento-cell b-combined" data-dir="bottom">
           <article class="bento-card">
             <div class="combined-stats">
               <div class="bento-stat"><div class="bento-stat-num">5+</div><div class="bento-stat-label">років досвіду</div></div>
@@ -1626,293 +1740,54 @@
 
   <!-- ══ ПРАВИЛА ══ -->
   <section class="dc-rules-section">
-    <div class="dc-rules-paper">
-      <div class="dc-wrap">
-        <h2 class="dc-rules-title">Що важливо<br>знати перед візитом</h2>
-        <div class="dc-rules-body">
-          <ul class="dc-rules-list">
-            <li>Приймаємо лише вакцинованих тварин.</li>
-            <li>При запізненні на 15+ хв майстер надає послугу на час, що залишився.</li>
-            <li>Агресивний собака? Приносьте намордник і будьте присутні весь грумінг.</li>
-            <li>Грумер може відмовити або замінити комплекс на адаптацію, якщо це безпечніше.</li>
-            <li>Знижка постійним хвостикам, які ходять кожні 3 тижні.</li>
-            <li>+15–30% до суми комплексу при агресії тварини до майстра.</li>
-            <li>Є ковтунці — вкажіть заздалегідь. Вичіс оплачується окремо.</li>
-            <li>Кожні 30 хв очікування після завершення — 150 грн.</li>
-            <li class="dc-rules-footer">🐾 Дякуємо за розуміння і чекаємо ваших хвостиків!</li>
-          </ul>
+    <span class="dc-rules-glow dc-rules-glow-1" aria-hidden="true"></span>
+    <span class="dc-rules-glow dc-rules-glow-2" aria-hidden="true"></span>
+    <div class="dc-rules-inner">
+      <h2 class="dc-rules-title scrub-rise">Що важливо знати перед візитом</h2>
+      <p class="dc-rules-sub scrub-rise">Кілька простих правил — щоб візит пройшов спокійно й приємно</p>
 
-          <hr class="dc-rules-divider">
-          <h3 class="dc-rules-subtitle">Правила скасування</h3>
-          <ul class="dc-rules-list">
-            <li>За 24+ години — безкоштовне скасування.</li>
-            <li>За 3 години — 50% вартості комплексу.</li>
-            <li>Не прийшли — 100% вартості комплексу.</li>
-          </ul>
-          <p class="dc-cancel-warning">⚠️ При несплаті — наступний візит лише з передоплатою 100%</p>
-          <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
-            <defs>
-              <filter id="stamp-red">
-                <feColorMatrix type="matrix" values="0 0 0 0 0.8  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
-              </filter>
-            </defs>
-          </svg>
-          <div class="dc-rules-stamp">
-            <img src="штамп1.png" alt="Печатка Dog Care Grooming" width="120" height="120" loading="lazy" />
-          </div>
-        </div>
+      <div class="rules-card scrub-rise">
+        <ol class="rules-list">
+          <li>Приймаємо лише вакцинованих тварин.</li>
+          <li>При запізненні на 15+ хв майстер надає послугу на час, що залишився.</li>
+          <li>Агресивний собака? Приносьте намордник і будьте присутні весь грумінг.</li>
+          <li>Грумер може відмовити або замінити комплекс на адаптацію, якщо це безпечніше.</li>
+          <li>Знижка постійним хвостикам, які ходять кожні 3 тижні.</li>
+          <li>+15–30% до суми комплексу при агресії тварини до майстра.</li>
+          <li>Є ковтунці — вкажіть заздалегідь. Вичіс оплачується окремо.</li>
+          <li>Кожні 30 хв очікування після завершення — 150 грн.</li>
+        </ol>
       </div>
+
+      <div class="rules-card scrub-rise">
+        <h3 class="rules-cancel-title">Правила скасування</h3>
+        <div class="rules-cancel-grid">
+          <div class="rules-cancel-item"><b>За 24+ год</b><span>Безкоштовне скасування</span></div>
+          <div class="rules-cancel-item"><b>За 3 год</b><span>50% вартості комплексу</span></div>
+          <div class="rules-cancel-item"><b>Не прийшли</b><span>100% вартості комплексу</span></div>
+        </div>
+        <p class="rules-warning">⚠️ При несплаті — наступний візит лише з передоплатою 100%</p>
+      </div>
+
+      <p class="rules-footer scrub-rise">🐾 Дякуємо за розуміння і чекаємо ваших хвостиків!</p>
     </div>
   </section>
 
   <!-- ══ ЦІНИ ══ -->
-  <section class="dc-section dc-section-white" id="послуги">
+  <!-- ══ ПРАЙС / ПАКЕТИ ══ -->
+  <section class="dc-section pkg-section" id="послуги">
     <div class="dc-wrap" id="grm-pricing-section-wrap">
-      <div class="dc-section-head dc-section-head--center">
-        <div>
-          <div class="dc-eyebrow-text reveal">Прозоре ціноутворення</div>
-          <h2 class="dc-h2 reveal" style="--reveal-i:1">Послуги та <em>ціни</em></h2>
-          <p class="dc-section-sub reveal" style="--reveal-i:2; margin: 12px auto 0;">Ціни залежать від породи, розміру та стану шерсті вашого улюбленця</p>
+      <div class="pkg-grid">
+        <div class="pkg-left">
+          <span class="pkg-badge reveal">Прайс</span>
+          <h2 class="pkg-title scrub-rise" style="--reveal-i:1">Догляд для кожного <em>улюбленця</em></h2>
+          <p class="pkg-desc reveal" style="--reveal-i:2">Оберіть напрямок догляду — від гігієнічного до повного комплексу. Гортайте, щоб переглянути варіанти та ціни.</p>
+          <div class="pkg-dots" id="pkg-dots" aria-hidden="true"></div>
         </div>
-      </div>
-
-      <div class="dc-price-tabs reveal" style="--reveal-i:2">
-        <button class="dc-price-tab active" data-tab="hygiene">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21H5a2 2 0 0 1-2-2v-2a6 6 0 0 1 12 0v2a2 2 0 0 1-2 2h-2"/><path d="M12 13V7"/><path d="M8 9l4-4 4 4"/></svg>
-          Гігієнічний
-        </button>
-        <button class="dc-price-tab" data-tab="full">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/><path d="M15 18l1 1 4-4-1-1"/></svg>
-          Повний комплекс
-        </button>
-        <button class="dc-price-tab" data-tab="hard">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>
-          Жорсткошерстні
-        </button>
-        <button class="dc-price-tab" data-tab="cats">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.68.26 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/></svg>
-          Кішки
-        </button>
-        <button class="dc-price-tab" data-tab="extras">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-          Додаткові послуги
-        </button>
-      </div>
-
-      <!-- Гігієнічний догляд -->
-      <div class="dc-price-panel active reveal" id="tab-hygiene" style="--reveal-i:3">
-        <div class="gp-card">
-          <div class="gp-card-head">
-            <div class="gp-card-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21H5a2 2 0 0 1-2-2v-2a6 6 0 0 1 12 0v2a2 2 0 0 1-2 2h-2"/><path d="M12 13V7"/><path d="M8 9l4-4 4 4"/></svg>
-            </div>
-            <div>
-              <div class="gp-card-title">Гігієнічний догляд</div>
-              <div class="gp-card-desc">Купання, сушка та базовий догляд — для довгошерстних порід</div>
-            </div>
-          </div>
-          <div class="gp-includes">
-            <span class="gp-includes-label">Що входить</span>
-            <div class="gp-chips">
-              <span class="gp-chip">Купання з профкосметикою</span>
-              <span class="gp-chip">Сушка</span>
-              <span class="gp-chip">Розчісування</span>
-              <span class="gp-chip">Стрижка кігтів</span>
-              <span class="gp-chip">Чищення вух</span>
-              <span class="gp-chip">Протирання очей</span>
-              <span class="gp-chip">Стрижка подушечок лап</span>
-            </div>
-          </div>
-          <div class="gp-rows">
-            <div class="gp-row"><span class="gp-row-name">Йоркширський тер'єр</span><span class="gp-row-price">800 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Мальтезе</span><span class="gp-row-price">800 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Той-пудель</span><span class="gp-row-price">800–850 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Метис до 10 кг</span><span class="gp-row-price">650–750 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Метис 10–25 кг</span><span class="gp-row-price">900–1050 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Метис 25–45 кг</span><span class="gp-row-price">1100–1200 ₴</span></div>
-          </div>
-          <div class="gp-note">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            Ціна залежить від стану шерсті та темпераменту тварини. Сильне розколтунювання оплачується окремо.
-          </div>
-        </div>
-      </div>
-
-      <!-- Повний комплекс -->
-      <div class="dc-price-panel" id="tab-full">
-        <div class="gp-card">
-          <div class="gp-card-head">
-            <div class="gp-card-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/><path d="M15 18l1 1 4-4-1-1"/></svg>
-            </div>
-            <div>
-              <div class="gp-card-title">Повний комплекс</div>
-              <div class="gp-card-desc">Гігієнічний догляд + модельна або породна стрижка</div>
-            </div>
-          </div>
-          <div class="gp-includes">
-            <span class="gp-includes-label">Що входить</span>
-            <div class="gp-chips">
-              <span class="gp-chip">Повний гігієнічний догляд</span>
-              <span class="gp-chip">Модельна / породна стрижка</span>
-              <span class="gp-chip">Стрижка хвостика</span>
-              <span class="gp-chip">Полірування шерсті</span>
-            </div>
-          </div>
-          <div class="gp-rows">
-            <div class="gp-row"><span class="gp-row-name">Йоркширський тер'єр</span><span class="gp-row-price">900–1000 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Мальтезе</span><span class="gp-row-price">950–1050 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Мініатюрний пудель</span><span class="gp-row-price">1000–1100 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Кокер-спанієль</span><span class="gp-row-price">1100–1250 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Золотистий ретривер</span><span class="gp-row-price">1300–1500 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Великий пудель</span><span class="gp-row-price">від 1500 ₴</span></div>
-          </div>
-          <div class="gp-note">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            Повний комплекс включає все з гігієнічного догляду + модельну або породну стрижку, стрижку хвостика та фінішне полірування.
-          </div>
-        </div>
-      </div>
-
-      <!-- Жорсткошерстні -->
-      <div class="dc-price-panel" id="tab-hard">
-        <div class="gp-card">
-          <div class="gp-card-head">
-            <div class="gp-card-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>
-            </div>
-            <div>
-              <div class="gp-card-title">Жорсткошерстні та короткошерстні</div>
-              <div class="gp-card-desc">Купання, фурмінація, тримінг, полірування</div>
-            </div>
-          </div>
-          <div class="gp-includes">
-            <span class="gp-includes-label">Що входить</span>
-            <div class="gp-chips">
-              <span class="gp-chip">Купання з профшампунем</span>
-              <span class="gp-chip">Сушка та вичісування</span>
-              <span class="gp-chip">Тримінг / Фурмінація</span>
-              <span class="gp-chip">Стрижка кігтів</span>
-              <span class="gp-chip">Чищення вух</span>
-            </div>
-          </div>
-          <div class="gp-rows">
-            <div class="gp-row"><span class="gp-row-name">Мопс / Французький бульдог</span><span class="gp-row-price">700–800 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Такса</span><span class="gp-row-price">700–750 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Ягдтер'єр / Фокстер'єр</span><span class="gp-row-price">900–1050 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Нім. вівчарка (Експрес линька)</span><span class="gp-row-price">900 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Хаскі / Лабрадор</span><span class="gp-row-price">1200–1400 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Велика порода 35+ кг</span><span class="gp-row-price">від 1600 ₴</span></div>
-          </div>
-          <div class="gp-note">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            Ціна залежить від ступеня линьки та стану шерсті. При вазі понад зазначену категорію вартість зростає на 15–20%.
-          </div>
-        </div>
-      </div>
-
-      <!-- Кішки -->
-      <div class="dc-price-panel" id="tab-cats">
-        <div class="gp-card">
-          <div class="gp-card-head">
-            <div class="gp-card-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.68.26 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/></svg>
-            </div>
-            <div>
-              <div class="gp-card-title">Грумінг котів</div>
-              <div class="gp-card-desc">Сухе вичісування або повне купання</div>
-            </div>
-          </div>
-          <div class="gp-includes">
-            <span class="gp-includes-label">Що входить</span>
-            <div class="gp-chips">
-              <span class="gp-chip">Розчісування</span>
-              <span class="gp-chip">Вичісування підшерстку</span>
-              <span class="gp-chip">Стрижка кігтів</span>
-              <span class="gp-chip">+ Купання з профкосметикою (повний пакет)</span>
-              <span class="gp-chip">+ Сушка (повний пакет)</span>
-            </div>
-          </div>
-          <div class="gp-rows">
-            <div class="gp-row"><span class="gp-row-name">Звичайний кіт — сухе вичісування</span><span class="gp-row-price">700 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Британець — сухе вичісування</span><span class="gp-row-price">800 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Звичайний кіт — повний пакет</span><span class="gp-row-price">1000 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Британець — повний пакет</span><span class="gp-row-price">1100 ₴</span></div>
-            <div class="gp-row"><span class="gp-row-name">Мейн-кун — повний пакет</span><span class="gp-row-price">1400 ₴</span></div>
-          </div>
-          <div class="gp-note">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            Рекомендуємо заздалегідь уточнити темперамент вашого улюбленця. При агресії майстер може попросити власника бути присутнім.
-          </div>
-        </div>
-      </div>
-
-      <!-- Додаткові послуги -->
-      <div class="dc-price-panel" id="tab-extras">
-        <div class="dc-extras-groups reveal" style="--reveal-i:0">
-          <div class="dc-extras-group">
-            <div class="dc-extras-group-head">
-              <span class="dc-extras-group-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21H5a2 2 0 0 1-2-2v-2a6 6 0 0 1 12 0v2a2 2 0 0 1-2 2h-2"/><path d="M12 13V7"/><path d="M8 9l4-4 4 4"/></svg>
-              </span>
-              <span class="dc-extras-group-title">Купання</span>
-            </div>
-            <ul class="dc-extras-rows">
-              <li><span class="dc-extras-row-name">до 7 кг</span><span class="dc-extras-row-price">600 ₴</span></li>
-              <li><span class="dc-extras-row-name">від 7 кг</span><span class="dc-extras-row-price">від 700 ₴</span></li>
-              <li><span class="dc-extras-row-name">від 15–45 кг</span><span class="dc-extras-row-price">від 900 ₴</span></li>
-            </ul>
-          </div>
-          <div class="dc-extras-group">
-            <div class="dc-extras-group-head">
-              <span class="dc-extras-group-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/></svg>
-              </span>
-              <span class="dc-extras-group-title">Стрижка без купання</span>
-            </div>
-            <p class="dc-extras-group-note">якщо песик попередньо чистий</p>
-            <ul class="dc-extras-rows">
-              <li><span class="dc-extras-row-name">Йоркширський тер'єр</span><span class="dc-extras-row-price">700 ₴</span></li>
-              <li><span class="dc-extras-row-name">Бівер йорк. тер'єр</span><span class="dc-extras-row-price">750 ₴</span></li>
-              <li><span class="dc-extras-row-name">Пікінес</span><span class="dc-extras-row-price">700 ₴</span></li>
-              <li><span class="dc-extras-row-name">Болонка</span><span class="dc-extras-row-price">700 ₴</span></li>
-              <li><span class="dc-extras-row-name">Шит-цу</span><span class="dc-extras-row-price">750 ₴</span></li>
-              <li><span class="dc-extras-row-name">Кавалер-чарльз-кінг</span><span class="dc-extras-row-price">750 ₴</span></li>
-              <li><span class="dc-extras-row-name">Спаніель</span><span class="dc-extras-row-price">900 ₴</span></li>
-            </ul>
-          </div>
-        </div>
-        <div class="dc-add-grid" id="grm-add-grid" style="margin-top: 24px;">
-          <div class="dc-add-card reveal" style="--reveal-i:1">
-            <div class="dc-add-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5V9a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1v2.5"/><path d="M15 11.5V9a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2.5"/><rect x="3" y="11" width="18" height="3" rx="1.5"/><path d="M5 14v5"/><path d="M9 14v5"/><path d="M15 14v5"/><path d="M19 14v5"/></svg></div>
-            <div class="dc-add-name">Стрижка кігтів</div>
-            <div class="dc-add-price">200 ₴</div>
-          </div>
-          <div class="dc-add-card reveal" style="--reveal-i:2">
-            <div class="dc-add-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c0-4.97 4.03-9 9-9s9 4.03 9 9"/><path d="M7 12c0-2.76 2.24-5 5-5s5 2.24 5 5"/><circle cx="12" cy="12" r="1"/></svg></div>
-            <div class="dc-add-name">Чищення вух</div>
-            <div class="dc-add-price">150 ₴</div>
-          </div>
-          <div class="dc-add-card reveal" style="--reveal-i:3">
-            <div class="dc-add-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg></div>
-            <div class="dc-add-name">Розколтунювання</div>
-            <div class="dc-add-price">від 250 ₴</div>
-          </div>
-          <div class="dc-add-card reveal" style="--reveal-i:4">
-            <div class="dc-add-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
-            <div class="dc-add-name">Чищення зубів (гель)</div>
-            <div class="dc-add-price">170 ₴</div>
-          </div>
-          <div class="dc-add-card reveal" style="--reveal-i:5">
-            <div class="dc-add-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3H3v3l9 9 3-3L6 3z"/><path d="M18 15l-3 3 1 1 4-4-1-1z"/></svg></div>
-            <div class="dc-add-name">Стрижка мордочки</div>
-            <div class="dc-add-price">+200 ₴</div>
-          </div>
-        </div>
+        <div class="pkg-stage" id="pkg-cards"><!-- картки рендеряться з JS --></div>
       </div>
     </div>
   </section>
-
   <!-- ══ ГАЛЕРЕЯ ══ -->
   <div class="grm-scroll-wrapper" id="grm-scroll-wrapper">
   <section class="grm-sticky-scene" id="галерея">
@@ -1943,7 +1818,7 @@
       <!-- Header -->
       <div class="gp-head">
         <div class="dc-eyebrow-text reveal" style="color:rgba(26,24,20,.5);justify-content:center;display:flex;">Покроково</div>
-        <h2 class="dc-h2 reveal" style="--reveal-i:1;color:var(--ink);margin:10px auto 0;text-align:center;">
+        <h2 class="dc-h2 scrub-rise" style="--reveal-i:1;color:var(--ink);margin:10px auto 0;text-align:center;">
           Як проходить <em style="color:rgba(26,24,20,.38);">сеанс</em>
         </h2>
       </div>
@@ -1964,8 +1839,8 @@
 
         <!-- Mobile soft vertical route -->
         <svg class="gp-svg gp-svg-m" viewBox="0 0 40 1000" preserveAspectRatio="none" aria-hidden="true">
-          <path class="gp-route-base" vector-effect="non-scaling-stroke" d="M20,0 C38,140 4,300 20,460 C36,620 4,780 20,1000"/>
-          <path class="gp-route-draw" vector-effect="non-scaling-stroke" pathLength="1" d="M20,0 C38,140 4,300 20,460 C36,620 4,780 20,1000"/>
+          <path class="gp-route-base" vector-effect="non-scaling-stroke" d="M20,0 L20,1000"/>
+          <path class="gp-route-draw" vector-effect="non-scaling-stroke" pathLength="1" d="M20,0 L20,1000"/>
         </svg>
 
         <article class="gp-card gp-c1">
@@ -2022,11 +1897,11 @@
           <!-- Text column (left) -->
           <div class="gr-text-col">
             <div class="dc-eyebrow-text reveal">Знайомтесь з майстром</div>
-            <h2 class="dc-h2 reveal" style="--reveal-i:1">Мене звати Роксолана</h2>
-            <p class="gr-text" style="--reveal-i:2">Грумер у DOG CARE — місці, де справді люблять тварин і де я знайшла свободу для творчості та ідей.</p>
-            <p class="gr-text" style="--reveal-i:3">Комфорт і психоемоційний стан тварини — понад усе. Краще зробити не ідеально, але без стресу. Я адаптую тварин до грумінгу, щоб він став для них нормою та позитивним досвідом, а не випробуванням.</p>
-            <p class="gr-text" style="--reveal-i:4">Працюю з собаками всіх порід, котами та кроликами — зокрема з тваринами, що мають особливості чи важкий пережитий досвід. <strong>Кожен заслуговує на красиву стрижку й догляд.</strong></p>
-            <p class="gr-text" style="--reveal-i:5">Тварини — не речі, і вони не обирають приходити на стрижку. Тому ми маємо зробити все, щоб їм це проходило якомога легше.</p>
+            <h2 class="dc-h2 scrub-rise" style="--reveal-i:1">Мене звати Роксолана</h2>
+            <p class="gr-text scrub-rise" style="--reveal-i:2">Грумер у DOG CARE — місці, де справді люблять тварин і де я знайшла свободу для творчості та ідей.</p>
+            <p class="gr-text scrub-rise" style="--reveal-i:3">Комфорт і психоемоційний стан тварини — понад усе. Краще зробити не ідеально, але без стресу. Я адаптую тварин до грумінгу, щоб він став для них нормою та позитивним досвідом, а не випробуванням.</p>
+            <p class="gr-text scrub-rise" style="--reveal-i:4">Працюю з собаками всіх порід, котами та кроликами — зокрема з тваринами, що мають особливості чи важкий пережитий досвід. <strong>Кожен заслуговує на красиву стрижку й догляд.</strong></p>
+            <p class="gr-text scrub-rise" style="--reveal-i:5">Тварини — не речі, і вони не обирають приходити на стрижку. Тому ми маємо зробити все, щоб їм це проходило якомога легше.</p>
           </div>
 
           <!-- Photo column (right) -->
@@ -2048,16 +1923,16 @@
   </section>
 
   <!-- ══ FAQ ══ -->
-  <section class="dc-section dc-section-white">
+  <section class="dc-section dc-section-white" id="faq">
     <div class="dc-wrap">
       <div class="dc-section-head dc-section-head--center">
         <div>
           <div class="dc-eyebrow-text reveal">Запитання та відповіді</div>
-          <h2 class="dc-h2 reveal" style="--reveal-i:1">Часті <em>запитання</em></h2>
+          <h2 class="dc-h2 scrub-rise" style="--reveal-i:1">Часті <em>запитання</em></h2>
         </div>
       </div>
-      <div class="dc-faq-list" style="max-width: 800px; margin: 0 auto;">
-        <div class="dc-faq-item reveal" style="--reveal-i:0">
+      <div class="dc-faq-list scrub-rise" style="max-width: 800px; margin: 0 auto;">
+        <div class="dc-faq-item" style="--reveal-i:0">
           <button class="dc-faq-q">
             Як часто потрібно водити собаку на грумінг?
             <span class="dc-faq-chevron">
@@ -2066,7 +1941,7 @@
           </button>
           <div class="dc-faq-a"><p>Для довгошерстних порід рекомендуємо кожні 6–8 тижнів. Для короткошерстних — кожні 2–3 місяці або за потреби. Кішок зазвичай 2–4 рази на рік. Точний графік залежить від породи та стилю життя вашого улюбленця.</p></div>
         </div>
-        <div class="dc-faq-item reveal" style="--reveal-i:1">
+        <div class="dc-faq-item" style="--reveal-i:1">
           <button class="dc-faq-q">
             Чи можу я залишатися під час процедури?
             <span class="dc-faq-chevron">
@@ -2075,7 +1950,7 @@
           </button>
           <div class="dc-faq-a"><p>Так! Ми — перша прозора територія грумінгу в місті. Ви можете спостерігати за процесом через скляні стіни. При прояві агресії ми можемо попросити власника бути присутнім у салоні.</p></div>
         </div>
-        <div class="dc-faq-item reveal" style="--reveal-i:2">
+        <div class="dc-faq-item" style="--reveal-i:2">
           <button class="dc-faq-q">
             Що робити, якщо у собаки колтуни?
             <span class="dc-faq-chevron">
@@ -2084,7 +1959,7 @@
           </button>
           <div class="dc-faq-a"><p>Розколтунювання — це окрема послуга, що оплачується додатково від 250 грн. Якщо колтунів дуже багато або вони занадто щільні, майстер може порекомендувати стрижку «під нуль» для комфорту тварини. Ми повідомимо про це ще до початку процедури.</p></div>
         </div>
-        <div class="dc-faq-item reveal" style="--reveal-i:3">
+        <div class="dc-faq-item" style="--reveal-i:3">
           <button class="dc-faq-q">
             Як підготувати собаку до першого грумінгу?
             <span class="dc-faq-chevron">
@@ -2093,7 +1968,7 @@
           </button>
           <div class="dc-faq-a"><p>Перед першим візитом рекомендуємо трохи погуляти, щоб собака була спокійніша. Не годуйте за 2 години до процедури. Принесіть будь-які медичні документи, якщо є алергія або шкірні захворювання. Ми зробимо все, щоб перший досвід був максимально комфортним.</p></div>
         </div>
-        <div class="dc-faq-item reveal" style="--reveal-i:4">
+        <div class="dc-faq-item" style="--reveal-i:4">
           <button class="dc-faq-q">
             Скільки часу займає процедура?
             <span class="dc-faq-chevron">
@@ -2102,7 +1977,7 @@
           </button>
           <div class="dc-faq-a"><p>Гігієнічний догляд для малих порід займає 1–1.5 години. Повний комплекс зі стрижкою — від 2 до 3.5 годин залежно від породи та складності стрижки. Для великих порід може знадобитися більше часу. Уточнюйте при записі.</p></div>
         </div>
-        <div class="dc-faq-item reveal" style="--reveal-i:5">
+        <div class="dc-faq-item" style="--reveal-i:5">
           <button class="dc-faq-q">
             Чи є знижки при регулярних відвідуваннях?
             <span class="dc-faq-chevron">
@@ -2115,41 +1990,64 @@
     </div>
   </section>
 
-  <!-- ══ CTA / КОНТАКТИ ══ -->
-  <section class="dc-section dc-section-cream" id="контакти">
-    <div class="dc-wrap">
-      <div class="dc-cta-band reveal">
-        <div>
-          <h2>Готові до запису? 🐾</h2>
-          <p>Залиште заявку онлайн або телефонуйте — відповімо швидко!</p>
+  <!-- ══ FOOTER ══ -->
+  <footer class="dc-footer footer-interactive-zone" id="контакти">
+
+    <!-- Full-width photo with morphing top edge, CTA overlay, fading into the dark footer -->
+    <div class="foot-photo" role="img" aria-label="Доглянутий пес Dog Care">
+      <div class="foot-photo-img"></div>
+      <svg class="foot-arc" viewBox="0 0 1440 260" preserveAspectRatio="none" aria-hidden="true">
+        <path id="footArcPath" d="M0,160 Q720,18 1440,160 L1440,0 L0,0 Z" fill="#ffffff"></path>
+      </svg>
+      <div class="foot-photo-tint"></div>
+      <!-- Desktop CTA overlaid on the photo (hidden ≤900px) -->
+      <div class="foot-photo-cta">
+        <h2 class="foot-cta-h">Готові подарувати<br>улюбленцю турботу?</h2>
+        <div class="foot-cta-contact">
+          <div class="foot-phones">
+            <a href="tel:+380667235102" class="foot-phone">+380 66 723 51 02</a>
+            <a href="tel:+380989013988" class="foot-phone">+380 98 901 39 88</a>
+          </div>
+          <div class="foot-cmeta">Instagram: @dog_care_grooming_if</div>
+          <div class="foot-cmeta">📍 вул. Молодіжка, 40, Івано-Франківськ</div>
         </div>
-        <div class="dc-cta-contacts" id="grm-contacts">
-          <a href="tel:+380667235102" class="dc-cta-phone">+380 66 723 51 02</a>
-          <a href="tel:+380989013988" class="dc-cta-phone">+380 98 901 39 88</a>
-          <div class="dc-cta-social">Instagram: @dog_care_grooming_if</div>
-          <div class="dc-cta-social">📍 вул. Молодіжка, 40, Івано-Франківськ</div>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:12px;">
-          <button onclick="bkOpen()" class="dc-btn dc-btn-primary" style="justify-content:center;">
+        <div class="foot-cbtns">
+          <button type="button" class="foot-cta-btn" onclick="bkOpen()">
             Записатися
-            <span class="dc-btn-arrow">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
+            <span class="foot-cta-arr"><svg width="16" height="16" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           </button>
-          <a id="grm-ig-btn" href="https://www.instagram.com/dog_care_grooming_if" target="_blank" class="dc-btn dc-btn-light" style="justify-content:center;">Instagram</a>
+          <a href="https://www.instagram.com/dog_care_grooming_if" target="_blank" rel="noopener" class="foot-cta-btn2">Instagram</a>
         </div>
+        <div class="foot-cta-line" aria-hidden="true"></div>
       </div>
     </div>
-  </section>
 
-  <!-- ══ FOOTER ══ -->
-  <footer class="dc-footer">
-    <div class="dc-wrap">
-      <div class="dc-footer-grid">
-        <!-- Logo + desc + socials -->
-        <div>
-          <div class="dc-footer-logo">
-            <svg height="36" viewBox="0 0 555 121" fill="#FFD23F" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0">
+    <!-- Dark body -->
+    <div class="foot-dark">
+      <div class="dc-wrap">
+        <div class="foot-cta-dark">
+          <h2 class="foot-cta-h">Готові подарувати<br>улюбленцю турботу?</h2>
+          <div class="foot-cta-contact">
+            <div class="foot-phones">
+              <a href="tel:+380667235102" class="foot-phone">+380 66 723 51 02</a>
+              <a href="tel:+380989013988" class="foot-phone">+380 98 901 39 88</a>
+            </div>
+            <div class="foot-cmeta">Instagram: @dog_care_grooming_if</div>
+            <div class="foot-cmeta">📍 вул. Молодіжка, 40, Івано-Франківськ</div>
+          </div>
+          <div class="foot-cbtns">
+            <button type="button" class="foot-cta-btn" onclick="bkOpen()">
+              Записатися
+              <span class="foot-cta-arr"><svg width="16" height="16" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </button>
+            <a href="https://www.instagram.com/dog_care_grooming_if" target="_blank" rel="noopener" class="foot-cta-btn2">Instagram</a>
+          </div>
+        </div>
+        <div class="foot-divider" aria-hidden="true"></div>
+        <div class="foot-grid">
+          <div class="reveal" style="--reveal-i:0">
+            <div class="foot-logo">
+              <span class="foot-logo-name"><svg height="30" viewBox="0 0 555 121" fill="#FFD23F" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0">
               <path d="M134.484 17.6875H122.319C122.592 15.6577 123.427 13.7474 123.699 11.7177H110.836V0C108.348 0.426409 105.861 2.11499 103.952 3.70123C97.8534 8.73286 95.2294 16.4423 95.2294 24.1348V32.4071C95.2294 34.4368 95.4004 36.0572 94.0194 37.6946C89.9994 42.4192 84.0016 45.6258 78.4814 48.2183C62.3807 55.7743 42.4977 58.1963 26.823 48.2525C15.2373 40.9012 8.43924 29.0299 3.63464 16.5447C2.88494 17.5339 2.56124 18.8302 2.18644 19.9901C1.38564 22.4462 0.72114 25.0046 0.36344 27.5801C-0.36926 32.7312 -0.0625603 38.1039 1.91384 42.982C7.22964 56.1154 22.9895 61.8976 36.2448 60.226C34.4729 61.5905 32.7692 62.8527 31.338 64.5925C26.6867 70.2552 26.0563 77.3336 26.1415 84.3608C26.1755 87.4309 27.7601 90.7399 26.823 93.793C26.4311 95.0722 25.5281 96.3002 24.3184 96.8802C23.4325 97.3066 22.325 97.0337 21.7628 97.9718C19.8886 101.11 18.713 104.931 17.2307 108.274C15.4418 112.316 13.1246 116.444 11.915 120.691H27.0615C27.0615 119.633 27.1637 118.508 26.9422 117.467C26.3118 114.533 24.0629 112.657 21.3198 111.719C24.3525 108.734 27.8964 106.159 31.1846 103.498C32.4625 102.458 34.7626 101.178 35.5293 99.7115C35.8359 99.1145 35.5804 98.347 35.5463 97.7159C35.4952 96.3514 35.4781 94.9357 35.7167 93.5712C36.6026 88.2496 74.9716 74.7922 86.6424 91.9679C87.9544 93.4859 90.4074 96.0956 92.4864 96.4537C93.2534 96.5902 94.0714 96.1979 94.7864 95.9591L99.1484 94.5093C104.634 92.6843 110.256 91.0128 115.674 89.0001C114.414 92.9913 114.942 97.7841 119.576 99.1657C121.297 99.6774 122.881 99.4898 124.619 99.3533V76.0714C120.786 76.0714 116.663 76.7536 112.914 77.453C115.027 75.0139 117.157 72.8307 118.588 69.8629C122.66 61.4882 121.552 51.5614 118.792 42.965C117.855 40.0654 116.254 37.3534 115.419 34.4539C116.407 34.4539 117.702 34.2321 118.622 34.5903C120.036 35.1361 121.161 36.8929 122.541 37.6946C125.607 39.4684 129.032 40.0995 132.405 38.8203C138.692 36.4495 141.214 29.644 140.481 23.4013C140.328 22.0709 140.055 18.9496 139.681 17.6533H134.484V17.6875Z"/>
               <path d="M49.0743 120.657H64.2209C63.5564 115.506 59.6037 111.805 54.356 111.686C55.3102 108.189 57.4399 104.795 59.3992 101.81C60.3874 100.309 66.9469 89.3412 67.407 87.6014C56.5369 85.7934 45.1727 90.7909 43.1793 93.0253C42.2252 93.6564 46.655 107.302 46.9106 108.718C47.6261 112.675 48.5632 116.666 49.0743 120.657ZM122.508 120.896C122.508 117.246 120.395 114.193 116.766 112.76C115.539 112.283 111.995 112.453 111.552 110.935C110.768 109.861 108.383 98.6199 107.412 95.1745C104.805 95.3962 98.3645 97.6988 98.1085 98.4322C97.9385 98.9269 98.9605 101.605 99.1315 102.049C99.5405 103.123 100.001 104.181 100.41 105.272C101.807 108.957 103.34 112.607 104.72 116.308C105.333 118.321 105.572 118.9 105.981 120.913H122.508V120.896Z"/>
               <path d="M95.2123 31.1442C95.2123 31.1442 113.221 37.1993 117.259 40.73C123.461 46.1539 129.117 52.2261 122.899 69.9818C117.736 53.8635 100.306 39.2119 93.7983 37.9156C93.0313 37.7451 93.0143 36.8411 93.5083 35.6471C94.0023 34.4532 93.4913 30.6837 95.2123 31.1442Z"/>
@@ -2160,61 +2058,66 @@
               <path d="M447.02 37.8496L430.044 37.8115C418.219 37.8115 411.24 41.8975 409.064 50.0693L401.053 80.0835C400.977 80.3522 400.939 80.6567 400.939 81.0395C400.939 81.4201 401.091 81.803 401.474 82.2978C401.817 82.7567 402.428 83.0232 403.23 83.0232H409.447C410.248 83.0232 411.048 82.7567 411.773 82.1836C412.498 81.6104 412.993 80.9231 413.184 80.0455L415.322 72.102L437.751 72.1781L437.713 80.1216C437.713 80.9993 437.979 81.6866 438.552 82.2597C439.123 82.8329 439.81 83.1015 440.688 83.1015H446.601C447.4 83.1015 448.126 82.8329 448.699 82.2597C449.27 81.6866 449.574 80.9992 449.574 80.1977L449.691 40.7892C449.691 40.0258 449.422 39.3384 448.927 38.7272C448.43 38.1541 447.783 37.8496 447.02 37.8496ZM437.751 63.2428L417.686 63.1667L420.509 53.047C421.042 51.0992 422.072 49.5723 423.561 48.426C425.047 47.2819 426.841 46.7088 428.862 46.7088L437.865 46.7468L437.751 63.2428Z"/>
               <path d="M498.431 71.1124C497.056 68.972 495.836 67.3309 494.768 66.1846C493.7 65.0406 492.518 64.2749 491.26 63.7801C499.192 62.2509 503.16 58.4337 503.16 52.2857C503.16 47.8931 501.635 44.3803 498.583 41.7832C495.532 39.1862 491.564 37.8899 486.758 37.8496L460.742 37.7734C459.943 37.7734 459.217 38.0801 458.644 38.6533C458.073 39.2242 457.807 39.9518 457.807 40.7534L457.69 80.0477C457.69 80.8492 457.997 81.5746 458.568 82.1477C459.141 82.7209 459.867 83.0254 460.666 83.0254H466.579C467.38 83.0254 468.106 82.7589 468.677 82.1477C469.25 81.5746 469.554 80.8873 469.554 80.0477L469.592 66.4914L477.298 66.5294C480.426 66.5294 483.097 68.2847 485.271 71.7213L490.611 80.1238C491.105 80.9634 491.831 81.6507 492.785 82.2238C493.738 82.797 494.616 83.1015 495.418 83.1015L502.969 83.1396C504.037 83.1396 504.572 82.6828 504.572 81.803C504.572 81.3082 504.42 80.7731 504.075 80.1999L498.431 71.1124ZM488.817 56.4097C487.179 57.2493 485.271 57.7083 483.097 57.6702L469.668 57.6322L469.706 46.7871L483.135 46.8252C485.309 46.8252 487.217 47.2819 488.855 48.1237C490.497 49.0013 491.336 50.376 491.336 52.2477C491.336 54.1171 490.497 55.5321 488.817 56.4097Z"/>
               <path d="M552.014 46.8229C552.816 46.8229 553.541 46.5565 554.112 45.9453C554.685 45.3721 554.99 44.6848 554.99 43.8452V40.8653C554.99 40.0638 554.723 39.3384 554.112 38.7652C553.541 38.1921 552.854 37.8876 552.014 37.8876L515.662 37.7734C514.86 37.7734 514.137 38.0399 513.564 38.613C512.991 39.1862 512.686 39.8735 512.686 40.675L512.572 79.9693C512.572 80.847 512.877 81.5343 513.45 82.1455C514.021 82.7187 514.746 83.0254 515.548 83.0254L551.748 83.1396C552.549 83.1396 553.273 82.8709 553.846 82.2597C554.417 81.6888 554.723 81.0014 554.723 80.1596V77.1439C554.723 76.3423 554.455 75.617 553.884 75.0438C553.311 74.4707 552.626 74.2043 551.824 74.2043L524.436 74.1259L524.474 64.81L548.123 64.8861C548.925 64.8861 549.65 64.6174 550.221 64.0085C550.794 63.4353 551.099 62.748 551.099 61.9061V58.9285C551.099 58.127 550.832 57.4016 550.221 56.8284C549.65 56.2553 548.963 55.9508 548.123 55.9508L524.474 55.8724L524.512 46.7087L552.014 46.8229Z"/>
-            </svg>
+            </svg></span>
+              <span class="foot-logo-sub">grooming</span>
+            </div>
+            <p class="foot-desc">Грумінг-салон у самому серці міста. Прозоро, дбайливо і з любов'ю до кожного улюбленця.</p>
+            <div class="foot-socials">
+              <a href="https://www.instagram.com/dog_care_grooming_if" target="_blank" rel="noopener" class="foot-social" aria-label="Instagram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg>
+              </a>
+              <a href="viber://chat?number=%2B380989013988" class="foot-social" aria-label="Viber">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.006 0h-.016C5.37 0 0 5.37 0 12c0 2.102.548 4.073 1.508 5.785L.527 23.473a.527.527 0 0 0 .648.648l5.688-.981A11.955 11.955 0 0 0 12.006 24C18.63 24 24 18.63 24 12S18.63 0 12.006 0zm5.543 16.538c-.245.686-.942 1.261-1.707 1.428-.455.097-.906.145-1.358.145-1.254 0-2.468-.317-3.604-.94-1.63-.894-3.083-2.231-4.122-3.803C6.04 12.3 5.5 10.934 5.5 9.604c0-.792.275-1.52.792-2.083.455-.497.999-.76 1.574-.76.222 0 .446.047.644.14.253.115.474.305.614.555l1.262 2.24c.166.295.19.655.064.96-.094.224-.243.41-.437.547l-.274.19c-.095.067-.154.173-.16.29-.005.117.043.23.131.31.27.246.53.505.78.756.25.25.51.51.756.78.08.088.193.136.31.131.117-.006.223-.065.29-.16l.19-.274c.137-.194.323-.343.547-.437.305-.126.665-.102.96.064l2.24 1.262c.25.14.44.361.555.614.093.198.14.422.14.644 0 .282-.058.55-.174.8z"/></svg>
+              </a>
+              <a href="https://t.me/dogcare888" target="_blank" rel="noopener" class="foot-social" aria-label="Telegram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              </a>
+            </div>
           </div>
-          <p class="dc-footer-desc">Грумінг‑салон у самому серці міста. Прозоро, дбайливо і з любов'ю до кожного улюбленця.</p>
-          <div class="dc-socials">
-            <a href="viber://chat?number=%2B380989013988" class="dc-social" aria-label="Viber">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.006 0h-.016C5.37 0 0 5.37 0 12c0 2.102.548 4.073 1.508 5.785L.527 23.473a.527.527 0 0 0 .648.648l5.688-.981A11.955 11.955 0 0 0 12.006 24C18.63 24 24 18.63 24 12S18.63 0 12.006 0zm5.543 16.538c-.245.686-.942 1.261-1.707 1.428-.455.097-.906.145-1.358.145-1.254 0-2.468-.317-3.604-.94-1.63-.894-3.083-2.231-4.122-3.803C6.04 12.3 5.5 10.934 5.5 9.604c0-.792.275-1.52.792-2.083.455-.497.999-.76 1.574-.76.222 0 .446.047.644.14.253.115.474.305.614.555l1.262 2.24c.166.295.19.655.064.96-.094.224-.243.41-.437.547l-.274.19c-.095.067-.154.173-.16.29-.005.117.043.23.131.31.27.246.53.505.78.756.25.25.51.51.756.78.08.088.193.136.31.131.117-.006.223-.065.29-.16l.19-.274c.137-.194.323-.343.547-.437.305-.126.665-.102.96.064l2.24 1.262c.25.14.44.361.555.614.093.198.14.422.14.644 0 .282-.058.55-.174.8zm-2.47-6.093a.527.527 0 0 1-.527-.527c0-1.12-.435-2.173-1.224-2.962-.789-.79-1.838-1.225-2.956-1.225a.527.527 0 0 1 0-1.054c1.4 0 2.716.545 3.705 1.535.989.989 1.535 2.304 1.535 3.706 0 .291-.236.527-.527.527zm-2.105 0a.527.527 0 0 1-.527-.527c0-1.159-.944-2.103-2.103-2.103a.527.527 0 0 1 0-1.054c1.742 0 3.157 1.415 3.157 3.157a.527.527 0 0 1-.527.527z"/></svg>
-            </a>
-            <a href="https://t.me/dogcare888" target="_blank" rel="noopener" class="dc-social" aria-label="Telegram">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-            </a>
+
+          <div class="reveal" style="--reveal-i:1">
+            <h4 class="foot-h">Послуги</h4>
+            <ul class="foot-links">
+              <li><a href="#послуги">Гігієнічний догляд</a></li>
+              <li><a href="#послуги">Повний комплекс</a></li>
+              <li><a href="#послуги">Грумінг котів</a></li>
+              <li><a href="#послуги">Додаткові послуги</a></li>
+            </ul>
+          </div>
+
+          <div class="reveal" style="--reveal-i:2">
+            <h4 class="foot-h">Навігація</h4>
+            <ul class="foot-links">
+              <li><a href="index.html">Головна</a></li>
+              <li><a href="#послуги">Ціни</a></li>
+              <li><a href="#процес">Як це працює</a></li>
+              <li><a href="#галерея">Галерея</a></li>
+              <li><a href="#контакти">Контакти</a></li>
+            </ul>
+          </div>
+
+          <div class="reveal" style="--reveal-i:3">
+            <h4 class="foot-h">Контакти</h4>
+            <ul class="foot-links">
+              <li><a href="tel:+380667235102">+380 66 723 51 02</a></li>
+              <li><a href="tel:+380989013988">+380 98 901 39 88</a></li>
+              <li><a href="mailto:dogcare8888@gmail.com">dogcare8888@gmail.com</a></li>
+              <li><a href="https://maps.google.com/?q=вул.+Молодіжна+40,+Івано-Франківськ" target="_blank" rel="noopener">вул. Молодіжна 40, Івано-Франківськ</a></li>
+            </ul>
           </div>
         </div>
-        <!-- Послуги -->
-        <div>
-          <h4>Послуги</h4>
-          <ul>
-            <li><a href="#послуги">Гігієнічний догляд</a></li>
-            <li><a href="#послуги">Повний комплекс</a></li>
-            <li><a href="#послуги">Грумінг котів</a></li>
-            <li><a href="#послуги">Додаткові послуги</a></li>
-          </ul>
-        </div>
-        <!-- Навігація -->
-        <div>
-          <h4>Навігація</h4>
-          <ul>
-            <li><a href="index.html">Головна</a></li>
-            <li><a href="#послуги">Ціни</a></li>
-            <li><a href="#процес">Як це працює</a></li>
-            <li><a href="#галерея">Галерея</a></li>
-            <li><a href="#контакти">Контакти</a></li>
-          </ul>
-        </div>
-        <!-- Контакти -->
-        <div>
-          <h4>Контакти</h4>
-          <ul>
-            <li><a href="tel:+380667235102">+380 66 723 51 02</a></li>
-            <li><a href="tel:+380989013988">+380 98 901 39 88</a></li>
-            <li><a href="mailto:dogcare8888@gmail.com">dogcare8888@gmail.com</a></li>
-            <li><a href="https://maps.google.com/?q=вул.+Молодіжна+40,+Івано-Франківськ" target="_blank" rel="noopener">вул. Молодіжна 40, Івано-Франківськ</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="dc-footer-bottom">
-        <div>© 2026 Dog Care. Усі права захищені.</div>
-        <div style="display:flex;gap:24px;align-items:center;">
-          <a href="#">Політика конфіденційності</a>
-          <a href="#">Умови</a>
-          <a href="admin.html" target="_blank" rel="noopener" style="opacity:.35;font-size:11px;letter-spacing:.03em">адмін</a>
+
+        <div class="foot-bottom">
+          <div>© 2026 Dog Care grooming. All rights reserved.</div>
+          <div class="foot-bottom-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms</a>
+            <a href="admin.html" target="_blank" rel="noopener" class="foot-admin">адмін</a>
+          </div>
         </div>
       </div>
     </div>
   </footer>
-
 </div><!-- /.dc-app -->
 
 <!-- ══ BOOKING MODAL ══ -->
@@ -2380,6 +2283,32 @@
     apply();
   })();
 
+  /* ── Bento: cards glide in from their sides, scrubbed to scroll ── */
+  (function () {
+    const cells = Array.prototype.slice.call(document.querySelectorAll('.bento .bento-cell'));
+    if (!cells.length) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+    gsap.registerPlugin(ScrollTrigger);
+    cells.forEach(function (cell) {
+      const dir = cell.getAttribute('data-dir');
+      const from = { autoAlpha: 0, scale: 0.92 };
+      if (dir === 'left') from.xPercent = -115;
+      else if (dir === 'right') from.xPercent = 115;
+      else from.yPercent = 120;
+      gsap.fromTo(cell, from, {
+        xPercent: 0, yPercent: 0, autoAlpha: 1, scale: 1, ease: 'none',
+        scrollTrigger: {
+          trigger: '.bento',
+          start: 'top 88%',
+          end: 'top 38%',
+          scrub: 0.8
+        }
+      });
+    });
+  })();
+
   /* ── Hero divider: a single arc that bends (up → down) on scroll ── */
   (function () {
     const path = document.getElementById('heroWavePath');
@@ -2475,8 +2404,9 @@
     }
   })();
 
-  /* ── Groomer text: line-by-line reveal (grouped by paragraph), persistent ── */
+  /* ── Groomer text: now uses .scrub-rise (same as headings); line-by-line reveal disabled ── */
   (function () {
+    return;
     const col = document.querySelector('#grumer .gr-text-col');
     if (!col) return;
     const paras = Array.from(col.querySelectorAll('.gr-text'));
@@ -2720,53 +2650,53 @@
 
   const INFO_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
 
-  function renderPanel(cat, active) {
-    /* Додаткові послуги */
-    if (cat.id === 'extra') {
-      const groupsHtml = (cat.groups||[]).map(g => {
-        const gIconSvg = g.icon === '🛁' ? PANEL_ICONS.hygiene : PANEL_ICONS.full;
-        return `<div class="dc-extras-group">
-          <div class="dc-extras-group-head">
-            <span class="dc-extras-group-icon">${gIconSvg}</span>
-            <span class="dc-extras-group-title">${esc(g.title)}</span>
-          </div>
-          ${g.note ? `<p class="dc-extras-group-note">${esc(g.note)}</p>` : ''}
-          <ul class="dc-extras-rows">
-            ${(g.rows||[]).map(r => `<li><span class="dc-extras-row-name">${esc(r.name)}</span><span class="dc-extras-row-price">${esc(r.price)}</span></li>`).join('')}
-          </ul>
-        </div>`;
-      }).join('');
-      const addRows = (cat.rows||[]).map(r =>
-        `<div class="dc-add-card"><div class="dc-add-icon">${PANEL_ICONS.full}</div><div class="dc-add-name">${esc(r.name)}</div><div class="dc-add-price">${esc(r.price)}</div></div>`
-      ).join('');
-      return `<div class="dc-price-panel${active?' active':''}">
-        ${groupsHtml ? `<div class="dc-extras-groups">${groupsHtml}</div>` : ''}
-        ${addRows ? `<div class="dc-add-grid" style="margin-top:24px">${addRows}</div>` : ''}
-      </div>`;
+  var PKG_CHK = '<svg class="pkg-chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>';
+
+  function renderCard(cat, i) {
+    var icon  = PANEL_ICONS[cat.id] || PANEL_ICONS.full;
+    var incl  = (cat.includes||[]).map(function(x){ return '<li>' + PKG_CHK + esc(x) + '</li>'; }).join('');
+    function rowLi(r){ return '<li><span class="nm">'+esc(r.name)+'</span><span class="pr">'+esc(r.price)+'</span></li>'; }
+    function subBlock(title, rws){ return '<div class="pkg-subblock"><div class="pkg-subblock-title">'+esc(title)+'</div><ul class="pkg-rows">'+(rws||[]).map(rowLi).join('')+'</ul></div>'; }
+    var listHtml = '';
+    if (cat.groups && cat.groups.length) {
+      var blocks = cat.groups.map(function(g){ return subBlock(g.title, g.rows); });
+      if (cat.rows && cat.rows.length) blocks.push(subBlock('Окремі послуги', cat.rows));
+      listHtml = '<div class="pkg-subblocks">' + blocks.join('') + '</div>';
+    } else if (cat.rows && cat.rows.length) {
+      listHtml = '<ul class="pkg-rows">' + cat.rows.map(rowLi).join('') + '</ul>';
     }
 
-    /* Основні категорії */
-    const rowsHtml = (cat.rows||[]).map(r =>
-      `<div class="gp-row"><span class="gp-row-name">${esc(r.name)}</span><span class="gp-row-price">${esc(r.price)}</span></div>`
-    ).join('');
-    const chipsHtml = (cat.includes||[]).map(inc =>
-      `<span class="gp-chip">${esc(inc)}</span>`
-    ).join('');
+    return '<div class="pkg-cell"><article class="pkg-card">' +
+      '<div class="pkg-card-top"><span class="pkg-icon">'+icon+'</span></div>' +
+      '<h3 class="pkg-name">'+esc(cat.label)+'</h3>' +
+      (cat.desc ? '<p class="pkg-cat-desc">'+esc(cat.desc)+'</p>' : '') +
+      (incl ? '<ul class="pkg-incl">'+incl+'</ul>' : '') +
+      listHtml +
+      (cat.note ? '<div class="pkg-note">'+INFO_SVG+'<span>'+esc(cat.note)+'</span></div>' : '') +
+      '<button type="button" class="pkg-bookbtn" onclick="bkOpen()">Записатися ' +
+        '<span class="arr"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>' +
+    '</article></div>';
+  }
 
-    return `<div class="dc-price-panel${active?' active':''}">
-      <div class="gp-card">
-        <div class="gp-card-head">
-          <div class="gp-card-icon">${PANEL_ICONS[cat.id]||PANEL_ICONS.full}</div>
-          <div>
-            <div class="gp-card-title">${esc(cat.label)}</div>
-            <div class="gp-card-desc">${esc(cat.desc||'')}</div>
-          </div>
-        </div>
-        ${chipsHtml ? `<div class="gp-includes"><span class="gp-includes-label">Що входить</span><div class="gp-chips">${chipsHtml}</div></div>` : ''}
-        <div class="gp-rows">${rowsHtml}</div>
-        ${cat.note ? `<div class="gp-note">${INFO_SVG}${esc(cat.note)}</div>` : ''}
-      </div>
-    </div>`;
+  function initPkgScroll(N) {
+    var stage = document.getElementById('pkg-cards');
+    if (!stage) return;
+    var cells = stage.querySelectorAll('.pkg-cell');
+    if (!cells.length) return;
+
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+      cells.forEach(function(c){ c.classList.add('is-in'); });
+      return;
+    }
+    /* Each card reveals (blur + rise + scale) scrubbed to scroll as it comes up */
+    gsap.registerPlugin(ScrollTrigger);
+    cells.forEach(function(cell){
+      gsap.fromTo(cell,
+        { autoAlpha: 0, y: 60, scale: 0.97, filter: 'blur(12px)' },
+        { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', ease: 'none',
+          scrollTrigger: { trigger: cell, start: 'top 92%', end: 'top 58%', scrub: 0.7 } });
+    });
   }
 
   function initGroomingPage() {
@@ -2805,45 +2735,11 @@
       animateStats(statsEl);
     }
 
-    /* Pricing tabs + panels — завжди рендеримо */
-    const mainCats = grm;
-    const extraCat = null;
-    const wrap = document.getElementById('grm-pricing-section-wrap');
-
-    if (wrap && mainCats.length) {
-      const tabsBar = wrap.querySelector('.dc-price-tabs');
-      /* Запам'ятовуємо активний таб перед перерендером */
-      const activeBtnIdx = tabsBar
-        ? [...tabsBar.querySelectorAll('.dc-price-tab')].findIndex(b => b.classList.contains('active'))
-        : 0;
-      const activeIdx = activeBtnIdx >= 0 ? activeBtnIdx : 0;
-
-      if (tabsBar) {
-        tabsBar.innerHTML = mainCats.map((cat, i) =>
-          `<button class="dc-price-tab${i===activeIdx?' active':''}" data-idx="${i}">${TAB_ICONS[cat.id]||''}${esc(cat.label)}</button>`
-        ).join('');
-      }
-      wrap.querySelectorAll('.dc-price-panel').forEach(p => p.remove());
-      mainCats.forEach((cat, i) => {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = renderPanel(cat, i === activeIdx);
-        wrap.appendChild(tmp.firstElementChild);
-      });
-      if (tabsBar) {
-        const getPanels = () => wrap.querySelectorAll('.dc-price-panel');
-        tabsBar.querySelectorAll('.dc-price-tab').forEach(btn => {
-          btn.addEventListener('click', () => {
-            tabsBar.querySelectorAll('.dc-price-tab').forEach(b => b.classList.remove('active'));
-            getPanels().forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-            getPanels()[parseInt(btn.dataset.idx)].classList.add('active');
-          });
-        });
-      }
-    }
-
-    /* Additional services — rendered inside tab panel via renderPanel */
-    if (false) {
+    /* Pricing — premium package cards (sticky left, cards scroll up) */
+    const stage = document.getElementById('pkg-cards');
+    if (stage && grm.length) {
+      stage.innerHTML = grm.map(renderCard).join('');
+      initPkgScroll(grm.length);
     }
 
     /* CTA contacts */
@@ -2964,8 +2860,12 @@
   }
 
   function initGalleryScroll() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+    var t0 = document.getElementById('grm-photos-track');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+      if (t0) t0.style.visibility = 'visible'; /* no animation: show statically */
+      return;
+    }
 
     gsap.registerPlugin(ScrollTrigger);
 
@@ -2979,10 +2879,10 @@
     }
     var scene   = document.querySelector('.grm-sticky-scene');
     var track   = document.getElementById('grm-photos-track');
-    if (!wrapper || !scene || !track) return;
+    if (!wrapper || !scene || !track) { if (t0) t0.style.visibility = 'visible'; return; }
 
     var cards = Array.from(track.querySelectorAll('.grm-photo-card'));
-    if (!cards.length) return;
+    if (!cards.length) { track.style.visibility = 'visible'; return; }
 
     var vw         = window.innerWidth;
     var sc         = vw < 480 ? 0.56 : vw < 768 ? 0.72 : 1.0;
@@ -2991,11 +2891,15 @@
     var endX       = -(trackWidth + vw * 0.08);
     var totalDur   = 2;
 
+    /* Off-screen start position; CSS keeps the track hidden until positions are computed */
+    gsap.set(track, { x: startX });
+
     var tl = gsap.timeline({
       scrollTrigger: {
         trigger:             wrapper,
-        /* pin handled by CSS sticky — GSAP only drives the scrub */
-        start:               'top 50%',   /* animation starts when section top hits viewport centre */
+        /* pin handled by CSS sticky — start the scrub exactly when the scene pins (top top)
+           so cards only move while pinned → no jump during the entrance */
+        start:               'top top',
         end:                 'bottom bottom',
         scrub:               1.2,
         invalidateOnRefresh: true,
@@ -3035,14 +2939,18 @@
           duration: halfDur, ease: 'sine.inOut' },
         peakT - halfDur
       );
-      /* fall: peak → rest */
+      /* fall: peak → rest — immediateRender:false so it doesn't force the peak state at t=0 */
       tl.fromTo(card,
         { y: maxY, rotation: peakRot, scale: 1.22 },
         { y: 0,    rotation: baseRot, scale: 1,
-          duration: halfDur, ease: 'sine.inOut' },
+          duration: halfDur, ease: 'sine.inOut', immediateRender: false },
         peakT
       );
     });
+
+    /* Compute positions for the current scroll, THEN reveal — no first-frame jump */
+    ScrollTrigger.refresh();
+    gsap.set(track, { visibility: 'visible' });
   }
 
   /* Лайтбокс */
@@ -3243,19 +3151,135 @@
     _lastTap = now;
   }, { passive: false });
 
-  // Stamp animation on scroll into view
-  (function() {
-    var stampImg = document.querySelector('.dc-rules-stamp img');
-    if (!stampImg) return;
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          stampImg.classList.add('stamp-hit');
-          observer.disconnect();
+  /* ── Scroll-scrubbed reveal (rules blocks + bento heading) ── */
+  (function () {
+    var items = Array.prototype.slice.call(document.querySelectorAll('.scrub-rise'));
+    if (!items.length) return;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+      items.forEach(function (el) { el.style.opacity = 1; });
+      return;
+    }
+    gsap.registerPlugin(ScrollTrigger);
+    items.forEach(function (el) {
+      gsap.fromTo(el,
+        { autoAlpha: 0, y: 64, filter: 'blur(8px)' },
+        { autoAlpha: 1, y: 0, filter: 'blur(0px)', ease: 'none',
+          scrollTrigger: { trigger: el, start: 'top 92%', end: 'top 55%', scrub: 0.8 } });
+    });
+  })();
+
+  /* ── Footer photo: top edge morphs concave→convex + subtle parallax ── */
+  (function () {
+    var path = document.getElementById('footArcPath');
+    if (!path) return;
+    var svg = path.closest('svg');
+    var photo = document.querySelector('.foot-photo-img');
+    var Y0 = 160, AMP = 150, W = 1440, ticking = false;
+    function update() {
+      ticking = false;
+      var rect = svg.getBoundingClientRect();
+      var vh = window.innerHeight || 1;
+      var p = (vh - rect.top) / vh; p = Math.max(0, Math.min(1, p));
+      var cy = (Y0 + AMP) - (2 * AMP) * p;           // concave → convex
+      path.setAttribute('d', 'M0,' + Y0 + ' Q' + (W/2) + ',' + cy.toFixed(1) + ' ' + W + ',' + Y0 + ' L' + W + ',0 L0,0 Z');
+      if (photo) { var baseY = window.innerWidth <= 900 ? 8 : 30; photo.style.backgroundPositionY = (baseY + (p - 0.5) * 12).toFixed(1) + '%'; }
+    }
+    function onScroll(){ if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  })();
+
+  /* ── Footer mouse-follow trail (desktop only) — crisp circle + solid comet trail, speed-reactive ── */
+  (function () {
+    if (window.matchMedia('(hover: none)').matches) return;
+    var zone = document.querySelector('.footer-interactive-zone');
+    if (!zone) return;
+
+    var canvas = document.createElement('canvas');
+    canvas.className = 'footer-trail-canvas';
+    zone.appendChild(canvas);
+    var ctx = canvas.getContext('2d');
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    function resize() {
+      var r = zone.getBoundingClientRect();
+      canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
+      canvas.style.width = r.width + 'px'; canvas.style.height = r.height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize(); window.addEventListener('resize', resize);
+
+    var MAX = 22;            // trail length (points)
+    var pts = [];            // {x,y}
+    var mx = 0, my = 0, hx = 0, hy = 0, lx = 0, ly = 0;
+    var R = 22, targetR = 22, spSmooth = 0;
+    var BASE_R = 22, MAX_R = 64;   // base circle; grows with speed
+    var active = false, raf = null;
+
+    function step() {
+      var tp = { x: mx, y: my };
+      if (active) {
+        hx += (tp.x - hx) * 0.32;
+        hy += (tp.y - hy) * 0.32;
+        var dx = hx - lx, dy = hy - ly, sp = Math.sqrt(dx * dx + dy * dy);
+        spSmooth += (sp - spSmooth) * 0.15;                 // smooth the speed
+        targetR = Math.min(MAX_R, BASE_R + spSmooth * 1.7);  // faster cursor → bigger circle
+        lx = hx; ly = hy;
+        R += (targetR - R) * 0.12;                            // smooth size change
+        pts.push({ x: hx, y: hy });
+        if (pts.length > MAX) pts.shift();
+      } else if (pts.length) {
+        pts.shift();                                          // retract trail on leave
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (pts.length) {
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#FFD23F'; ctx.fillStyle = '#FFD23F';
+        ctx.lineWidth = R * 2;
+        if (pts.length > 2) {
+          /* smooth flowing curve through point midpoints (no angular jerk) */
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          for (var i = 1; i < pts.length - 1; i++) {
+            var mxp = (pts[i].x + pts[i + 1].x) / 2;
+            var myp = (pts[i].y + pts[i + 1].y) / 2;
+            ctx.quadraticCurveTo(pts[i].x, pts[i].y, mxp, myp);
+          }
+          ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+          ctx.stroke();
+        } else if (pts.length === 2) {
+          ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y); ctx.lineTo(pts[1].x, pts[1].y); ctx.stroke();
         }
-      });
-    }, { threshold: 0.5, rootMargin: '-20% 0px -20% 0px' });
-    observer.observe(stampImg);
+        var h = pts[pts.length - 1];
+        ctx.beginPath(); ctx.arc(h.x, h.y, R, 0, Math.PI * 2); ctx.fill();
+      }
+
+      var moving = Math.abs(tp.x - hx) > 0.3 || Math.abs(tp.y - hy) > 0.3;
+      if (active || moving || pts.length) { raf = requestAnimationFrame(step); }
+      else { ctx.clearRect(0, 0, canvas.width, canvas.height); raf = null; }
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(step); }
+
+    zone.addEventListener('mousemove', function (e) {
+      var r = zone.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; kick();
+    });
+    zone.addEventListener('mouseenter', function (e) {
+      var r = zone.getBoundingClientRect();
+      mx = hx = lx = e.clientX - r.left; my = hy = ly = e.clientY - r.top;
+      pts.length = 0; R = BASE_R; targetR = BASE_R; spSmooth = 0; active = true;
+      canvas.classList.add('is-on'); kick();
+    });
+    zone.addEventListener('mouseleave', function () {
+      active = false; canvas.classList.remove('is-on');
+    });
+
+    /* Hide the circle/trail over interactive elements (links & buttons) */
+    zone.addEventListener('mouseover', function (e) {
+      if (e.target.closest('a, button')) canvas.classList.remove('is-on');
+      else if (active) canvas.classList.add('is-on');
+    });
   })();
 
 </script>

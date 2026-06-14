@@ -138,8 +138,8 @@ function Process() {
     <section className="dc-process dc-section-with-wave" id="process">
       <WaveDivider from="#FFFEF7" variant="double" height={80} />
       {/* Decorative paw clusters on the sides — uploaded PNG assets */}
-      <img className="dc-process-paws dc-process-paws-left" src="./paws-left.png" alt="" aria-hidden="true" />
-      <img className="dc-process-paws dc-process-paws-right" src="./paws-right.png" alt="" aria-hidden="true" />
+      <img className="dc-process-paws dc-process-paws-left" src="./assets/images/paws-left.png" alt="" aria-hidden="true" />
+      <img className="dc-process-paws dc-process-paws-right" src="./assets/images/paws-right.png" alt="" aria-hidden="true" />
       <div className="dc-wrap" style={{ position: "relative", zIndex: 1 }}>
         <SectionHead
           eyebrow="Як ми працюємо"
@@ -156,7 +156,7 @@ function Process() {
               </div>
             </div>
           ))}
-          <img className="dc-process-center" src="./process-dog.png" alt="" />
+          <img className="dc-process-center" src="./assets/images/process-dog.png" alt="" />
         </div>
       </div>
     </section>
@@ -170,7 +170,7 @@ const TRAINERS = [
     badge: "~300 собак",
     photo: "Pavlo",
     spec: "Дресирування з 2016",
-    src: "./team-3.png",
+    src: "./assets/images/team-3.png",
     bio: "З дитинства захоплювався собаками. У 2014 р. закінчив аграрний коледж за спеціальністю «ветеринарія». У 2014–2016 рр. — молодший кінолог‑інструктор ТОВ «Секюрайті». З 2016 року займається дресируванням собак — вивчив близько 300 вихованців.",
     education: [
       "Аграрний коледж — ветеринарія, 2014",
@@ -189,7 +189,7 @@ const TRAINERS = [
     badge: "ЛНУВМ",
     photo: "Taras",
     spec: "Спільна мова з кожною",
-    src: "./team-2.png",
+    src: "./assets/images/team-2.png",
     bio: "Тварини для нього все. Закінчив Рогатинський коледж та Львівський університет за фахом «ветеринарна медицина». 2 роки працював у ветклініці. З 2022 р. займається дресируванням.",
     education: [
       "Рогатинський коледж — ветмедицина",
@@ -208,7 +208,7 @@ const TRAINERS = [
     badge: "Вроцлав",
     photo: "Veronika",
     spec: "Корекція поведінки",
-    src: "./team-1.png",
+    src: "./assets/images/team-1.png",
     bio: "Закінчила курси зоопсихології у м. Вроцлав (Польща). Працювала в собачому притулку та займалася консультаціями, допомагаючи людям виправляти поведінку собак вдома. З 2021 р. — службова кінологія.",
     education: [
       "Курси зоопсихології, Вроцлав, Польща",

@@ -194,7 +194,7 @@ function AboutBlock() {
             </div>
           </div>
           <div className="dc-about-photo">
-            <img className="dc-about-dog" src="./about-dog.png" alt="Школа №1 у Івано-Франківську · 300+ вивчених собак" />
+            <img className="dc-about-dog" src="./assets/images/about-dog.png" alt="Школа №1 у Івано-Франківську · 300+ вивчених собак" />
           </div>
         </div>
       </div>

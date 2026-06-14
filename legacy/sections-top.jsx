@@ -141,7 +141,7 @@ function Hero({ onBook }) {
                 class="dc-hero-slot"
                 fit="contain"
                 placeholder="Перетягніть фото собаки"
-                src="./hero-dog.png"></image-slot>
+                src="./assets/images/hero-dog.png"></image-slot>
               <div className="dc-photo-tag dc-photo-tag-1">
                 <span className="dc-photo-tag-emoji"><PawPrint size={14} /></span>
                 Усі породи

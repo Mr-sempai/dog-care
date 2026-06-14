@@ -419,8 +419,8 @@ function ContactForm() {
   return (
     <section className="dc-section dc-section-yellow dc-section-with-wave dc-contact-section" id="contact">
       <WaveDivider from="#FFFEF7" variant="soft" height={80} flip={true} />
-      <img className="dc-contact-paws dc-contact-paws-left" src="./paws-left.png" alt="" aria-hidden="true" />
-      <img className="dc-contact-paws dc-contact-paws-right" src="./paws-right.png" alt="" aria-hidden="true" />
+      <img className="dc-contact-paws dc-contact-paws-left" src="./assets/images/paws-left.png" alt="" aria-hidden="true" />
+      <img className="dc-contact-paws dc-contact-paws-right" src="./assets/images/paws-right.png" alt="" aria-hidden="true" />
       <div className="dc-wrap" style={{ position: "relative", zIndex: 1 }}>
         <div className="dc-form-card">
           <div className="dc-form-side">

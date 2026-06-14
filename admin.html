@@ -1952,28 +1952,48 @@
         }
       }
 
+      // ── Firestore-backed storage (works on static hosting, like the gallery) ──
+      const SITE_KEYS = ["services", "trainers", "pricing", "socials", "grooming", "grooming_meta"];
+      function fsContent() {
+        return firebase.firestore().collection("site_content");
+      }
+
       async function loadDB() {
         if (!USE_SERVER) {
           loadFromLocalStorage();
           return;
         }
+        const lsGet = (k, def) => {
+          try { return JSON.parse(localStorage.getItem(k)) || def; } catch (e) { return def; }
+        };
         try {
-          const r = await fetch("/api/data");
-          const d = await r.json();
-          DB.services = d.services || JSON.parse(JSON.stringify(DEFAULT_SERVICES));
-          DB.trainers = (d.trainers || JSON.parse(JSON.stringify(DEFAULT_TRAINERS))).map((t) => ({
+          const snaps = await Promise.all(SITE_KEYS.map((k) => fsContent().doc(k).get()));
+          const d = {};
+          snaps.forEach((s, i) => {
+            const v = s.exists ? s.data() : null;
+            if (v && typeof v.json === "string") {
+              try { d[SITE_KEYS[i]] = JSON.parse(v.json); } catch (e) {}
+            }
+          });
+          const cloudEmpty = SITE_KEYS.every((k) => d[k] === undefined);
+
+          DB.services = d.services || lsGet("dc_services", JSON.parse(JSON.stringify(DEFAULT_SERVICES)));
+          DB.trainers = (d.trainers || lsGet("dc_trainers", JSON.parse(JSON.stringify(DEFAULT_TRAINERS)))).map((t) => ({
             ...t,
             src: t.src && t.src.length > 200000 ? "" : t.src || "",
           }));
-          const rawPricing = d.pricing;
-          DB.pricing = rawPricing
-            ? migratePricing(rawPricing)
-            : JSON.parse(JSON.stringify(DEFAULT_PRICING));
-          DB.socials = d.socials || JSON.parse(JSON.stringify(DEFAULT_SOCIALS));
-          DB.grooming = d.grooming || JSON.parse(JSON.stringify(DEFAULT_GROOMING));
-          DB.grooming_meta = d.grooming_meta || JSON.parse(JSON.stringify(DEFAULT_GROOMING_META));
+          const rawPricing = d.pricing || lsGet("dc_pricing", null);
+          DB.pricing = rawPricing ? migratePricing(rawPricing) : JSON.parse(JSON.stringify(DEFAULT_PRICING));
+          DB.socials = d.socials || lsGet("dc_socials", JSON.parse(JSON.stringify(DEFAULT_SOCIALS)));
+          const rawGrm = d.grooming || lsGet("dc_grooming", null);
+          DB.grooming = rawGrm ? migrateGrooming(rawGrm) : JSON.parse(JSON.stringify(DEFAULT_GROOMING));
+          DB.grooming_meta = d.grooming_meta || lsGet("dc_grooming_meta", JSON.parse(JSON.stringify(DEFAULT_GROOMING_META)));
+
+          saveToLocalStorage();
+          // First run on the cloud: seed Firestore with current local/default data
+          if (cloudEmpty) { try { await saveDB(); } catch (e) {} }
         } catch (e) {
-          console.error("loadDB error, falling back to localStorage:", e);
+          console.error("loadDB Firestore error, falling back to localStorage:", e);
           loadFromLocalStorage();
         }
       }
@@ -1982,13 +2002,19 @@
         saveToLocalStorage();
         if (!USE_SERVER) return;
         try {
-          await fetch("/api/data", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(DB),
-          });
+          const now = firebase.firestore.FieldValue.serverTimestamp();
+          await Promise.all(
+            SITE_KEYS.map((k) =>
+              fsContent().doc(k).set({ json: JSON.stringify(DB[k]), updatedAt: now }),
+            ),
+          );
         } catch (e) {
-          // server unavailable — localStorage already saved above, continue silently
+          console.error("saveDB Firestore error:", e);
+          alert(
+            "Не вдалось зберегти у хмару (Firestore): " +
+              e.message +
+              "\n\nПеревір правила безпеки Firestore (потрібен дозвіл на запис).",
+          );
         }
       }
 
@@ -2328,7 +2354,12 @@
         toast("🗑 Видалено з команди");
       }
 
-      // ═══════════════════ GROOMING PHOTOS (Firebase) ═══════════════════
+      // ═══════════════════ GROOMING PHOTOS (Cloudinary + Firestore) ═══════════════════
+      // ↓↓↓ ВСТАВ СВОЇ ДАНІ З CLOUDINARY ↓↓↓
+      const CLOUDINARY_CLOUD_NAME = "dfmxtawwk";
+      const CLOUDINARY_PRESET = "dog_care_unsigned";
+      // ↑↑↑ ───────────────────────────── ↑↑↑
+
       async function renderGrmPhotos() {
         const grid = document.getElementById("grm-photo-grid");
         if (!grid) return;
@@ -2371,12 +2402,23 @@
           canvas.getContext("2d").drawImage(img, 0, 0, w, h);
           URL.revokeObjectURL(objUrl);
           const blob = await new Promise(r => canvas.toBlob(r, "image/jpeg", 0.82));
-          const path = "grooming/" + Date.now() + "_" + file.name;
-          const ref = firebase.storage().ref(path);
-          await ref.put(blob);
-          const url = await ref.getDownloadURL();
+          // → Cloudinary (unsigned upload, без картки)
+          const fd = new FormData();
+          fd.append("file", blob);
+          fd.append("upload_preset", CLOUDINARY_PRESET);
+          const resp = await fetch(
+            "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/image/upload",
+            { method: "POST", body: fd }
+          );
+          const data = await resp.json();
+          if (!data.secure_url) {
+            alert("Помилка Cloudinary: " + ((data.error && data.error.message) || "перевір cloud name / назву пресета"));
+            continue;
+          }
           await firebase.firestore().collection("grm_photos").add({
-            url, path, name: file.name,
+            url: data.secure_url,
+            path: data.public_id,
+            name: file.name,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
           uploaded++;
@@ -2388,8 +2430,9 @@
 
       async function deleteGrmPhoto(id, path) {
         if (!confirm("Видалити фото?")) return;
+        // прибираємо лише запис у Firestore (з сайту фото зникає одразу);
+        // сам файл лишається в Cloudinary — видалити його можна вручну в дашборді Cloudinary
         await firebase.firestore().collection("grm_photos").doc(id).delete();
-        try { await firebase.storage().ref(path).delete(); } catch(e) {}
         await renderGrmPhotos();
         toast("🗑 Фото видалено");
       }
